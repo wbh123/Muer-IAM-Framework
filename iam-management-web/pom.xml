@@ -1,17 +1,17 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>com.wust.iam</groupId>
+        <groupId>io.github.iamstarter</groupId>
         <artifactId>iam-parent</artifactId>
         <version>0.1.0-SNAPSHOT</version>
     </parent>
     <artifactId>iam-management-web</artifactId>
 
     <dependencies>
-        <dependency><groupId>com.wust.iam</groupId><artifactId>iam-authentication</artifactId><version>${project.version}</version></dependency>
-        <dependency><groupId>com.wust.iam</groupId><artifactId>iam-authorization</artifactId><version>${project.version}</version></dependency>
-        <dependency><groupId>com.wust.iam</groupId><artifactId>iam-session</artifactId><version>${project.version}</version></dependency>
-        <dependency><groupId>com.wust.iam</groupId><artifactId>iam-diagnostics</artifactId><version>${project.version}</version></dependency>
+        <dependency><groupId>io.github.iamstarter</groupId><artifactId>iam-authentication</artifactId><version>${project.version}</version></dependency>
+        <dependency><groupId>io.github.iamstarter</groupId><artifactId>iam-authorization</artifactId><version>${project.version}</version></dependency>
+        <dependency><groupId>io.github.iamstarter</groupId><artifactId>iam-session</artifactId><version>${project.version}</version></dependency>
+        <dependency><groupId>io.github.iamstarter</groupId><artifactId>iam-diagnostics</artifactId><version>${project.version}</version></dependency>
         <dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-web</artifactId></dependency>
         <dependency><groupId>org.springframework.security</groupId><artifactId>spring-security-core</artifactId></dependency>
         <dependency><groupId>com.fasterxml.jackson.core</groupId><artifactId>jackson-annotations</artifactId></dependency>
@@ -34,9 +34,9 @@
                         <configuration>
                             <inputSpec>${project.basedir}/src/main/resources/openapi/iam.yaml</inputSpec>
                             <generatorName>spring</generatorName>
-                            <apiPackage>com.wust.iam.web.api</apiPackage>
-                            <modelPackage>com.wust.iam.web.dto</modelPackage>
-                            <invokerPackage>com.wust.iam.web.invoker</invokerPackage>
+                            <apiPackage>io.github.iamstarter.web.api</apiPackage>
+                            <modelPackage>io.github.iamstarter.web.dto</modelPackage>
+                            <invokerPackage>io.github.iamstarter.web.invoker</invokerPackage>
                             <generateApis>true</generateApis>
                             <generateModels>true</generateModels>
                             <skipIfSpecIsUnchanged>false</skipIfSpecIsUnchanged>

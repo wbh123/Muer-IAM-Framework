@@ -1,6 +1,6 @@
 # IAM Implementation Inventory
 
-> Source repository: `Wust-Dormitory-Select` at branch point `main`.
+> Source: generic IAM extraction baseline.
 >
 > Purpose: identify reusable IAM capabilities before extraction. This document
 > describes source-system facts; it is not part of the generic framework API.

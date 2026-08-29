@@ -1,24 +1,24 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>com.wust.iam</groupId>
+        <groupId>io.github.iamstarter</groupId>
         <artifactId>iam-parent</artifactId>
         <version>0.1.0-SNAPSHOT</version>
     </parent>
     <artifactId>iam-authentication</artifactId>
     <dependencies>
         <dependency>
-            <groupId>com.wust.iam</groupId>
+            <groupId>io.github.iamstarter</groupId>
             <artifactId>iam-core</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.wust.iam</groupId>
+            <groupId>io.github.iamstarter</groupId>
             <artifactId>iam-session</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.wust.iam</groupId>
+            <groupId>io.github.iamstarter</groupId>
             <artifactId>iam-authorization</artifactId>
             <version>${project.version}</version>
         </dependency>

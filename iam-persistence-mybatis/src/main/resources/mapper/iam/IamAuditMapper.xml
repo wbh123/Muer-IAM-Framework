@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.wust.iam.persistence.mapper.IamAuditMapper">
+<mapper namespace="io.github.iamstarter.persistence.mapper.IamAuditMapper">
     <insert id="insertAudit">
         INSERT INTO iam_audit_log
             (event_id, operator_ref, action_code, resource_type, resource_id, result_code, request_id,

@@ -57,6 +57,15 @@ foreach ($javaFile in $javaFiles) {
     if ($content -match '(?m)^package\s+' -and $content -notmatch "(?m)^package\s+$([regex]::Escape($basePackage))(?:\.|;)") {
         throw "Java package in '$($javaFile.FullName)' is outside '$basePackage'."
     }
+    $packageMatch = [regex]::Match($content, '(?m)^package\s+(?<package>[A-Za-z0-9_.]+);')
+    if ($packageMatch.Success) {
+        $pathMatch = [regex]::Match($javaFile.FullName, '[\\/]src[\\/](?:main|test)[\\/]java[\\/](?<relative>.+)$')
+        if (-not $pathMatch.Success) { throw "Cannot identify Java source root for '$($javaFile.FullName)'." }
+        $expectedRelative = Join-Path ($packageMatch.Groups['package'].Value.Replace('.', [IO.Path]::DirectorySeparatorChar)) $javaFile.Name
+        if (-not [string]::Equals($pathMatch.Groups['relative'].Value, $expectedRelative, [StringComparison]::OrdinalIgnoreCase)) {
+            throw "Java source path does not match package declaration: '$($javaFile.FullName)'."
+        }
+    }
 }
 
 Write-Host "Project identity is consistent for $displayName."

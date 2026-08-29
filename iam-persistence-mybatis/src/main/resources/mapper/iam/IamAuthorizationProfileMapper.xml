@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.wust.iam.persistence.mapper.IamAuthorizationProfileMapper">
-    <resultMap id="profileRow" type="com.wust.iam.persistence.AuthorizationProfileRow">
+<mapper namespace="io.github.iamstarter.persistence.mapper.IamAuthorizationProfileMapper">
+    <resultMap id="profileRow" type="io.github.iamstarter.persistence.AuthorizationProfileRow">
         <constructor>
             <arg column="profile_id" javaType="_long"/>
             <arg column="user_id" javaType="_long"/>
@@ -15,11 +15,11 @@
         </constructor>
     </resultMap>
 
-    <resultMap id="scope" type="com.wust.iam.core.model.ResourceScope">
+    <resultMap id="scope" type="io.github.iamstarter.core.model.ResourceScope">
         <constructor>
             <arg column="resource_type" javaType="java.lang.String"/>
             <arg column="resource_id" javaType="java.lang.String"/>
-            <arg column="scope_access" javaType="com.wust.iam.core.model.ScopeAccess"/>
+            <arg column="scope_access" javaType="io.github.iamstarter.core.model.ScopeAccess"/>
         </constructor>
     </resultMap>
 

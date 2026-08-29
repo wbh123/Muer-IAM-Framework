@@ -6,7 +6,7 @@ A consuming Spring Boot application declares one IAM production dependency:
 
 ```xml
 <dependency>
-    <groupId>com.wust.iam</groupId>
+    <groupId>io.github.iamstarter</groupId>
     <artifactId>iam-spring-boot-starter</artifactId>
     <version>0.1.0-SNAPSHOT</version>
 </dependency>

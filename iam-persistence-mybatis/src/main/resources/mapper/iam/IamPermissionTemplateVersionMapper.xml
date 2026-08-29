@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.wust.iam.persistence.mapper.IamPermissionTemplateVersionMapper">
-    <resultMap id="versionRow" type="com.wust.iam.persistence.PermissionTemplateVersionRow">
+<mapper namespace="io.github.iamstarter.persistence.mapper.IamPermissionTemplateVersionMapper">
+    <resultMap id="versionRow" type="io.github.iamstarter.persistence.PermissionTemplateVersionRow">
         <constructor>
             <arg column="version_id" javaType="_long"/>
             <arg column="template_id" javaType="_long"/>
             <arg column="version_number" javaType="_int"/>
-            <arg column="status" javaType="com.wust.iam.authorization.TemplateVersionStatus"/>
+            <arg column="status" javaType="io.github.iamstarter.authorization.TemplateVersionStatus"/>
         </constructor>
     </resultMap>
 

@@ -1,4 +1,4 @@
-# Generic IAM Framework
+# IAM Spring Boot Starter
 
 A reusable Identity and Access Management framework for Spring Boot applications, providing authentication, fine-grained authorization, permission templates, authorization profiles, resource scopes, distributed session management, security auditing and explainable authorization decisions.
 
@@ -23,7 +23,7 @@ A reusable Identity and Access Management framework for Spring Boot applications
 
    ```xml
    <dependency>
-       <groupId>com.wust.iam</groupId>
+       <groupId>io.github.iamstarter</groupId>
        <artifactId>iam-spring-boot-starter</artifactId>
        <version>0.1.0-SNAPSHOT</version>
    </dependency>
