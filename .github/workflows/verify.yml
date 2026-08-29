@@ -1,0 +1,44 @@
+name: Verify IAM Starter
+
+on:
+  push:
+    branches: [main, develop/**, feature/**]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Verify project identity
+        shell: pwsh
+        run: |
+          $forbiddenTokens = @(
+            ([char[]](99,111,109,46,119,117,115,116,46,105,97,109) -join ''),
+            ([char[]](99,111,109,46,119,117,115,116) -join ''),
+            ([char[]](87,117,115,116) -join ''),
+            ([char[]](0x6B66,0x6C49,0x79D1,0x6280,0x5927,0x5B66) -join '')
+          )
+          ./scripts/test-identity-check.ps1 -RepositoryRoot $PWD
+          ./scripts/test-rename-project.ps1 -RepositoryRoot $PWD
+          ./scripts/verify-no-legacy-identifiers.ps1 -RepositoryRoot $PWD -ForbiddenToken $forbiddenTokens
+
+      - name: Test Spring Boot auto-configuration
+        run: >-
+          mvn -B -pl iam-spring-boot-autoconfigure -am
+          -Dtest=IamAutoConfigurationTest
+          -Dsurefire.failIfNoSpecifiedTests=false test
+
+      - name: Package the consumable Starter
+        run: mvn -B -pl iam-spring-boot-starter -am package -DskipTests

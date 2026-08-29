@@ -26,13 +26,14 @@ $newBasePackage = Get-MetadataValue $metadata 'basePackage'
 [xml]$rootPom = Get-Content -LiteralPath (Join-Path $RepositoryRoot 'pom.xml') -Raw -Encoding utf8
 $oldGroupId = [string]$rootPom.project.groupId
 $oldBasePackage = $oldGroupId
+$oldVersion = [string]$rootPom.project.version
 $oldDisplayName = [string]$rootPom.project.name
 
-$trackedFiles = git -c "safe.directory=$RepositoryRoot" -C $RepositoryRoot ls-files -- '*.java' '*.xml' '*.yaml' '*.yml' '*.md' '*.txt'
+$trackedFiles = git -c "safe.directory=$RepositoryRoot" -C $RepositoryRoot ls-files -- '*.java' '*.xml' '*.yaml' '*.yml' '*.md' '*.txt' '*.imports'
 foreach ($relativePath in $trackedFiles) {
     $path = Join-Path $RepositoryRoot $relativePath
     $content = Get-Content -LiteralPath $path -Raw -Encoding utf8
-    $updated = $content.Replace($oldBasePackage, $newBasePackage).Replace($oldGroupId, $newGroupId).Replace($oldDisplayName, $newDisplayName)
+    $updated = $content.Replace($oldBasePackage, $newBasePackage).Replace($oldGroupId, $newGroupId).Replace($oldVersion, $newVersion).Replace($oldDisplayName, $newDisplayName)
     if ($updated -ne $content) {
         Set-Content -LiteralPath $path -Value $updated -Encoding utf8NoBOM -NoNewline
     }

@@ -50,6 +50,12 @@ See [IAM_INTEGRATION_GUIDE.md](docs/IAM_INTEGRATION_GUIDE.md) for complete
 configuration and [iam-example](iam-example) for an order and department
 consumer.
 
+## Project maintenance
+
+- [Contributing](CONTRIBUTING.md) defines branch and compatibility rules.
+- [Release policy](docs/RELEASE_POLICY.md) defines version and publication boundaries.
+- [Security policy](SECURITY.md) defines responsible reporting expectations.
+
 ## Modules
 
 Applications normally depend only on `iam-spring-boot-starter`. Internal
