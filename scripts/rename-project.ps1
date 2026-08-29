@@ -43,15 +43,15 @@ $newPath = $newBasePackage.Replace('.', [IO.Path]::DirectorySeparatorChar)
 $packageDirectories = Get-ChildItem -LiteralPath $RepositoryRoot -Recurse -Directory |
     Where-Object { $_.FullName.EndsWith($oldPath) }
 foreach ($packageDirectory in $packageDirectories) {
-    $sourceRoot = Split-Path -LiteralPath $packageDirectory.FullName -Parent
+    $sourceRoot = Split-Path -Path $packageDirectory.FullName -Parent
     $newDirectory = Join-Path $sourceRoot $newPath
-    $newParent = Split-Path -LiteralPath $newDirectory -Parent
+    $newParent = Split-Path -Path $newDirectory -Parent
     New-Item -ItemType Directory -Path $newParent -Force | Out-Null
     Move-Item -LiteralPath $packageDirectory.FullName -Destination $newDirectory
-    $oldParent = Split-Path -LiteralPath $packageDirectory.FullName -Parent
+    $oldParent = Split-Path -Path $packageDirectory.FullName -Parent
     while ((Test-Path -LiteralPath $oldParent) -and -not (Get-ChildItem -LiteralPath $oldParent -Force | Select-Object -First 1)) {
         Remove-Item -LiteralPath $oldParent
-        $oldParent = Split-Path -LiteralPath $oldParent -Parent
+        $oldParent = Split-Path -Path $oldParent -Parent
     }
 }
 
