@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wust.iam.persistence.mapper.IamAuditMapper">
+    <insert id="insertAudit">
+        INSERT INTO iam_audit_log
+            (event_id, operator_ref, action_code, resource_type, resource_id, result_code, request_id,
+             before_state, after_state, metadata, occurred_at)
+        VALUES
+            (#{record.auditId}, #{record.operator}, #{record.action}, #{record.resourceType}, #{record.resourceId},
+             #{record.result}, #{record.requestId}, #{beforeJson}, #{afterJson}, #{metadataJson}, #{record.occurredAt})
+    </insert>
+
+    <select id="findDatabaseId" resultType="java.lang.Long">
+        SELECT id FROM iam_audit_log WHERE event_id = #{auditId}
+    </select>
+
+    <insert id="insertSubject">
+        INSERT INTO iam_audit_subject_link (audit_log_id, subject_type, subject_id, relation_code)
+        VALUES (#{auditLogId}, #{subject.subjectType}, #{subject.subjectId}, #{subject.relation})
+    </insert>
+</mapper>

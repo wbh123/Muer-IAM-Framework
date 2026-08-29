@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wust.iam.persistence.mapper.IamUserMapper">
+    <resultMap id="iamUser" type="com.wust.iam.core.model.IamUser">
+        <constructor>
+            <arg column="id" javaType="_long"/>
+            <arg column="username" javaType="java.lang.String"/>
+            <arg column="user_type" javaType="java.lang.String"/>
+            <arg column="enabled" javaType="_boolean"/>
+            <arg column="authorization_version" javaType="_long"/>
+        </constructor>
+    </resultMap>
+    <select id="findById" resultMap="iamUser">
+        SELECT id, username, user_type, enabled, authorization_version
+        FROM iam_user WHERE id = #{userId}
+    </select>
+    <select id="findPage" resultMap="iamUser">
+        SELECT id, username, user_type, enabled, authorization_version
+        FROM iam_user WHERE id &gt; #{afterUserId}
+        ORDER BY id LIMIT #{limit}
+    </select>
+    <insert id="upsert">
+        INSERT INTO iam_user (id, username, user_type, enabled, authorization_version)
+        VALUES (#{userId}, #{username}, #{userType}, #{enabled}, #{authorizationVersion})
+        ON DUPLICATE KEY UPDATE
+            username = VALUES(username), user_type = VALUES(user_type), enabled = VALUES(enabled)
+    </insert>
+</mapper>

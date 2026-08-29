@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wust.iam.persistence.mapper.IamLoginEventMapper">
+    <insert id="insert">
+        INSERT INTO iam_login_event
+            (event_id, user_id, identity_key, identity_domain, client_type, client_instance,
+             ip_address, user_agent, device_type, os_name, browser_name, app_version, session_id,
+             result_code, reason_code, request_id, occurred_at)
+        VALUES
+            (#{eventId}, #{userId}, #{identityKey}, #{identityDomain}, #{clientType}, #{clientInstance},
+             #{ipAddress}, #{userAgent}, #{deviceType}, #{osName}, #{browserName}, #{appVersion}, #{sessionId},
+             #{result}, #{reasonCode}, #{requestId}, #{occurredAt})
+    </insert>
+</mapper>

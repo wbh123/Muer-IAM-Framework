@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wust.iam.persistence.mapper.IamPermissionTemplateVersionMapper">
+    <resultMap id="versionRow" type="com.wust.iam.persistence.PermissionTemplateVersionRow">
+        <constructor>
+            <arg column="version_id" javaType="_long"/>
+            <arg column="template_id" javaType="_long"/>
+            <arg column="version_number" javaType="_int"/>
+            <arg column="status" javaType="com.wust.iam.authorization.TemplateVersionStatus"/>
+        </constructor>
+    </resultMap>
+
+    <select id="findVersion" resultMap="versionRow">
+        SELECT id AS version_id, template_id, version_number, status
+        FROM iam_permission_template_version
+        WHERE id = #{versionId}
+    </select>
+
+    <select id="findPermissions" resultType="java.lang.String">
+        SELECT permission.permission_code
+        FROM iam_template_permission link
+        JOIN iam_permission permission ON permission.id = link.permission_id
+        WHERE link.template_version_id = #{versionId}
+        ORDER BY permission.permission_code
+    </select>
+
+    <select id="exists" resultType="int">
+        SELECT COUNT(*) FROM iam_permission_template_version WHERE id = #{versionId}
+    </select>
+
+    <insert id="insertVersion">
+        INSERT INTO iam_permission_template_version (id, template_id, version_number, status, published_at)
+        VALUES (#{version.versionId}, #{version.templateId}, #{version.versionNumber}, #{version.status},
+                CASE WHEN #{version.status} = 'PUBLISHED' THEN CURRENT_TIMESTAMP(6) ELSE NULL END)
+    </insert>
+
+    <update id="updateVersion">
+        UPDATE iam_permission_template_version
+        SET template_id = #{version.templateId},
+            version_number = #{version.versionNumber},
+            status = #{version.status},
+            published_at = CASE
+                WHEN #{version.status} = 'PUBLISHED' THEN COALESCE(published_at, CURRENT_TIMESTAMP(6))
+                ELSE NULL
+            END
+        WHERE id = #{version.versionId}
+    </update>
+
+    <insert id="upsertPermission">
+        INSERT INTO iam_permission (permission_code, display_name)
+        VALUES (#{permissionCode}, #{permissionCode})
+        ON DUPLICATE KEY UPDATE permission_code = VALUES(permission_code)
+    </insert>
+
+    <delete id="deletePermissionLinks">
+        DELETE FROM iam_template_permission WHERE template_version_id = #{versionId}
+    </delete>
+
+    <insert id="insertPermissionLink">
+        INSERT INTO iam_template_permission (template_version_id, permission_id)
+        SELECT #{versionId}, id FROM iam_permission WHERE permission_code = #{permissionCode}
+    </insert>
+</mapper>

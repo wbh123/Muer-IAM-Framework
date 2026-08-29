@@ -1,0 +1,484 @@
+openapi: 3.0.3
+info:
+  title: Generic IAM Management API
+  version: 0.1.0
+servers:
+  - url: /
+paths:
+  /iam/auth/login:
+    post:
+      tags: [Authentication]
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/LoginRequest'}
+      responses:
+        '200':
+          description: Authenticated
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/LoginResponse'}
+        '401': {description: Invalid credentials}
+  /iam/auth/logout:
+    post:
+      tags: [Authentication]
+      operationId: logout
+      responses:
+        '204': {description: Logged out}
+        '401': {description: Authentication required}
+  /iam/auth/me:
+    get:
+      tags: [Authentication]
+      operationId: getCurrentPrincipal
+      responses:
+        '200':
+          description: Current principal
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/PrincipalResponse'}
+        '401': {description: Authentication required}
+  /iam/sessions:
+    get:
+      tags: [Sessions]
+      operationId: listMySessions
+      parameters:
+        - name: userId
+          in: query
+          required: false
+          deprecated: true
+          schema: {type: integer, format: int64}
+          description: Ignored compatibility parameter; identity always comes from the Bearer principal.
+      responses:
+        '200':
+          description: Active sessions owned by the current principal
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/SessionListResponse'}
+        '401': {description: Authentication required}
+  /iam/sessions/{sessionId}/revoke:
+    post:
+      tags: [Sessions]
+      operationId: revokeMySession
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema: {type: string}
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/RevokeRequest'}
+      responses:
+        '204': {description: Session revoked}
+        '401': {description: Authentication required}
+        '404': {description: Active session not found for current principal}
+  /iam/sessions/revoke-others:
+    post:
+      tags: [Sessions]
+      operationId: revokeOtherSessions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/RevokeOthersRequest'}
+      responses:
+        '204': {description: Other sessions revoked}
+        '401': {description: Authentication required}
+  /iam/authorization/profiles:
+    get:
+      tags: [Authorization]
+      operationId: listMyAuthorizationProfiles
+      responses:
+        '200':
+          description: Profiles available to the current principal
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {$ref: '#/components/schemas/AuthorizationProfileResponse'}
+  /iam/authorization/profiles/{profileId}/switch:
+    post:
+      tags: [Authorization]
+      operationId: switchAuthorizationProfile
+      parameters:
+        - name: profileId
+          in: path
+          required: true
+          schema: {type: integer, format: int64}
+      responses:
+        '200':
+          description: New token with exactly one active profile
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/LoginResponse'}
+        '401':
+          description: Authentication required
+        '404':
+          description: Profile is not available to the current principal
+  /iam/authorization/diagnostics:
+    post:
+      tags: [Authorization]
+      operationId: evaluateAuthorization
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/AuthorizationEvaluationRequest'}
+      responses:
+        '200':
+          description: Projection of the runtime authorization decision
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/AuthorizationDecisionResponse'}
+  /iam/admin/templates/{versionId}:
+    put:
+      tags: [Administration]
+      operationId: savePermissionTemplateVersion
+      parameters:
+        - name: versionId
+          in: path
+          required: true
+          schema: {type: integer, format: int64}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/PermissionTemplateVersionRequest'}
+      responses:
+        '204': {description: Template version saved}
+        '401': {description: Authentication required}
+        '403': {description: Administration permission denied}
+  /iam/admin/users:
+    get:
+      tags: [Administration]
+      operationId: listUsers
+      parameters:
+        - name: afterUserId
+          in: query
+          schema: {type: integer, format: int64, minimum: 0, default: 0}
+        - name: limit
+          in: query
+          schema: {type: integer, minimum: 1, maximum: 100, default: 50}
+      responses:
+        '200':
+          description: Cursor-paginated users
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/UserListResponse'}
+        '401': {description: Authentication required}
+        '403': {description: Administration permission denied}
+  /iam/admin/users/{userId}:
+    put:
+      tags: [Administration]
+      operationId: saveUser
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema: {type: integer, format: int64}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/UserRequest'}
+      responses:
+        '204': {description: User saved}
+        '401': {description: Authentication required}
+        '403': {description: Administration permission denied}
+  /iam/admin/users/{userId}/identities:
+    get:
+      tags: [Administration]
+      operationId: listUserIdentities
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema: {type: integer, format: int64}
+      responses:
+        '200':
+          description: Identities bound to the user
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {$ref: '#/components/schemas/IdentityResponse'}
+        '401': {description: Authentication required}
+        '403': {description: Administration permission denied}
+  /iam/admin/identities/{identityId}:
+    put:
+      tags: [Administration]
+      operationId: saveIdentity
+      parameters:
+        - name: identityId
+          in: path
+          required: true
+          schema: {type: string}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/IdentityRequest'}
+      responses:
+        '204': {description: Identity saved and authorization version incremented}
+        '401': {description: Authentication required}
+        '403': {description: Administration permission denied}
+  /iam/admin/profiles/{profileId}:
+    put:
+      tags: [Administration]
+      operationId: saveAuthorizationProfile
+      parameters:
+        - name: profileId
+          in: path
+          required: true
+          schema: {type: integer, format: int64}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/AuthorizationProfileRequest'}
+      responses:
+        '204': {description: Profile and scopes saved}
+        '400': {description: Path and body profile identifiers differ}
+        '401': {description: Authentication required}
+        '403': {description: Administration permission denied}
+  /iam/admin/profiles/{profileId}/scopes:
+    put:
+      tags: [Administration]
+      operationId: replaceAuthorizationProfileScopes
+      parameters:
+        - name: profileId
+          in: path
+          required: true
+          schema: {type: integer, format: int64}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/ScopeReplacementRequest'}
+      responses:
+        '204': {description: Profile scopes replaced and authorization version incremented}
+        '401': {description: Authentication required}
+        '403': {description: Administration permission denied}
+  /iam/admin/users/{userId}/authorization-version:
+    post:
+      tags: [Administration]
+      operationId: incrementAuthorizationVersion
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema: {type: integer, format: int64}
+      responses:
+        '200':
+          description: Incremented authorization version
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [authorizationVersion]
+                properties:
+                  authorizationVersion: {type: integer, format: int64}
+        '401': {description: Authentication required}
+        '403': {description: Administration permission denied}
+  /iam/admin/sessions/{sessionId}/revoke:
+    post:
+      tags: [Administration]
+      operationId: forceRevokeSession
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema: {type: string}
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/RevokeRequest'}
+      responses:
+        '204': {description: Session forcibly revoked}
+        '401': {description: Authentication required}
+        '403': {description: Administration permission denied}
+        '404': {description: Active session not found}
+  /iam/admin/users/{userId}/sessions/revoke:
+    post:
+      tags: [Administration]
+      operationId: forceRevokeUserSessions
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema: {type: integer, format: int64}
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/RevokeRequest'}
+      responses:
+        '204': {description: All active sessions for the user forcibly revoked}
+        '401': {description: Authentication required}
+        '403': {description: Administration permission denied}
+components:
+  schemas:
+    LoginRequest:
+      type: object
+      required: [username, password, clientType]
+      properties:
+        username: {type: string, minLength: 1}
+        password: {type: string, format: password, minLength: 1, writeOnly: true}
+        clientType: {type: string, minLength: 1}
+        clientInstance: {type: string, maxLength: 191, nullable: true}
+    LoginResponse:
+      type: object
+      required: [accessToken, sessionId, expiresAt, principal]
+      properties:
+        accessToken: {type: string}
+        sessionId: {type: string}
+        expiresAt: {type: string, format: date-time}
+        principal: {$ref: '#/components/schemas/PrincipalResponse'}
+    PrincipalResponse:
+      type: object
+      required: [userId, identityId, identityDomain, clientType, authorizationVersion]
+      properties:
+        userId: {type: integer, format: int64}
+        identityId: {type: string}
+        identityDomain: {type: string}
+        activeProfileId: {type: integer, format: int64, nullable: true}
+        templateVersionId: {type: integer, format: int64, nullable: true}
+        clientType: {type: string}
+        authorizationVersion: {type: integer, format: int64}
+    SessionResponse:
+      type: object
+      required: [sessionId, userId, clientType, loginAt, lastSeenAt, expiresAt]
+      properties:
+        sessionId: {type: string}
+        userId: {type: integer, format: int64}
+        clientType: {type: string}
+        clientInstance: {type: string, nullable: true}
+        ipAddress: {type: string, nullable: true}
+        userAgent: {type: string, nullable: true}
+        loginAt: {type: string, format: date-time}
+        lastSeenAt: {type: string, format: date-time}
+        expiresAt: {type: string, format: date-time}
+        logoutAt: {type: string, format: date-time, nullable: true}
+    SessionListResponse:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items: {$ref: '#/components/schemas/SessionResponse'}
+    RevokeRequest:
+      type: object
+      properties:
+        reason: {type: string, default: USER_REQUEST}
+    RevokeOthersRequest:
+      type: object
+      required: [currentSessionId]
+      properties:
+        currentSessionId: {type: string, minLength: 1}
+        reason: {type: string, default: USER_REQUEST}
+    UserRequest:
+      type: object
+      required: [username, userType, enabled]
+      properties:
+        username: {type: string, minLength: 1, maxLength: 191}
+        userType: {type: string, minLength: 1, maxLength: 64}
+        enabled: {type: boolean}
+    UserResponse:
+      type: object
+      required: [userId, username, userType, enabled, authorizationVersion]
+      properties:
+        userId: {type: integer, format: int64}
+        username: {type: string}
+        userType: {type: string}
+        enabled: {type: boolean}
+        authorizationVersion: {type: integer, format: int64}
+    UserListResponse:
+      type: object
+      required: [items]
+      properties:
+        items: {type: array, items: {$ref: '#/components/schemas/UserResponse'}}
+        nextAfterUserId: {type: integer, format: int64, nullable: true}
+    IdentityRequest:
+      type: object
+      required: [userId, identityKey, domain, enabled]
+      properties:
+        userId: {type: integer, format: int64}
+        identityKey: {type: string, minLength: 1, maxLength: 191}
+        domain: {type: string, minLength: 1, maxLength: 64}
+        enabled: {type: boolean}
+    IdentityResponse:
+      type: object
+      required: [identityId, userId, identityKey, domain, enabled]
+      properties:
+        identityId: {type: string}
+        userId: {type: integer, format: int64}
+        identityKey: {type: string}
+        domain: {type: string}
+        enabled: {type: boolean}
+    ResourceScope:
+      type: object
+      required: [scopeType, scopeRefId, accessMode]
+      properties:
+        scopeType: {type: string}
+        scopeRefId: {type: string}
+        accessMode: {type: string, enum: [READ, WRITE]}
+    ScopeReplacementRequest:
+      type: object
+      required: [scopes]
+      properties:
+        scopes:
+          type: array
+          items: {$ref: '#/components/schemas/ResourceScope'}
+    AuthorizationProfileResponse:
+      type: object
+      required: [profileId, userId, profileName, templateVersionId, clientTypes, enabled, revoked, scopes]
+      properties:
+        profileId: {type: integer, format: int64}
+        userId: {type: integer, format: int64}
+        profileName: {type: string}
+        templateVersionId: {type: integer, format: int64}
+        clientTypes: {type: array, items: {type: string}}
+        enabled: {type: boolean}
+        revoked: {type: boolean}
+        validFrom: {type: string, format: date-time, nullable: true}
+        validUntil: {type: string, format: date-time, nullable: true}
+        scopes: {type: array, items: {$ref: '#/components/schemas/ResourceScope'}}
+    AuthorizationProfileRequest:
+      allOf:
+        - {$ref: '#/components/schemas/AuthorizationProfileResponse'}
+    PermissionTemplateVersionRequest:
+      type: object
+      required: [templateId, versionNumber, status, permissions]
+      properties:
+        templateId: {type: integer, format: int64}
+        versionNumber: {type: integer, minimum: 1}
+        status: {type: string, enum: [DRAFT, PUBLISHED]}
+        permissions: {type: array, uniqueItems: true, items: {type: string}}
+    AuthorizationEvaluationRequest:
+      type: object
+      required: [permissionCode, domain, clientType, resourceType, resourceId, scopeAccess]
+      properties:
+        permissionCode: {type: string}
+        domain: {type: string}
+        clientType: {type: string}
+        resourceType: {type: string}
+        resourceId: {type: string}
+        scopeAccess: {type: string, enum: [READ, WRITE]}
+    AuthorizationDecisionStep:
+      type: object
+      required: [code, passed, reason]
+      properties:
+        code: {type: string}
+        passed: {type: boolean}
+        reason: {type: string}
+    AuthorizationDecisionResponse:
+      type: object
+      required: [allowed, decisionCode, steps]
+      properties:
+        allowed: {type: boolean}
+        decisionCode: {type: string}
+        steps: {type: array, items: {$ref: '#/components/schemas/AuthorizationDecisionStep'}}
