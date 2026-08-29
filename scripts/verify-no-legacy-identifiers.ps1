@@ -9,7 +9,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 foreach ($token in $ForbiddenToken) {
-    $hits = git -C $RepositoryRoot grep -n -i -- $token
+    $hits = git -c "safe.directory=$RepositoryRoot" -C $RepositoryRoot grep -n -i -- $token
     if ($LASTEXITCODE -eq 0) {
         throw "Forbidden identifier found: $token"
     }

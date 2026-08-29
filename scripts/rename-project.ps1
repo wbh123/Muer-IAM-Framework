@@ -15,7 +15,7 @@ function Get-MetadataValue {
     return $match.Groups['value'].Value.Trim().Trim('"').Trim("'")
 }
 
-$dirty = git -C $RepositoryRoot status --porcelain
+$dirty = git -c "safe.directory=$RepositoryRoot" -C $RepositoryRoot status --porcelain
 if ($dirty) { throw 'Working tree must be clean before rename-project.ps1 runs.' }
 
 $metadata = Get-Content -LiteralPath $MetadataPath -Raw -Encoding utf8
@@ -28,7 +28,7 @@ $oldGroupId = [string]$rootPom.project.groupId
 $oldBasePackage = $oldGroupId
 $oldDisplayName = [string]$rootPom.project.name
 
-$trackedFiles = git -C $RepositoryRoot ls-files -- '*.java' '*.xml' '*.yaml' '*.yml' '*.md' '*.txt'
+$trackedFiles = git -c "safe.directory=$RepositoryRoot" -C $RepositoryRoot ls-files -- '*.java' '*.xml' '*.yaml' '*.yml' '*.md' '*.txt'
 foreach ($relativePath in $trackedFiles) {
     $path = Join-Path $RepositoryRoot $relativePath
     $content = Get-Content -LiteralPath $path -Raw -Encoding utf8
