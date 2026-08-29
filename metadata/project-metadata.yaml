@@ -1,0 +1,9 @@
+project:
+  displayName: IAM Spring Boot Starter
+  repositoryName: IAM-Spring-Boot-Starter
+  description: Reusable identity and access management starter for Spring Boot.
+coordinates:
+  groupId: io.github.iamstarter
+  version: 0.1.0-SNAPSHOT
+java:
+  basePackage: io.github.iamstarter
