@@ -61,6 +61,9 @@ public class IamProperties {
         if (clientTypes.isEmpty() || clientTypes.stream().anyMatch(type -> type == null || type.isBlank())) {
             throw new IllegalStateException("iam.client-types must contain at least one non-blank value");
         }
+        if (token.redisPrefix == null || token.redisPrefix.isBlank()) {
+            throw new IllegalStateException("iam.token.redis-prefix must not be blank");
+        }
     }
 
     public static class Token {
