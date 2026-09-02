@@ -58,6 +58,9 @@ public class IamProperties {
         if (token.ttl == null || token.ttl.isZero() || token.ttl.isNegative()) {
             throw new IllegalStateException("iam.token.ttl must be positive");
         }
+        if (clientTypes.isEmpty() || clientTypes.stream().anyMatch(type -> type == null || type.isBlank())) {
+            throw new IllegalStateException("iam.client-types must contain at least one non-blank value");
+        }
     }
 
     public static class Token {
