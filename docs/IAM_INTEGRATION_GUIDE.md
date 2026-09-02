@@ -50,6 +50,10 @@ manages the same IAM schema by another deployment process.
 `iam.token.ttl` must be a positive duration. Invalid values are rejected while
 the Spring application context is being created, before any token can be issued.
 
+`iam.client-types` is the starter login allow-list. A client type must match an
+entry exactly; other login attempts are rejected before the host
+`IdentityAuthenticator` is invoked. The default allow-list is `[WEB]`.
+
 ## Required identity adapter
 
 The host verifies its own credentials and projects the result into one generic

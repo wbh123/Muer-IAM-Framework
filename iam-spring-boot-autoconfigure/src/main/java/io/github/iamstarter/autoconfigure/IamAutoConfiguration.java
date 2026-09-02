@@ -61,6 +61,7 @@ import org.springframework.security.web.authentication.AnonymousAuthenticationFi
 
 import java.time.Clock;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import javax.sql.DataSource;
 import java.io.IOException;
@@ -196,9 +197,14 @@ public class IamAutoConfiguration {
                                                    AuthorizationVersionRepository versions,
                                                    ObjectProvider<IdentityAuthenticator> authenticator,
                                                    IamProperties properties) {
+        var allowedClientTypes = Set.copyOf(properties.getClientTypes());
+        var hostAuthenticator = authenticator.getIfAvailable(() -> request -> Optional.empty());
+        IdentityAuthenticator configuredAuthenticator = request -> allowedClientTypes.contains(request.clientType())
+                ? hostAuthenticator.authenticate(request)
+                : Optional.empty();
         return new AuthenticationService(tokens, sessions,
                 loginEvents.getIfAvailable(() -> event -> { }), versions::currentVersion,
-                authenticator.getIfAvailable(() -> request -> Optional.empty()), Clock.systemUTC(),
+                configuredAuthenticator, Clock.systemUTC(),
                 properties.getToken().getTtl(), properties.getSession().getTouchInterval(),
                 IamAutoConfiguration::randomId,
                 IamAutoConfiguration::randomId, IamAutoConfiguration::randomId);

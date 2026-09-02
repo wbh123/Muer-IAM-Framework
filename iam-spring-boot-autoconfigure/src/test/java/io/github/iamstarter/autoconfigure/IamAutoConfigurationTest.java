@@ -5,6 +5,8 @@ import io.github.iamstarter.authorization.AuthorizationProfileRepository;
 import io.github.iamstarter.authorization.AuthorizationVersionRepository;
 import io.github.iamstarter.authorization.PermissionTemplateVersionRepository;
 import io.github.iamstarter.authentication.AuthenticationService;
+import io.github.iamstarter.authentication.IdentityAuthenticator;
+import io.github.iamstarter.authentication.LoginRequest;
 import io.github.iamstarter.core.model.IamPrincipal;
 import io.github.iamstarter.core.port.ResourceHierarchyProvider;
 import io.github.iamstarter.session.TokenStore;
@@ -38,10 +40,12 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.time.Duration;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -93,6 +97,19 @@ class IamAutoConfigurationTest {
     void rejects_a_non_positive_token_ttl_during_startup() {
         contextRunner.withPropertyValues("iam.token.ttl=0s")
                 .run(context -> assertNotNull(context.getStartupFailure()));
+    }
+
+    @Test
+    void configured_client_types_reject_a_login_before_the_host_authenticator_runs() {
+        contextRunner.withUserConfiguration(PermissiveIdentityConfiguration.class)
+                .withPropertyValues("iam.client-types=WEB")
+                .run(context -> {
+                    var authentication = context.getBean(AuthenticationService.class);
+
+                    assertTrue(authentication.login(new LoginRequest(
+                            "operator", "secret", "MOBILE")).isEmpty());
+                    assertEquals(0, context.getBean(AtomicInteger.class).get());
+                });
     }
 
     @Test
@@ -195,5 +212,22 @@ class IamAutoConfigurationTest {
             return mock(StringRedisTemplate.class);
         }
 
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    static class PermissiveIdentityConfiguration {
+        @Bean
+        AtomicInteger authenticatorInvocations() {
+            return new AtomicInteger();
+        }
+
+        @Bean
+        IdentityAuthenticator identityAuthenticator(AtomicInteger authenticatorInvocations) {
+            return request -> {
+                authenticatorInvocations.incrementAndGet();
+                return Optional.of(new IamPrincipal(
+                    7L, "identity-7", "EXAMPLE", 31L, 9L, request.clientType(), 4L));
+            };
+        }
     }
 }
