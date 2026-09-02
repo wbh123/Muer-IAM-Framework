@@ -11,6 +11,30 @@ final class IamShowcaseFixture {
     void seedOperatorA(JdbcTemplate jdbc) {
         clearIamTables(jdbc);
         seedPermissionModel(jdbc);
+        insertOperatorAIdentity(jdbc);
+        insertReader501Profile(jdbc);
+    }
+
+    /**
+     * Resets all IAM fixture data and seeds both of operator A's switchable
+     * profiles. This is the only composable fixture because profile switching
+     * requires the same principal to own both profiles.
+     */
+    void seedOperatorAProfiles(JdbcTemplate jdbc) {
+        clearIamTables(jdbc);
+        seedPermissionModel(jdbc);
+        insertOperatorAIdentity(jdbc);
+        insertReader501Profile(jdbc);
+        jdbc.update("""
+                INSERT INTO iam_authorization_profile
+                    (id, user_id, template_version_id, profile_key, display_name, client_types, enabled, revoked_at)
+                VALUES (402, 101, 302, 'approver-501', 'Approver 501', '[\"WEB\"]', TRUE, NULL)
+                """);
+        insertScope(jdbc, 402, "501", "READ");
+        insertScope(jdbc, 402, "501", "WRITE");
+    }
+
+    private static void insertOperatorAIdentity(JdbcTemplate jdbc) {
         jdbc.update("""
                 INSERT INTO iam_user (id, external_ref, username, user_type, authorization_version)
                 VALUES (101, 'operator-a', 'operator-a', 'MEMBER', 1)
@@ -19,6 +43,9 @@ final class IamShowcaseFixture {
                 INSERT INTO iam_identity (id, user_id, identity_key, identity_domain, credential_ref)
                 VALUES ('identity-operator-a', 101, 'operator-a', 'EXAMPLE', 'demo-password')
                 """);
+    }
+
+    private static void insertReader501Profile(JdbcTemplate jdbc) {
         jdbc.update("""
                 INSERT INTO iam_authorization_profile
                     (id, user_id, template_version_id, profile_key, display_name, client_types, enabled, revoked_at)
@@ -76,10 +103,24 @@ final class IamShowcaseFixture {
                 VALUES (301, 201, 1, 'PUBLISHED', CURRENT_TIMESTAMP(6))
                 """);
         jdbc.update("""
+                INSERT INTO iam_permission_template (id, template_key, display_name)
+                VALUES (202, 'showcase-approver', 'Showcase Approver')
+                """);
+        jdbc.update("""
+                INSERT INTO iam_permission_template_version (id, template_id, version_number, status, published_at)
+                VALUES (302, 202, 1, 'PUBLISHED', CURRENT_TIMESTAMP(6))
+                """);
+        jdbc.update("""
                 INSERT INTO iam_permission (id, permission_code, display_name)
                 VALUES (601, 'order.read', 'Read order')
                 """);
+        jdbc.update("""
+                INSERT INTO iam_permission (id, permission_code, display_name)
+                VALUES (602, 'order.approve', 'Approve order')
+                """);
         jdbc.update("INSERT INTO iam_template_permission (template_version_id, permission_id) VALUES (301, 601)");
+        jdbc.update("INSERT INTO iam_template_permission (template_version_id, permission_id) VALUES (302, 601)");
+        jdbc.update("INSERT INTO iam_template_permission (template_version_id, permission_id) VALUES (302, 602)");
     }
 
     private static void insertScope(JdbcTemplate jdbc, long profileId, String departmentId, String access) {

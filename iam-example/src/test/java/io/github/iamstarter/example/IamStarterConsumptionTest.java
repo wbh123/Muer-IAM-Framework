@@ -114,6 +114,23 @@ class IamStarterConsumptionTest {
     }
 
     @Test
+    void profile_switch_changes_order_approval_from_reader_denial_to_approver_success() throws Exception {
+        fixture.seedOperatorAProfiles(jdbc);
+        String readerToken = loginToken("operator-a");
+
+        assertEquals(403, request("/example/orders/9001/approve", "POST", readerToken, null).statusCode());
+        var profiles = request("/iam/authorization/profiles", "GET", readerToken, null);
+        assertEquals(200, profiles.statusCode());
+        assertEquals(2, json.readTree(profiles.body()).size());
+
+        var switchResponse = request("/iam/authorization/profiles/402/switch", "POST", readerToken, null);
+        assertEquals(200, switchResponse.statusCode());
+        String approverToken = json.readTree(switchResponse.body()).path("accessToken").asText();
+
+        assertEquals(200, request("/example/orders/9001/approve", "POST", approverToken, null).statusCode());
+    }
+
+    @Test
     void rejected_client_or_credentials_do_not_create_a_session() throws Exception {
         fixture.seedOperatorA(jdbc);
 
@@ -132,11 +149,14 @@ class IamStarterConsumptionTest {
     }
 
     private HttpResponse<String> requestAsOperatorA(String path) throws Exception {
+        return request(path, "GET", loginToken("operator-a"), null);
+    }
+
+    private String loginToken(String username) throws Exception {
         var login = request("/iam/auth/login", "POST", null,
-                "{\"username\":\"operator-a\",\"password\":\"demo-pass\",\"clientType\":\"WEB\"}");
-        assertEquals(200, login.statusCode(), "operator A must authenticate");
-        String token = json.readTree(login.body()).path("accessToken").asText();
-        return request(path, "GET", token, null);
+                "{\"username\":\"%s\",\"password\":\"demo-pass\",\"clientType\":\"WEB\"}".formatted(username));
+        assertEquals(200, login.statusCode(), "%s must authenticate".formatted(username));
+        return json.readTree(login.body()).path("accessToken").asText();
     }
 
     private HttpResponse<String> login(String username, String password, String clientType) throws Exception {
