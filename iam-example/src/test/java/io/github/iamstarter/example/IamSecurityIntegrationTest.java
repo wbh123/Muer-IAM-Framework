@@ -19,8 +19,10 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.stream.StreamSupport;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(classes = IamExampleApplication.class,
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -94,12 +96,41 @@ class IamSecurityIntegrationTest {
         assertEquals(401, request("/example/orders/9001", "GET", null, null).statusCode());
     }
 
+    @Test
+    void switched_profile_uses_a_new_listed_session_and_revocation_rejects_only_its_token() throws Exception {
+        fixture.seedOperatorAProfiles(jdbc);
+        var reader = login();
+
+        var switched = switchProfile(reader.token(), IamShowcaseFixture.APPROVER_501_PROFILE_ID);
+
+        assertEquals(403, request("/example/orders/9001/approve", "POST", reader.token(), null).statusCode());
+        assertEquals(200, request("/example/orders/9001/approve", "POST", switched.token(), null).statusCode());
+        assertEquals(200, request("/example/orders/9001", "GET", reader.token(), null).statusCode());
+        assertEquals(200, request("/iam/sessions", "GET", switched.token(), null).statusCode());
+        assertTrue(listedSessionIds(switched.token()).anyMatch(switched.sessionId()::equals));
+        assertEquals(204, request("/iam/sessions/" + switched.sessionId() + "/revoke", "POST", switched.token(), "{}").statusCode());
+        assertEquals(401, request("/example/orders/9001", "GET", switched.token(), null).statusCode());
+    }
+
     private Login login() throws Exception {
         var response = request("/iam/auth/login", "POST", null,
                 "{\"username\":\"operator-a\",\"password\":\"demo-pass\",\"clientType\":\"WEB\"}");
         assertEquals(200, response.statusCode());
         JsonNode body = json.readTree(response.body());
         return new Login(body.path("accessToken").asText(), body.path("sessionId").asText());
+    }
+
+    private Login switchProfile(String token, long profileId) throws Exception {
+        var response = request("/iam/authorization/profiles/" + profileId + "/switch", "POST", token, null);
+        assertEquals(200, response.statusCode());
+        JsonNode body = json.readTree(response.body());
+        return new Login(body.path("accessToken").asText(), body.path("sessionId").asText());
+    }
+
+    private java.util.stream.Stream<String> listedSessionIds(String token) throws Exception {
+        var sessions = request("/iam/sessions", "GET", token, null);
+        JsonNode items = json.readTree(sessions.body()).path("items");
+        return StreamSupport.stream(items.spliterator(), false).map(item -> item.path("sessionId").asText());
     }
 
     private HttpResponse<String> request(String path, String method, String token, String body) throws Exception {

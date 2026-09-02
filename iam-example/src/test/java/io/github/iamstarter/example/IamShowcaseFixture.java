@@ -3,6 +3,9 @@ package io.github.iamstarter.example;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 final class IamShowcaseFixture {
+    static final long READER_501_PROFILE_ID = 401L;
+    static final long APPROVER_501_PROFILE_ID = 402L;
+
     /**
      * Resets all IAM fixture data and seeds the operator A reader scenario.
      * This method is intentionally independent and is not composable with
@@ -28,10 +31,10 @@ final class IamShowcaseFixture {
         jdbc.update("""
                 INSERT INTO iam_authorization_profile
                     (id, user_id, template_version_id, profile_key, display_name, client_types, enabled, revoked_at)
-                VALUES (402, 101, 302, 'approver-501', 'Approver 501', '[\"WEB\"]', TRUE, NULL)
-                """);
-        insertScope(jdbc, 402, "501", "READ");
-        insertScope(jdbc, 402, "501", "WRITE");
+                VALUES (?, 101, 302, 'approver-501', 'Approver 501', '[\"WEB\"]', TRUE, NULL)
+                """, APPROVER_501_PROFILE_ID);
+        insertScope(jdbc, APPROVER_501_PROFILE_ID, "501", "READ");
+        insertScope(jdbc, APPROVER_501_PROFILE_ID, "501", "WRITE");
     }
 
     private static void insertOperatorAIdentity(JdbcTemplate jdbc) {
@@ -49,9 +52,9 @@ final class IamShowcaseFixture {
         jdbc.update("""
                 INSERT INTO iam_authorization_profile
                     (id, user_id, template_version_id, profile_key, display_name, client_types, enabled, revoked_at)
-                VALUES (401, 101, 301, 'reader-501', 'Reader 501', '[\"WEB\"]', TRUE, NULL)
-                """);
-        insertScope(jdbc, 401, "501", "READ");
+                VALUES (?, 101, 301, 'reader-501', 'Reader 501', '[\"WEB\"]', TRUE, NULL)
+                """, READER_501_PROFILE_ID);
+        insertScope(jdbc, READER_501_PROFILE_ID, "501", "READ");
     }
 
     /**

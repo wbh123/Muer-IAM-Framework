@@ -123,7 +123,7 @@ class IamStarterConsumptionTest {
         assertEquals(200, profiles.statusCode());
         assertEquals(2, json.readTree(profiles.body()).size());
 
-        var switchResponse = request("/iam/authorization/profiles/402/switch", "POST", readerToken, null);
+        var switchResponse = request("/iam/authorization/profiles/" + IamShowcaseFixture.APPROVER_501_PROFILE_ID + "/switch", "POST", readerToken, null);
         assertEquals(200, switchResponse.statusCode());
         String approverToken = json.readTree(switchResponse.body()).path("accessToken").asText();
 
