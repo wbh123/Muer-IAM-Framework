@@ -25,6 +25,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest(classes = IamExampleApplication.class,
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class IamSecurityIntegrationTest {
+    private final IamShowcaseFixture fixture = new IamShowcaseFixture();
+
     static final MySQLContainer<?> MYSQL = new MySQLContainer<>(DockerImageName.parse("mysql:8.4"))
             .withDatabaseName("iam_security")
             .withUsername("iam")
@@ -65,31 +67,7 @@ class IamSecurityIntegrationTest {
 
     @BeforeEach
     void seedIdentityProjection() {
-        jdbc.update("DELETE FROM iam_session");
-        jdbc.update("DELETE FROM iam_authorization_scope");
-        jdbc.update("DELETE FROM iam_authorization_profile");
-        jdbc.update("DELETE FROM iam_template_permission");
-        jdbc.update("DELETE FROM iam_permission_template_version");
-        jdbc.update("DELETE FROM iam_permission_template");
-        jdbc.update("DELETE FROM iam_permission");
-        jdbc.update("DELETE FROM iam_user");
-        jdbc.update("""
-                INSERT INTO iam_user (id, external_ref, username, user_type, authorization_version)
-                VALUES (101, 'security-user', 'security-user', 'MEMBER', 1)
-                """);
-        jdbc.update("INSERT INTO iam_permission_template (id, template_key, display_name) VALUES (201, 'security', 'Security')");
-        jdbc.update("INSERT INTO iam_permission_template_version (id, template_id, version_number, status) VALUES (301, 201, 1, 'PUBLISHED')");
-        jdbc.update("INSERT INTO iam_permission (id, permission_code, display_name) VALUES (601, 'order.read', 'Read order')");
-        jdbc.update("INSERT INTO iam_template_permission (template_version_id, permission_id) VALUES (301, 601)");
-        jdbc.update("""
-                INSERT INTO iam_authorization_profile
-                    (id, user_id, template_version_id, profile_key, display_name, client_types, enabled, revoked_at)
-                VALUES (401, 101, 301, 'security', 'Security', '[\"WEB\"]', TRUE, NULL)
-                """);
-        jdbc.update("""
-                INSERT INTO iam_authorization_scope (profile_id, resource_type, resource_id, scope_access)
-                VALUES (401, 'DEPARTMENT', '501', 'READ')
-                """);
+        fixture.seedOperatorA(jdbc);
     }
 
     @Test
