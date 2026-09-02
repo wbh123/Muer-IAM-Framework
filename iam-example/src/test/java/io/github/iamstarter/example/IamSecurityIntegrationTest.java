@@ -96,7 +96,7 @@ class IamSecurityIntegrationTest {
 
     private Login login() throws Exception {
         var response = request("/iam/auth/login", "POST", null,
-                "{\"username\":\"demo\",\"password\":\"demo-pass\",\"clientType\":\"WEB\"}");
+                "{\"username\":\"operator-a\",\"password\":\"demo-pass\",\"clientType\":\"WEB\"}");
         assertEquals(200, response.statusCode());
         JsonNode body = json.readTree(response.body());
         return new Login(body.path("accessToken").asText(), body.path("sessionId").asText());

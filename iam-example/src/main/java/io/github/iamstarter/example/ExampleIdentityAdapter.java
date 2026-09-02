@@ -12,12 +12,16 @@ public class ExampleIdentityAdapter {
     @Bean
     IdentityAuthenticator exampleIdentityAuthenticator() {
         return request -> {
-            if (!"demo".equals(request.username()) || !"demo-pass".equals(request.password())
-                    || !"WEB".equals(request.clientType())) {
+            if (!"demo-pass".equals(request.password())) {
                 return Optional.empty();
             }
-            return Optional.of(new IamPrincipal(
-                    101L, "example-user", "EXAMPLE", 401L, 301L, request.clientType(), 1L));
+            return switch (request.username()) {
+                case "operator-a" -> Optional.of(new IamPrincipal(
+                        101L, "identity-operator-a", "EXAMPLE", 401L, 301L, request.clientType(), 1L));
+                case "operator-b" -> Optional.of(new IamPrincipal(
+                        102L, "identity-operator-b", "EXAMPLE", 403L, 301L, request.clientType(), 1L));
+                default -> Optional.empty();
+            };
         };
     }
 }

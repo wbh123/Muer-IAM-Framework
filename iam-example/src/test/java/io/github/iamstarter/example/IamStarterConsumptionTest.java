@@ -80,7 +80,7 @@ class IamStarterConsumptionTest {
     }
 
     @Test
-    void seeded_reader_profile_can_read_only_its_department_through_configured_demo_principal() throws Exception {
+    void seeded_reader_profile_can_read_only_its_department_through_operator_a_principal() throws Exception {
         fixture.seedOperatorA(jdbc);
 
         assertEquals(List.of("READ"), jdbc.queryForList("""
@@ -88,15 +88,15 @@ class IamStarterConsumptionTest {
                 WHERE profile_id = 401 AND resource_type = 'DEPARTMENT' AND resource_id = '501'
                 ORDER BY scope_access
                 """, String.class));
-        assertEquals(200, requestAsConfiguredDemo("/example/orders/9001").statusCode());
-        assertEquals(403, requestAsConfiguredDemo("/example/orders/9002").statusCode());
+        assertEquals(200, requestAsOperatorA("/example/orders/9001").statusCode());
+        assertEquals(403, requestAsOperatorA("/example/orders/9002").statusCode());
     }
 
     @Test
     void login_token_and_persisted_session_work_across_real_infrastructure() throws Exception {
         fixture.seedOperatorA(jdbc);
         var login = request("/iam/auth/login", "POST", null,
-                "{\"username\":\"demo\",\"password\":\"demo-pass\",\"clientType\":\"WEB\"}");
+                "{\"username\":\"operator-a\",\"password\":\"demo-pass\",\"clientType\":\"WEB\"}");
         assertEquals(200, login.statusCode());
         JsonNode loginBody = json.readTree(login.body());
         String token = loginBody.path("accessToken").asText();
@@ -113,6 +113,15 @@ class IamStarterConsumptionTest {
         assertEquals(403, request("/example/orders/9002", "GET", token, null).statusCode());
     }
 
+    @Test
+    void rejected_client_or_credentials_do_not_create_a_session() throws Exception {
+        fixture.seedOperatorA(jdbc);
+
+        assertEquals(401, login("operator-a", "demo-pass", "MOBILE").statusCode());
+        assertEquals(401, login("operator-a", "wrong", "WEB").statusCode());
+        assertEquals(0L, jdbc.queryForObject("SELECT COUNT(*) FROM iam_session", Long.class));
+    }
+
     private HttpResponse<String> request(String path, String method, String token, String body) throws Exception {
         var builder = HttpRequest.newBuilder(URI.create("http://127.0.0.1:" + port + path))
                 .header("Content-Type", "application/json");
@@ -122,11 +131,17 @@ class IamStarterConsumptionTest {
         return http.send(builder.build(), HttpResponse.BodyHandlers.ofString());
     }
 
-    private HttpResponse<String> requestAsConfiguredDemo(String path) throws Exception {
+    private HttpResponse<String> requestAsOperatorA(String path) throws Exception {
         var login = request("/iam/auth/login", "POST", null,
-                "{\"username\":\"demo\",\"password\":\"demo-pass\",\"clientType\":\"WEB\"}");
-        assertEquals(200, login.statusCode(), "configured demo principal must authenticate");
+                "{\"username\":\"operator-a\",\"password\":\"demo-pass\",\"clientType\":\"WEB\"}");
+        assertEquals(200, login.statusCode(), "operator A must authenticate");
         String token = json.readTree(login.body()).path("accessToken").asText();
         return request(path, "GET", token, null);
+    }
+
+    private HttpResponse<String> login(String username, String password, String clientType) throws Exception {
+        return request("/iam/auth/login", "POST", null, """
+                {"username":"%s","password":"%s","clientType":"%s"}
+                """.formatted(username, password, clientType));
     }
 }
