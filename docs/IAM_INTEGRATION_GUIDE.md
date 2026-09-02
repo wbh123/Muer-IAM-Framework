@@ -59,6 +59,10 @@ entry. The default allow-list is `[WEB]`.
 multiple IAM applications share the same Redis deployment, so their opaque
 token and reverse-index keys remain isolated.
 
+`iam.schema.history-table` must be non-blank. It is the Flyway history table
+for the IAM migration set and should remain distinct from a host application's
+own migration history.
+
 ## Required identity adapter
 
 The host verifies its own credentials and projects the result into one generic

@@ -64,6 +64,9 @@ public class IamProperties {
         if (token.redisPrefix == null || token.redisPrefix.isBlank()) {
             throw new IllegalStateException("iam.token.redis-prefix must not be blank");
         }
+        if (schema.historyTable == null || schema.historyTable.isBlank()) {
+            throw new IllegalStateException("iam.schema.history-table must not be blank");
+        }
     }
 
     public static class Token {

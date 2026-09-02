@@ -112,6 +112,12 @@ class IamAutoConfigurationTest {
     }
 
     @Test
+    void rejects_an_empty_schema_history_table_during_startup() {
+        contextRunner.withPropertyValues("iam.schema.history-table=")
+                .run(context -> assertNotNull(context.getStartupFailure()));
+    }
+
+    @Test
     void configured_client_types_reject_a_login_before_the_host_authenticator_runs() {
         contextRunner.withUserConfiguration(PermissiveIdentityConfiguration.class)
                 .withPropertyValues("iam.client-types=WEB")
