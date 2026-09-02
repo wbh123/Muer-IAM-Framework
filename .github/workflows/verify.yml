@@ -40,5 +40,11 @@ jobs:
           -Dtest=IamAutoConfigurationTest
           -Dsurefire.failIfNoSpecifiedTests=false test
 
+      - name: Smoke test the starter from a consumer application
+        run: >-
+          mvn -B -pl iam-example -am
+          -Dtest=IamStarterAutoConfigurationSmokeTest
+          -Dsurefire.failIfNoSpecifiedTests=false test
+
       - name: Package the consumable Starter
         run: mvn -B -pl iam-spring-boot-starter -am package -DskipTests
