@@ -90,6 +90,12 @@ class IamAutoConfigurationTest {
     }
 
     @Test
+    void rejects_a_non_positive_token_ttl_during_startup() {
+        contextRunner.withPropertyValues("iam.token.ttl=0s")
+                .run(context -> assertNotNull(context.getStartupFailure()));
+    }
+
+    @Test
     void schema_migration_can_be_disabled_for_a_host_managed_database() {
         new ApplicationContextRunner()
                 .withUserConfiguration(InfrastructureConfiguration.class)

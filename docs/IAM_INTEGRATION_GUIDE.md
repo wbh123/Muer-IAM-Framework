@@ -47,6 +47,9 @@ IAM migrations are loaded only from `classpath:db/iam/migration` and use their
 own history table. Set `iam.schema.enabled=false` only when the host deliberately
 manages the same IAM schema by another deployment process.
 
+`iam.token.ttl` must be a positive duration. Invalid values are rejected while
+the Spring application context is being created, before any token can be issued.
+
 ## Required identity adapter
 
 The host verifies its own credentials and projects the result into one generic
