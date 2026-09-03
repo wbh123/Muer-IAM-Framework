@@ -22,6 +22,7 @@ import java.net.http.HttpResponse;
 import java.util.stream.StreamSupport;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(classes = IamExampleApplication.class,
@@ -103,6 +104,8 @@ class IamSecurityIntegrationTest {
 
         var switched = switchProfile(reader.token(), IamShowcaseFixture.APPROVER_501_PROFILE_ID);
 
+        assertNotEquals(reader.token(), switched.token());
+        assertNotEquals(reader.sessionId(), switched.sessionId());
         assertEquals(403, request("/example/orders/9001/approve", "POST", reader.token(), null).statusCode());
         assertEquals(200, request("/example/orders/9001/approve", "POST", switched.token(), null).statusCode());
         assertEquals(200, request("/example/orders/9001", "GET", reader.token(), null).statusCode());
@@ -110,6 +113,7 @@ class IamSecurityIntegrationTest {
         assertTrue(listedSessionIds(switched.token()).anyMatch(switched.sessionId()::equals));
         assertEquals(204, request("/iam/sessions/" + switched.sessionId() + "/revoke", "POST", switched.token(), "{}").statusCode());
         assertEquals(401, request("/example/orders/9001", "GET", switched.token(), null).statusCode());
+        assertEquals(200, request("/example/orders/9001", "GET", reader.token(), null).statusCode());
     }
 
     private Login login() throws Exception {
