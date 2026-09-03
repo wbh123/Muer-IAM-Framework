@@ -83,8 +83,9 @@ without an IAM Principal.
 The document showcase will replace its manual `AuthorizationEngine` calls with
 `@RequirePermission` on read and update methods. Its resolver reads the
 document ID path variable, maps it to the host-owned document, and returns a
-`DOCUMENT` descriptor with `PROJECT` and `DEPARTMENT` parents. The business
-handler remains responsible for returning `404` when the document is absent.
+`DOCUMENT` descriptor with `PROJECT` and `DEPARTMENT` parents. When the host
+cannot find that document, the interceptor returns `404` before invoking the
+business handler.
 
 ## Verification
 

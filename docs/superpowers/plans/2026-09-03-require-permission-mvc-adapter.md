@@ -163,8 +163,8 @@ Expected: the controller still has direct engine ownership and has no resolver.
 - [ ] **Step 3: Implement host mapping and annotation use**
 
 Move document lookup into a focused host-owned store/service shared by the
-controller and resolver. Keep `404` in the controller for an unknown document;
-the interceptor only evaluates known resources. Remove manual principal lookup,
+controller and resolver. The interceptor returns `404` for an unknown document
+before the controller is invoked. Remove manual principal lookup,
 authorization request construction, and direct engine calls from the
 controller. Keep the host security chain and its bearer filter unchanged.
 
