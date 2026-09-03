@@ -9,10 +9,10 @@ evaluation, audit, and diagnostics.
 
 The showcase uses anonymous demonstration data only:
 
-| Identity | Password | Client | Initial profile | Result |
+| Identity | Password | Client | Profile state | Result |
 | --- | --- | --- | --- | --- |
 | `operator-a` | `demo-pass` | `WEB` | `reader-501` | Reads order `9001`; cannot approve it or read department `502`. |
-| `operator-a` | `demo-pass` | `WEB` | `approver-501` | Reads and approves order `9001`; still cannot read department `502`. |
+| `operator-a` | `demo-pass` | `WEB` | `approver-501` after profile switch | Reads and approves order `9001`; still cannot read department `502`. |
 | `operator-b` | `demo-pass` | `WEB` | `reader-502` | Reads order `9002`; cannot read department `501`. |
 
 These credentials exist solely for this consumer example. Do not copy them into
