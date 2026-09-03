@@ -16,7 +16,7 @@ public class ExampleSecurityConfiguration {
     SecurityFilterChain exampleSecurityFilterChain(HttpSecurity http, IamBearerTokenFilter bearerFilter)
             throws Exception {
         return http
-                .securityMatcher("/example/**")
+                .securityMatcher("/example/**", "/api/**")
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(requests -> requests.anyRequest().authenticated())

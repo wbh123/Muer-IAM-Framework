@@ -23,8 +23,9 @@ public class ExampleIdentityAdapter {
                 return Optional.empty();
             }
             var profileId = user.id() == 101L ? 401L : 403L;
+            var templateVersionId = user.id() == 101L ? 302L : 301L;
             return Optional.of(new IamPrincipal(user.id(), "app-user-" + user.id(),
-                    "EXAMPLE", profileId, 301L, request.clientType(), 1L));
+                    "EXAMPLE", profileId, templateVersionId, request.clientType(), 1L));
         };
     }
 }

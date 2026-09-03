@@ -84,10 +84,27 @@ final class IamShowcaseFixture {
     void seedIndependentConsumer(JdbcTemplate jdbc) {
         clearIamTables(jdbc);
         jdbc.update("INSERT INTO iam_user (id, external_ref, username, user_type, authorization_version) VALUES (101, 'author-a', 'author-a', 'MEMBER', 1)");
+        jdbc.update("INSERT INTO iam_user (id, external_ref, username, user_type, authorization_version) VALUES (102, 'reader-b', 'reader-b', 'MEMBER', 1)");
+        jdbc.update("INSERT INTO iam_identity (id, user_id, identity_key, identity_domain, credential_ref) VALUES ('identity-author-a', 101, 'author-a', 'EXAMPLE', 'demo-pass')");
+        jdbc.update("INSERT INTO iam_identity (id, user_id, identity_key, identity_domain, credential_ref) VALUES ('identity-reader-b', 102, 'reader-b', 'EXAMPLE', 'demo-pass')");
         jdbc.update("INSERT INTO iam_permission (id, permission_code, display_name) VALUES (701, 'document:read', 'Read document')");
         jdbc.update("INSERT INTO iam_permission (id, permission_code, display_name) VALUES (702, 'document:create', 'Create document')");
         jdbc.update("INSERT INTO iam_permission (id, permission_code, display_name) VALUES (703, 'document:update', 'Update document')");
         jdbc.update("INSERT INTO iam_permission (id, permission_code, display_name) VALUES (704, 'document:delete', 'Delete document')");
+        jdbc.update("INSERT INTO iam_permission_template (id, template_key, display_name) VALUES (201, 'document-reader', 'Document Reader')");
+        jdbc.update("INSERT INTO iam_permission_template (id, template_key, display_name) VALUES (202, 'document-admin', 'Document Administrator')");
+        jdbc.update("INSERT INTO iam_permission_template_version (id, template_id, version_number, status, published_at) VALUES (301, 201, 1, 'PUBLISHED', CURRENT_TIMESTAMP(6))");
+        jdbc.update("INSERT INTO iam_permission_template_version (id, template_id, version_number, status, published_at) VALUES (302, 202, 1, 'PUBLISHED', CURRENT_TIMESTAMP(6))");
+        jdbc.update("INSERT INTO iam_template_permission (template_version_id, permission_id) VALUES (301, 701)");
+        jdbc.update("INSERT INTO iam_template_permission (template_version_id, permission_id) VALUES (302, 701)");
+        jdbc.update("INSERT INTO iam_template_permission (template_version_id, permission_id) VALUES (302, 702)");
+        jdbc.update("INSERT INTO iam_template_permission (template_version_id, permission_id) VALUES (302, 703)");
+        jdbc.update("INSERT INTO iam_template_permission (template_version_id, permission_id) VALUES (302, 704)");
+        jdbc.update("INSERT INTO iam_authorization_profile (id, user_id, template_version_id, profile_key, display_name, client_types, enabled, revoked_at) VALUES (401, 101, 302, 'author-admin', 'Author Administrator', '[\"WEB\"]', TRUE, NULL)");
+        jdbc.update("INSERT INTO iam_authorization_profile (id, user_id, template_version_id, profile_key, display_name, client_types, enabled, revoked_at) VALUES (403, 102, 301, 'reader-project-101', 'Reader Project 101', '[\"WEB\"]', TRUE, NULL)");
+        jdbc.update("INSERT INTO iam_authorization_scope (profile_id, resource_type, resource_id, scope_access) VALUES (401, 'PROJECT', '101', 'WRITE')");
+        jdbc.update("INSERT INTO iam_authorization_scope (profile_id, resource_type, resource_id, scope_access) VALUES (401, 'PROJECT', '101', 'READ')");
+        jdbc.update("INSERT INTO iam_authorization_scope (profile_id, resource_type, resource_id, scope_access) VALUES (403, 'PROJECT', '101', 'READ')");
     }
 
     private static void clearIamTables(JdbcTemplate jdbc) {
