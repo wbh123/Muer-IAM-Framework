@@ -1,37 +1,186 @@
-# IAM Starter Consumer Example
+# IAM Starter Consumer Showcase
 
-This module is a consuming Spring Boot application, not another IAM deployment
-layer. Its only production dependency is `iam-spring-boot-starter`.
+`iam-example` is a consuming Spring Boot application, not another IAM
+deployment layer. Its only production dependency is `iam-spring-boot-starter`.
+The host application supplies its small `IdentityAuthenticator` and order-to-
+department hierarchy adapter; the starter supplies schema migration, MyBatis
+repositories, opaque tokens, persisted sessions, IAM controllers, permission
+evaluation, audit, and diagnostics.
 
-The example provides a deliberately small `IdentityAuthenticator` and uses the
-starter defaults for schema migration, MyBatis repositories, Redis tokens,
-session persistence, controllers and `/iam/**` security.
+The showcase uses anonymous demonstration data only:
 
-`GET /example/orders/{orderId}` requires `order.read` plus READ access to the
-order's department. `POST /example/orders/{orderId}/approve` requires
-`order.approve` plus WRITE access. The example business security chain reuses
-the starter Bearer filter explicitly, demonstrating how host routes remain
-host-owned while consuming the same IAM principal.
+| Identity | Password | Client | Initial profile | Result |
+| --- | --- | --- | --- | --- |
+| `operator-a` | `demo-pass` | `WEB` | `reader-501` | Reads order `9001`; cannot approve it or read department `502`. |
+| `operator-a` | `demo-pass` | `WEB` | `approver-501` | Reads and approves order `9001`; still cannot read department `502`. |
+| `operator-b` | `demo-pass` | `WEB` | `reader-502` | Reads order `9002`; cannot read department `501`. |
 
-Runtime environment variables:
+These credentials exist solely for this consumer example. Do not copy them into
+a real application or use them as deployment credentials.
 
-```text
-IAM_EXAMPLE_JDBC_URL
-IAM_EXAMPLE_DB_USERNAME
-IAM_EXAMPLE_DB_PASSWORD
-IAM_EXAMPLE_REDIS_HOST
-IAM_EXAMPLE_REDIS_PORT
+## Run it with infrastructure
+
+The application needs MySQL for durable IAM state and Redis for the opaque-
+token index. Set the following environment variables for a MySQL database and
+Redis instance that contain the generic showcase projection. The Testcontainers
+integration command below creates and seeds that projection automatically.
+
+```bash
+export IAM_EXAMPLE_JDBC_URL='jdbc:mysql://127.0.0.1:3306/iam_example'
+export IAM_EXAMPLE_DB_USERNAME='iam'
+export IAM_EXAMPLE_DB_PASSWORD='replace-with-local-password'
+export IAM_EXAMPLE_REDIS_HOST='127.0.0.1'
+export IAM_EXAMPLE_REDIS_PORT='6379'
+
+mvn -pl iam-example -am spring-boot:run
 ```
 
-The bundled `demo` / `demo-pass` credential exists only to demonstrate the
-adapter boundary and must never be copied into a real application. The
-integration test starts isolated MySQL and Redis containers, seeds the matching
-generic IAM projection, logs in over HTTP and reads the persisted session with
-the returned Bearer token.
+Keep the application running, then set its address in a second shell:
 
-The same Bearer token can call `POST /iam/authorization/diagnostics` with the
-generated `AuthorizationEvaluationRequest` JSON to inspect the starter's
-runtime authorization decision. A reader profile receives a
-`PERMISSION_DENIED` decision for order approval, while its permitted read
-request is projected as `ALLOWED`; the example does not recalculate either
-decision.
+```bash
+export IAM_EXAMPLE_BASE_URL='http://127.0.0.1:8080'
+```
+
+The commands below use `curl` and `jq`; they retain the token returned by your
+own login response in shell variables and never require copying, logging, or
+committing an opaque token.
+
+## HTTP walkthrough
+
+### 1. Log in as the reader profile
+
+`POST /iam/auth/login` accepts the demonstration identity only through the
+configured `WEB` client. It returns an `accessToken` and `sessionId`.
+
+```bash
+LOGIN_RESPONSE="$(curl --fail-with-body -sS \
+  -X POST "$IAM_EXAMPLE_BASE_URL/iam/auth/login" \
+  -H 'Content-Type: application/json' \
+  --data '{"username":"operator-a","password":"demo-pass","clientType":"WEB"}')"
+export IAM_EXAMPLE_TOKEN="$(jq -r '.accessToken' <<<"$LOGIN_RESPONSE")"
+export IAM_EXAMPLE_SESSION_ID="$(jq -r '.sessionId' <<<"$LOGIN_RESPONSE")"
+```
+
+A rejected password or non-`WEB` client returns `401` and creates no session.
+
+### 2. Read the resolved identity and its persisted session
+
+`GET /iam/auth/me` resolves the current principal, while `GET /iam/sessions`
+lists that principal's active persisted sessions.
+
+```bash
+curl --fail-with-body -sS "$IAM_EXAMPLE_BASE_URL/iam/auth/me" \
+  -H "Authorization: Bearer $IAM_EXAMPLE_TOKEN"
+
+curl --fail-with-body -sS "$IAM_EXAMPLE_BASE_URL/iam/sessions" \
+  -H "Authorization: Bearer $IAM_EXAMPLE_TOKEN"
+```
+
+The session list includes `IAM_EXAMPLE_SESSION_ID`; MySQL remains the durable
+session authority while Redis indexes opaque tokens.
+
+### 3. Read an allowed order and observe a forbidden department scope
+
+`GET /example/orders/9001` returns `200` for `reader-501` because it has READ
+scope for department `501`.
+
+```bash
+curl --fail-with-body -sS "$IAM_EXAMPLE_BASE_URL/example/orders/9001" \
+  -H "Authorization: Bearer $IAM_EXAMPLE_TOKEN"
+```
+
+`GET /example/orders/9002` returns `403`: the valid identity lacks department
+`502` scope.
+
+```bash
+curl -sS -o /dev/null -w '%{http_code}\n' \
+  "$IAM_EXAMPLE_BASE_URL/example/orders/9002" \
+  -H "Authorization: Bearer $IAM_EXAMPLE_TOKEN"
+# 403
+```
+
+### 4. Observe the reader's forbidden approval
+
+`POST /example/orders/9001/approve` returns `403` under `reader-501`, because
+that profile has no `order.approve` permission.
+
+```bash
+curl -sS -o /dev/null -w '%{http_code}\n' \
+  -X POST "$IAM_EXAMPLE_BASE_URL/example/orders/9001/approve" \
+  -H "Authorization: Bearer $IAM_EXAMPLE_TOKEN"
+# 403
+```
+
+### 5. Switch profile and approve with the replacement token
+
+The seeded approver profile has ID `402`. `POST /iam/authorization/profiles/402/switch`
+creates a separate session and returns
+a new token; it does not modify the reader token.
+
+```bash
+SWITCH_RESPONSE="$(curl --fail-with-body -sS \
+  -X POST "$IAM_EXAMPLE_BASE_URL/iam/authorization/profiles/402/switch" \
+  -H "Authorization: Bearer $IAM_EXAMPLE_TOKEN")"
+export IAM_EXAMPLE_APPROVER_TOKEN="$(jq -r '.accessToken' <<<"$SWITCH_RESPONSE")"
+export IAM_EXAMPLE_APPROVER_SESSION_ID="$(jq -r '.sessionId' <<<"$SWITCH_RESPONSE")"
+
+curl --fail-with-body -sS \
+  -X POST "$IAM_EXAMPLE_BASE_URL/example/orders/9001/approve" \
+  -H "Authorization: Bearer $IAM_EXAMPLE_APPROVER_TOKEN"
+```
+
+The approval returns `200`. The original reader token still cannot approve.
+
+### 6. Inspect runtime authorization diagnostics
+
+`POST /iam/authorization/diagnostics` projects the starter's decision; the
+example does not recompute permissions or scope. This reader-token request
+returns a denied `PERMISSION_DENIED` decision with its decision steps.
+
+```bash
+curl --fail-with-body -sS \
+  -X POST "$IAM_EXAMPLE_BASE_URL/iam/authorization/diagnostics" \
+  -H 'Content-Type: application/json' \
+  -H "Authorization: Bearer $IAM_EXAMPLE_TOKEN" \
+  --data '{"permissionCode":"order.approve","applicationCode":"EXAMPLE","clientType":"WEB","resourceType":"ORDER","resourceId":"9001","scopeAccess":"WRITE"}'
+```
+
+For an allowed decision, submit `order.read`, resource type `DEPARTMENT`,
+resource ID `501`, and scope access `READ` with the same reader token.
+
+### 7. Revoke the replacement session
+
+`POST /iam/sessions/{sessionId}/revoke` invalidates every opaque token for that
+session. Reusing the replacement token for `GET /example/orders/9001` then
+returns `401`; the separate reader session remains active.
+
+```bash
+curl --fail-with-body -sS -o /dev/null -w '%{http_code}\n' \
+  -X POST "$IAM_EXAMPLE_BASE_URL/iam/sessions/$IAM_EXAMPLE_APPROVER_SESSION_ID/revoke" \
+  -H 'Content-Type: application/json' \
+  -H "Authorization: Bearer $IAM_EXAMPLE_APPROVER_TOKEN" \
+  --data '{}'
+# 204
+
+curl -sS -o /dev/null -w '%{http_code}\n' \
+  "$IAM_EXAMPLE_BASE_URL/example/orders/9001" \
+  -H "Authorization: Bearer $IAM_EXAMPLE_APPROVER_TOKEN"
+# 401
+```
+
+## Verification boundaries
+
+The fast smoke check is container-free and proves a consuming Spring Boot
+application discovers the starter:
+
+```bash
+mvn -pl iam-example -am -Dtest=IamStarterAutoConfigurationSmokeTest -Dsurefire.failIfNoSpecifiedTests=false test
+```
+
+The real-infrastructure suite requires Docker. It starts isolated MySQL and
+Redis Testcontainers, seeds the generic projection, and proves this HTTP
+walkthrough including profile switching and revocation:
+
+```bash
+mvn -pl iam-example -am -Pintegration -Dtest=IamStarterConsumptionTest,IamSecurityIntegrationTest -Dsurefire.failIfNoSpecifiedTests=false test
+```
