@@ -81,6 +81,15 @@ final class IamShowcaseFixture {
         insertScope(jdbc, 403, "502", "READ");
     }
 
+    void seedIndependentConsumer(JdbcTemplate jdbc) {
+        clearIamTables(jdbc);
+        jdbc.update("INSERT INTO iam_user (id, external_ref, username, user_type, authorization_version) VALUES (101, 'author-a', 'author-a', 'MEMBER', 1)");
+        jdbc.update("INSERT INTO iam_permission (id, permission_code, display_name) VALUES (701, 'document:read', 'Read document')");
+        jdbc.update("INSERT INTO iam_permission (id, permission_code, display_name) VALUES (702, 'document:create', 'Create document')");
+        jdbc.update("INSERT INTO iam_permission (id, permission_code, display_name) VALUES (703, 'document:update', 'Update document')");
+        jdbc.update("INSERT INTO iam_permission (id, permission_code, display_name) VALUES (704, 'document:delete', 'Delete document')");
+    }
+
     private static void clearIamTables(JdbcTemplate jdbc) {
         jdbc.update("DELETE FROM iam_audit_subject_link");
         jdbc.update("DELETE FROM iam_audit_log");
