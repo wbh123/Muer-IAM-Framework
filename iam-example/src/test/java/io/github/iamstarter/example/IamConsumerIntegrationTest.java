@@ -69,11 +69,11 @@ class IamConsumerIntegrationTest {
         var author = login("author-a");
         var reader = login("reader-b");
 
-        assertEquals(200, request("/iam/auth/me", "GET", author, null).statusCode());
-        var authorRead = request("/api/documents/1001", "GET", author, null);
+        assertEquals(200, request("/iam/auth/me", "GET", author.token(), null).statusCode());
+        var authorRead = request("/api/documents/1001", "GET", author.token(), null);
         assertEquals(200, authorRead.statusCode(), authorRead.body());
-        assertEquals(200, request("/api/documents/1001", "GET", reader, null).statusCode());
-        var crossProjectRead = request("/api/documents/2001", "GET", reader, null);
+        assertEquals(200, request("/api/documents/1001", "GET", reader.token(), null).statusCode());
+        var crossProjectRead = request("/api/documents/2001", "GET", reader.token(), null);
         assertEquals(403, crossProjectRead.statusCode(), crossProjectRead.body());
         assertEquals(401, request("/api/documents/1001", "GET", null, null).statusCode());
     }
@@ -87,18 +87,29 @@ class IamConsumerIntegrationTest {
         var update = "{\"status\":\"PUBLISHED\"}";
 
         assertEquals(401, request("/api/documents/1001", "POST", null, update).statusCode());
-        assertEquals(403, request("/api/documents/1001", "POST", reader, update).statusCode());
-        var updated = request("/api/documents/1001", "POST", author, update);
+        assertEquals(403, request("/api/documents/1001", "POST", reader.token(), update).statusCode());
+        var updated = request("/api/documents/1001", "POST", author.token(), update);
         assertEquals(200, updated.statusCode(), updated.body());
         assertEquals("PUBLISHED", json.readTree(updated.body()).path("status").asText());
     }
 
-    private String login(String username) throws Exception {
+    @Test
+    void revoked_consumer_session_cannot_reuse_its_bearer_token() throws Exception {
+        new IamShowcaseFixture().seedIndependentConsumer(jdbc);
+
+        var author = login("author-a");
+
+        assertEquals(200, request("/api/documents/1001", "GET", author.token(), null).statusCode());
+        assertEquals(204, request("/iam/sessions/" + author.sessionId() + "/revoke", "POST", author.token(), "{}").statusCode());
+        assertEquals(401, request("/api/documents/1001", "GET", author.token(), null).statusCode());
+    }
+
+    private Login login(String username) throws Exception {
         var response = request("/iam/auth/login", "POST", null,
                 "{\"username\":\"%s\",\"password\":\"demo-pass\",\"clientType\":\"WEB\"}".formatted(username));
         assertEquals(200, response.statusCode());
         JsonNode body = json.readTree(response.body());
-        return body.path("accessToken").asText();
+        return new Login(body.path("accessToken").asText(), body.path("sessionId").asText());
     }
 
     private HttpResponse<String> request(String path, String method, String token, String body) throws Exception {
@@ -109,4 +120,6 @@ class IamConsumerIntegrationTest {
                 : HttpRequest.BodyPublishers.ofString(body));
         return http.send(builder.build(), HttpResponse.BodyHandlers.ofString());
     }
+
+    private record Login(String token, String sessionId) { }
 }
