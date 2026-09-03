@@ -28,3 +28,10 @@ adapter boundary and must never be copied into a real application. The
 integration test starts isolated MySQL and Redis containers, seeds the matching
 generic IAM projection, logs in over HTTP and reads the persisted session with
 the returned Bearer token.
+
+The same Bearer token can call `POST /iam/authorization/diagnostics` with the
+generated `AuthorizationEvaluationRequest` JSON to inspect the starter's
+runtime authorization decision. A reader profile receives a
+`PERMISSION_DENIED` decision for order approval, while its permitted read
+request is projected as `ALLOWED`; the example does not recalculate either
+decision.

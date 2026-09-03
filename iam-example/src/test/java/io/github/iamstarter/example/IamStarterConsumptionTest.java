@@ -4,6 +4,7 @@ import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 import io.github.iamstarter.authentication.AuthenticationService;
 import io.github.iamstarter.session.SessionRepository;
+import io.github.iamstarter.web.dto.AuthorizationEvaluationRequest;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(classes = IamExampleApplication.class,
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -131,6 +133,25 @@ class IamStarterConsumptionTest {
     }
 
     @Test
+    void authorization_diagnostics_projects_denied_and_allowed_runtime_decisions() throws Exception {
+        fixture.seedOperatorAProfiles(jdbc);
+        String readerToken = loginToken("operator-a");
+
+        var denied = diagnose(readerToken, authorizationRequest(
+                "order.approve", "ORDER", "9001", AuthorizationEvaluationRequest.ScopeAccessEnum.WRITE));
+
+        assertEquals(false, denied.allowed());
+        assertEquals("PERMISSION_DENIED", denied.decisionCode());
+        assertTrue(denied.steps().stream().anyMatch(step -> step.code().contains("PERMISSION")));
+
+        var allowed = diagnose(readerToken, authorizationRequest(
+                "order.read", "DEPARTMENT", "501", AuthorizationEvaluationRequest.ScopeAccessEnum.READ));
+
+        assertEquals(true, allowed.allowed());
+        assertEquals("ALLOWED", allowed.decisionCode());
+    }
+
+    @Test
     void rejected_client_or_credentials_do_not_create_a_session() throws Exception {
         fixture.seedOperatorA(jdbc);
 
@@ -163,5 +184,27 @@ class IamStarterConsumptionTest {
         return request("/iam/auth/login", "POST", null, """
                 {"username":"%s","password":"%s","clientType":"%s"}
                 """.formatted(username, password, clientType));
+    }
+
+    private AuthorizationEvaluationRequest authorizationRequest(String permissionCode, String resourceType,
+                                                                  String resourceId,
+                                                                  AuthorizationEvaluationRequest.ScopeAccessEnum scopeAccess) {
+        return new AuthorizationEvaluationRequest(permissionCode, "EXAMPLE", "WEB", resourceType, resourceId, scopeAccess);
+    }
+
+    private Diagnosis diagnose(String token, AuthorizationEvaluationRequest authorizationRequest) throws Exception {
+        var response = request("/iam/authorization/diagnostics", "POST", token,
+                json.writeValueAsString(authorizationRequest));
+        assertEquals(200, response.statusCode());
+        JsonNode body = json.readTree(response.body());
+        return new Diagnosis(body.path("allowed").asBoolean(), body.path("decisionCode").asText(), body.path("steps").valueStream()
+                .map(step -> new DiagnosisStep(step.path("code").asText()))
+                .toList());
+    }
+
+    private record Diagnosis(boolean allowed, String decisionCode, List<DiagnosisStep> steps) {
+    }
+
+    private record DiagnosisStep(String code) {
     }
 }
