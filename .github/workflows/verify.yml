@@ -2,9 +2,10 @@ name: Verify IAM Starter
 
 on:
   push:
-    branches: [main, develop/**, feature/**]
+    branches: [main, develop/**, feature/**, codex/**]
   pull_request:
     branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -46,5 +47,53 @@ jobs:
           -Dtest=IamStarterAutoConfigurationSmokeTest
           -Dsurefire.failIfNoSpecifiedTests=false test
 
+      - name: Verify consumer showcase documentation
+        run: bash scripts/test-showcase-readme.sh
+
       - name: Package the consumable Starter
         run: mvn -B -pl iam-spring-boot-starter -am package -DskipTests
+
+  showcase-integration:
+    name: Docker/Testcontainers consumer showcase
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Check Docker availability
+        run: docker info
+
+      - name: Run MySQL and Redis consumer walkthrough
+        run: >-
+          mvn -B -pl iam-example -am -Pintegration
+          -Dtest=IamStarterConsumptionTest,IamSecurityIntegrationTest
+          -Dsurefire.failIfNoSpecifiedTests=false test
+
+  consumer-integration:
+    name: Independent Consumer acceptance
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Check Docker availability
+        run: docker info
+
+      - name: Enforce Consumer public API boundary
+        run: bash scripts/verify-consumer-public-api.sh
+
+      - name: Run independent Consumer acceptance
+        run: >-
+          mvn -B -pl iam-example -am -Pintegration
+          -Dtest=IamConsumerIntegrationTest
+          -Dsurefire.failIfNoSpecifiedTests=false test

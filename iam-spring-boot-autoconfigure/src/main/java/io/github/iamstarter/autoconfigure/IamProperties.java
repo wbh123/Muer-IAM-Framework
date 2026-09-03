@@ -1,5 +1,6 @@
 package io.github.iamstarter.autoconfigure;
 
+import jakarta.annotation.PostConstruct;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.time.Duration;
@@ -50,6 +51,22 @@ public class IamProperties {
 
     public void setClientTypes(List<String> clientTypes) {
         this.clientTypes = new ArrayList<>(clientTypes == null ? List.of() : clientTypes);
+    }
+
+    @PostConstruct
+    void validate() {
+        if (token.ttl == null || token.ttl.isZero() || token.ttl.isNegative()) {
+            throw new IllegalStateException("iam.token.ttl must be positive");
+        }
+        if (clientTypes.isEmpty() || clientTypes.stream().anyMatch(type -> type == null || type.isBlank())) {
+            throw new IllegalStateException("iam.client-types must contain at least one non-blank value");
+        }
+        if (token.redisPrefix == null || token.redisPrefix.isBlank()) {
+            throw new IllegalStateException("iam.token.redis-prefix must not be blank");
+        }
+        if (schema.historyTable == null || schema.historyTable.isBlank()) {
+            throw new IllegalStateException("iam.schema.history-table must not be blank");
+        }
     }
 
     public static class Token {

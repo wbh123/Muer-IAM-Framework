@@ -18,4 +18,5 @@ foreach ($token in $ForbiddenToken) {
     }
 }
 
+$global:LASTEXITCODE = 0
 Write-Host 'Forbidden-identifier scan passed.'

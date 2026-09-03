@@ -4,8 +4,8 @@ import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 import io.github.iamstarter.authentication.AuthenticationService;
 import io.github.iamstarter.session.SessionRepository;
+import io.github.iamstarter.web.dto.AuthorizationEvaluationRequest;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,13 +22,17 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(classes = IamExampleApplication.class,
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class IamStarterConsumptionTest {
+    private final IamShowcaseFixture fixture = new IamShowcaseFixture();
+
     static final MySQLContainer<?> MYSQL = new MySQLContainer<>(DockerImageName.parse("mysql:8.4"))
             .withDatabaseName("iam_example")
             .withUsername("iam")
@@ -71,36 +75,6 @@ class IamStarterConsumptionTest {
 
     private final HttpClient http = HttpClient.newHttpClient();
 
-    @BeforeEach
-    void seedIdentityProjection() {
-        jdbc.update("DELETE FROM iam_session");
-        jdbc.update("DELETE FROM iam_authorization_scope");
-        jdbc.update("DELETE FROM iam_authorization_profile");
-        jdbc.update("DELETE FROM iam_template_permission");
-        jdbc.update("DELETE FROM iam_permission_template_version");
-        jdbc.update("DELETE FROM iam_permission_template");
-        jdbc.update("DELETE FROM iam_permission");
-        jdbc.update("DELETE FROM iam_user");
-        jdbc.update("""
-                INSERT INTO iam_user (id, external_ref, username, user_type, authorization_version)
-                VALUES (101, 'example-user', 'example-user', 'MEMBER', 1)
-                """);
-        jdbc.update("INSERT INTO iam_permission_template (id, template_key, display_name) VALUES (201, 'example', 'Example')");
-        jdbc.update("INSERT INTO iam_permission_template_version (id, template_id, version_number, status) VALUES (301, 201, 1, 'PUBLISHED')");
-        jdbc.update("INSERT INTO iam_permission (id, permission_code, display_name) VALUES (601, 'order.read', 'Read order')");
-        jdbc.update("INSERT INTO iam_template_permission (template_version_id, permission_id) VALUES (301, 601)");
-        jdbc.update("""
-                INSERT INTO iam_authorization_profile
-                    (id, user_id, template_version_id, profile_key, display_name, client_types, enabled, revoked_at)
-                VALUES (401, 101, 301, 'default', 'Default', '[\"WEB\"]', TRUE, NULL)
-                """);
-        jdbc.update("""
-                INSERT INTO iam_authorization_scope
-                    (profile_id, resource_type, resource_id, scope_access)
-                VALUES (401, 'DEPARTMENT', '501', 'READ')
-                """);
-    }
-
     @Test
     void one_starter_dependency_auto_configures_the_runtime() {
         assertNotNull(context.getBean(AuthenticationService.class));
@@ -108,9 +82,23 @@ class IamStarterConsumptionTest {
     }
 
     @Test
+    void seeded_reader_profile_can_read_only_its_department_through_operator_a_principal() throws Exception {
+        fixture.seedOperatorA(jdbc);
+
+        assertEquals(List.of("READ"), jdbc.queryForList("""
+                SELECT scope_access FROM iam_authorization_scope
+                WHERE profile_id = 401 AND resource_type = 'DEPARTMENT' AND resource_id = '501'
+                ORDER BY scope_access
+                """, String.class));
+        assertEquals(200, requestAsOperatorA("/example/orders/9001").statusCode());
+        assertEquals(403, requestAsOperatorA("/example/orders/9002").statusCode());
+    }
+
+    @Test
     void login_token_and_persisted_session_work_across_real_infrastructure() throws Exception {
+        fixture.seedOperatorA(jdbc);
         var login = request("/iam/auth/login", "POST", null,
-                "{\"username\":\"demo\",\"password\":\"demo-pass\",\"clientType\":\"WEB\"}");
+                "{\"username\":\"operator-a\",\"password\":\"demo-pass\",\"clientType\":\"WEB\"}");
         assertEquals(200, login.statusCode());
         JsonNode loginBody = json.readTree(login.body());
         String token = loginBody.path("accessToken").asText();
@@ -127,6 +115,51 @@ class IamStarterConsumptionTest {
         assertEquals(403, request("/example/orders/9002", "GET", token, null).statusCode());
     }
 
+    @Test
+    void profile_switch_changes_order_approval_from_reader_denial_to_approver_success() throws Exception {
+        fixture.seedOperatorAProfiles(jdbc);
+        String readerToken = loginToken("operator-a");
+
+        assertEquals(403, request("/example/orders/9001/approve", "POST", readerToken, null).statusCode());
+        var profiles = request("/iam/authorization/profiles", "GET", readerToken, null);
+        assertEquals(200, profiles.statusCode());
+        assertEquals(2, json.readTree(profiles.body()).size());
+
+        var switchResponse = request("/iam/authorization/profiles/" + IamShowcaseFixture.APPROVER_501_PROFILE_ID + "/switch", "POST", readerToken, null);
+        assertEquals(200, switchResponse.statusCode());
+        String approverToken = json.readTree(switchResponse.body()).path("accessToken").asText();
+
+        assertEquals(200, request("/example/orders/9001/approve", "POST", approverToken, null).statusCode());
+    }
+
+    @Test
+    void authorization_diagnostics_projects_denied_and_allowed_runtime_decisions() throws Exception {
+        fixture.seedOperatorAProfiles(jdbc);
+        String readerToken = loginToken("operator-a");
+
+        var denied = diagnose(readerToken, authorizationRequest(
+                "order.approve", "ORDER", "9001", AuthorizationEvaluationRequest.ScopeAccessEnum.WRITE));
+
+        assertEquals(false, denied.allowed());
+        assertEquals("PERMISSION_DENIED", denied.decisionCode());
+        assertTrue(denied.steps().stream().anyMatch(step -> step.code().contains("PERMISSION")));
+
+        var allowed = diagnose(readerToken, authorizationRequest(
+                "order.read", "DEPARTMENT", "501", AuthorizationEvaluationRequest.ScopeAccessEnum.READ));
+
+        assertEquals(true, allowed.allowed());
+        assertEquals("ALLOWED", allowed.decisionCode());
+    }
+
+    @Test
+    void rejected_client_or_credentials_do_not_create_a_session() throws Exception {
+        fixture.seedOperatorA(jdbc);
+
+        assertEquals(401, login("operator-a", "demo-pass", "MOBILE").statusCode());
+        assertEquals(401, login("operator-a", "wrong", "WEB").statusCode());
+        assertEquals(0L, jdbc.queryForObject("SELECT COUNT(*) FROM iam_session", Long.class));
+    }
+
     private HttpResponse<String> request(String path, String method, String token, String body) throws Exception {
         var builder = HttpRequest.newBuilder(URI.create("http://127.0.0.1:" + port + path))
                 .header("Content-Type", "application/json");
@@ -134,5 +167,44 @@ class IamStarterConsumptionTest {
         builder.method(method, body == null ? HttpRequest.BodyPublishers.noBody()
                 : HttpRequest.BodyPublishers.ofString(body));
         return http.send(builder.build(), HttpResponse.BodyHandlers.ofString());
+    }
+
+    private HttpResponse<String> requestAsOperatorA(String path) throws Exception {
+        return request(path, "GET", loginToken("operator-a"), null);
+    }
+
+    private String loginToken(String username) throws Exception {
+        var login = request("/iam/auth/login", "POST", null,
+                "{\"username\":\"%s\",\"password\":\"demo-pass\",\"clientType\":\"WEB\"}".formatted(username));
+        assertEquals(200, login.statusCode(), "%s must authenticate".formatted(username));
+        return json.readTree(login.body()).path("accessToken").asText();
+    }
+
+    private HttpResponse<String> login(String username, String password, String clientType) throws Exception {
+        return request("/iam/auth/login", "POST", null, """
+                {"username":"%s","password":"%s","clientType":"%s"}
+                """.formatted(username, password, clientType));
+    }
+
+    private AuthorizationEvaluationRequest authorizationRequest(String permissionCode, String resourceType,
+                                                                  String resourceId,
+                                                                  AuthorizationEvaluationRequest.ScopeAccessEnum scopeAccess) {
+        return new AuthorizationEvaluationRequest(permissionCode, "EXAMPLE", "WEB", resourceType, resourceId, scopeAccess);
+    }
+
+    private Diagnosis diagnose(String token, AuthorizationEvaluationRequest authorizationRequest) throws Exception {
+        var response = request("/iam/authorization/diagnostics", "POST", token,
+                json.writeValueAsString(authorizationRequest));
+        assertEquals(200, response.statusCode());
+        JsonNode body = json.readTree(response.body());
+        return new Diagnosis(body.path("allowed").asBoolean(), body.path("decisionCode").asText(), body.path("steps").valueStream()
+                .map(step -> new DiagnosisStep(step.path("code").asText()))
+                .toList());
+    }
+
+    private record Diagnosis(boolean allowed, String decisionCode, List<DiagnosisStep> steps) {
+    }
+
+    private record DiagnosisStep(String code) {
     }
 }
