@@ -35,6 +35,9 @@ import io.github.iamstarter.persistence.RedisTokenStore;
 import io.github.iamstarter.persistence.MyBatisLoginEventRepository;
 import io.github.iamstarter.persistence.MyBatisIamUserRepository;
 import io.github.iamstarter.persistence.MyBatisIdentityRepository;
+import io.github.iamstarter.autoconfigure.web.IamAuthorizationInterceptor;
+import io.github.iamstarter.autoconfigure.web.IamAuthorizationWebMvcConfiguration;
+import io.github.iamstarter.autoconfigure.web.MvcResourceDescriptorResolver;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.builder.xml.XMLMapperBuilder;
 import org.apache.ibatis.io.Resources;
@@ -58,6 +61,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.time.Clock;
 import java.util.Optional;
@@ -215,6 +219,23 @@ public class IamAutoConfiguration {
     @ConditionalOnBean(AuthenticationService.class)
     IamBearerTokenFilter iamBearerTokenFilter(AuthenticationService authentication) {
         return new IamBearerTokenFilter(authentication);
+    }
+
+    @Bean
+    @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
+    @ConditionalOnBean(AuthorizationEngine.class)
+    @ConditionalOnMissingBean(IamAuthorizationInterceptor.class)
+    IamAuthorizationInterceptor iamAuthorizationInterceptor(AuthorizationEngine authorization,
+                                                             ObjectProvider<MvcResourceDescriptorResolver> resources) {
+        return new IamAuthorizationInterceptor(authorization, resources.getIfAvailable());
+    }
+
+    @Bean
+    @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
+    @ConditionalOnBean(IamAuthorizationInterceptor.class)
+    @ConditionalOnMissingBean(IamAuthorizationWebMvcConfiguration.class)
+    WebMvcConfigurer iamAuthorizationWebMvcConfigurer(IamAuthorizationInterceptor interceptor) {
+        return new IamAuthorizationWebMvcConfiguration(interceptor);
     }
 
     @Bean(name = "iamBearerTokenFilterRegistration")

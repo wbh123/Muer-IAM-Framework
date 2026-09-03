@@ -20,6 +20,7 @@ import io.github.iamstarter.persistence.MyBatisAuthorizationVersionRepository;
 import io.github.iamstarter.persistence.MyBatisPermissionTemplateVersionRepository;
 import io.github.iamstarter.persistence.MyBatisSessionRepository;
 import io.github.iamstarter.persistence.RedisTokenStore;
+import io.github.iamstarter.autoconfigure.web.IamAuthorizationInterceptor;
 import org.apache.ibatis.session.SqlSessionFactory;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.AfterEach;
@@ -36,6 +37,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.time.Duration;
@@ -166,7 +168,11 @@ class IamAutoConfigurationTest {
                 .withConfiguration(org.springframework.boot.autoconfigure.AutoConfigurations.of(
                         SecurityAutoConfiguration.class, ServletWebSecurityAutoConfiguration.class,
                         IamAutoConfiguration.class))
-                .run(context -> assertNotNull(context.getBean("iamSecurityFilterChain", SecurityFilterChain.class)));
+                .run(context -> {
+                    assertNotNull(context.getBean("iamSecurityFilterChain", SecurityFilterChain.class));
+                    assertNotNull(context.getBean(IamAuthorizationInterceptor.class));
+                    assertNotNull(context.getBean("iamAuthorizationWebMvcConfigurer", WebMvcConfigurer.class));
+                });
     }
 
     @Test
