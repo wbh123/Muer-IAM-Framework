@@ -101,9 +101,11 @@ final class IamShowcaseFixture {
         jdbc.update("INSERT INTO iam_template_permission (template_version_id, permission_id) VALUES (302, 703)");
         jdbc.update("INSERT INTO iam_template_permission (template_version_id, permission_id) VALUES (302, 704)");
         jdbc.update("INSERT INTO iam_authorization_profile (id, user_id, template_version_id, profile_key, display_name, client_types, enabled, revoked_at) VALUES (401, 101, 302, 'author-admin', 'Author Administrator', '[\"WEB\"]', TRUE, NULL)");
+        jdbc.update("INSERT INTO iam_authorization_profile (id, user_id, template_version_id, profile_key, display_name, client_types, enabled, revoked_at) VALUES (402, 101, 301, 'author-reader', 'Author Reader', '[\"WEB\"]', TRUE, NULL)");
         jdbc.update("INSERT INTO iam_authorization_profile (id, user_id, template_version_id, profile_key, display_name, client_types, enabled, revoked_at) VALUES (403, 102, 301, 'reader-project-101', 'Reader Project 101', '[\"WEB\"]', TRUE, NULL)");
         jdbc.update("INSERT INTO iam_authorization_scope (profile_id, resource_type, resource_id, scope_access) VALUES (401, 'PROJECT', '101', 'WRITE')");
         jdbc.update("INSERT INTO iam_authorization_scope (profile_id, resource_type, resource_id, scope_access) VALUES (401, 'PROJECT', '101', 'READ')");
+        jdbc.update("INSERT INTO iam_authorization_scope (profile_id, resource_type, resource_id, scope_access) VALUES (402, 'PROJECT', '101', 'READ')");
         jdbc.update("INSERT INTO iam_authorization_scope (profile_id, resource_type, resource_id, scope_access) VALUES (403, 'PROJECT', '101', 'READ')");
     }
 

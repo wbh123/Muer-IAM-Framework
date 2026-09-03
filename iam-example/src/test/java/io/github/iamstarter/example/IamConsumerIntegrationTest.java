@@ -104,10 +104,30 @@ class IamConsumerIntegrationTest {
         assertEquals(401, request("/api/documents/1001", "GET", author.token(), null).statusCode());
     }
 
+    @Test
+    void switched_consumer_profile_loses_write_access_without_invalidating_the_admin_session() throws Exception {
+        new IamShowcaseFixture().seedIndependentConsumer(jdbc);
+
+        var admin = login("author-a");
+        var reader = switchProfile(admin, 402L);
+        var update = "{\"status\":\"REVIEWED\"}";
+
+        assertEquals(200, request("/api/documents/1001", "GET", reader.token(), null).statusCode());
+        assertEquals(403, request("/api/documents/1001", "POST", reader.token(), update).statusCode());
+        assertEquals(200, request("/api/documents/1001", "POST", admin.token(), update).statusCode());
+    }
+
     private Login login(String username) throws Exception {
         var response = request("/iam/auth/login", "POST", null,
                 "{\"username\":\"%s\",\"password\":\"demo-pass\",\"clientType\":\"WEB\"}".formatted(username));
         assertEquals(200, response.statusCode());
+        JsonNode body = json.readTree(response.body());
+        return new Login(body.path("accessToken").asText(), body.path("sessionId").asText());
+    }
+
+    private Login switchProfile(Login current, long profileId) throws Exception {
+        var response = request("/iam/authorization/profiles/" + profileId + "/switch", "POST", current.token(), null);
+        assertEquals(200, response.statusCode(), response.body());
         JsonNode body = json.readTree(response.body());
         return new Login(body.path("accessToken").asText(), body.path("sessionId").asText());
     }
