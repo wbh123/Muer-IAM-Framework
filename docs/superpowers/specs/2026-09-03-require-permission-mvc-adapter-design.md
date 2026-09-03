@@ -43,8 +43,9 @@ Optional<ResourceDescriptor> resolve(HttpServletRequest request, HandlerMethod h
 
 The resolver returns the resource to evaluate for the matched handler. It may
 use validated request path variables and host services. Returning an empty
-result is a host configuration error for an annotated route; it is not treated
-as allowed access or as a missing resource.
+result means the requested host resource does not exist and produces `404`; it
+is never treated as allowed access. An annotated route without a resolver bean
+is a host configuration error.
 
 ## Request flow
 
@@ -60,8 +61,8 @@ MVC handler with @RequirePermission
 
 If no annotation is present, the interceptor does nothing. If an annotated
 handler has no authenticated `IamPrincipal`, the response is `401`. If the
-engine denies the request, the response is `403`. If no resolver bean exists
-or it returns empty for an annotated handler, the interceptor returns `500` so
+engine denies the request, the response is `403`. If the resolver returns empty
+the interceptor returns `404`. If no resolver bean exists, it returns `500` so
 an incomplete host integration cannot silently expose a route.
 
 ## Auto-configuration
@@ -88,8 +89,8 @@ handler remains responsible for returning `404` when the document is absent.
 ## Verification
 
 Focused unit tests prove annotation precedence, an unannotated handler bypass,
-unauthenticated `401`, resolver misconfiguration `500`, engine denial `403`,
-and an allowed request reaching the handler. Consumer integration tests prove
+unauthenticated `401`, missing-resource `404`, resolver misconfiguration `500`,
+engine denial `403`, and an allowed request reaching the handler. Consumer integration tests prove
 the document read/write, cross-project denial, profile switch, and session
 revocation flows still return their established HTTP results through the
 annotation path.

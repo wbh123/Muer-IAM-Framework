@@ -56,9 +56,19 @@ class IamAuthorizationInterceptorTest {
     }
 
     @Test
-    void fails_closed_when_the_host_cannot_resolve_the_resource() throws Exception {
+    void returns_not_found_when_the_host_cannot_resolve_the_resource() throws Exception {
         authenticate();
         var interceptor = new IamAuthorizationInterceptor(mock(AuthorizationEngine.class), (request, method) -> Optional.empty());
+        var response = new MockHttpServletResponse();
+
+        assertFalse(interceptor.preHandle(new MockHttpServletRequest(), response, handler("read")));
+        assertEquals(404, response.getStatus());
+    }
+
+    @Test
+    void fails_closed_when_an_annotated_handler_has_no_resource_resolver() throws Exception {
+        authenticate();
+        var interceptor = new IamAuthorizationInterceptor(mock(AuthorizationEngine.class), null);
         var response = new MockHttpServletResponse();
 
         assertFalse(interceptor.preHandle(new MockHttpServletRequest(), response, handler("read")));

@@ -34,7 +34,7 @@ public final class IamAuthorizationInterceptor implements HandlerInterceptor {
         if (principal == null) return deny(response, HttpServletResponse.SC_UNAUTHORIZED);
         if (resources == null) return deny(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         var resource = resources.resolve(request, method);
-        if (resource.isEmpty()) return deny(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        if (resource.isEmpty()) return deny(response, HttpServletResponse.SC_NOT_FOUND);
         var decision = authorization.decide(principal, new AuthorizationRequest(
                 requirement.value(), principal.identityDomain(), principal.clientType(),
                 resource.orElseThrow(), requirement.access()));

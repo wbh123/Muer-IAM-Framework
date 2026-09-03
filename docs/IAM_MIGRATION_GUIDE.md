@@ -15,6 +15,7 @@ that endpoint is explicitly migrated.
 | Credential verification | `IdentityAuthenticator` |
 | Authenticated user projection | `IamPrincipal` |
 | Resource lookup and ancestry | `ResourceDescriptor`, `ResourceHierarchyProvider` |
+| MVC route permission declaration | `@RequirePermission`, `MvcResourceDescriptorResolver` |
 | Additional risk or compliance rules | `AuthorizationPolicy` |
 | Existing permission assignment | `PermissionTemplateVersion` |
 | Current assignment and validity | `AuthorizationProfile` |
@@ -28,8 +29,8 @@ depend on host entities, mappers or vocabulary.
 1. Publish the starter without enabling it in production.
 2. Project users, identities, templates, profiles and scopes into IAM tables.
 3. Implement credential and resource-hierarchy adapters.
-4. Run the existing authorization path and `AuthorizationEngine.decide` in
-   shadow mode for one read-only endpoint.
+4. Run the existing authorization path and either `AuthorizationEngine.decide`
+   or `@RequirePermission` in shadow mode for one read-only endpoint.
 5. Compare allowed/denied outcomes and diagnostic step codes. Resolve every
    mismatch before changing enforcement authority.
 6. Enable IAM enforcement for that endpoint while retaining an immediate
@@ -51,6 +52,26 @@ depend on host entities, mappers or vocabulary.
 
 IAM uses migrations from `classpath:db/iam/migration` and its own
 `iam_flyway_schema_history`. This keeps host migration numbering independent.
+
+## Declarative MVC enforcement
+
+For Servlet MVC handlers, a host may replace repeated controller-level engine
+calls with the starter's public web API:
+
+```java
+@RequirePermission(value = "invoice:approve", access = ScopeAccess.WRITE)
+@PostMapping("/api/invoices/{id}/approve")
+ResponseEntity<Invoice> approve(@PathVariable String id) { /* host logic */ }
+```
+
+The host registers one `MvcResourceDescriptorResolver` that converts validated
+route variables into a host-owned `ResourceDescriptor`. The starter evaluates
+that descriptor with the current `IamPrincipal`; it does not discover or model
+host entities. Unannotated routes are unaffected. Annotated requests return
+`401` without a principal, `403` on engine denial, `404` when the resolver
+cannot find the requested resource, and `500` when no resolver is registered.
+Direct engine invocation remains the correct option outside MVC or when a
+single request needs exceptional authorization flow.
 
 ## Rollback
 

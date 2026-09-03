@@ -43,6 +43,32 @@ publishing changes:
 bash scripts/verify-consumer-public-api.sh
 ```
 
+### Declarative MVC authorization
+
+The document controller declares its permission at the endpoint boundary. The
+host application supplies the resource mapping; the starter supplies the MVC
+interceptor and delegates the final decision to `AuthorizationEngine`.
+
+```java
+@GetMapping("/api/documents/{id}")
+@RequirePermission("document:read")
+ResponseEntity<Document> read(@PathVariable String id) { /* host handler */ }
+
+@Component
+final class DocumentResourceResolver implements MvcResourceDescriptorResolver {
+    public Optional<ResourceDescriptor> resolve(HttpServletRequest request, HandlerMethod handler) {
+        // Resolve validated route variables through host-owned services.
+    }
+}
+```
+
+An unannotated route is unchanged. An annotated route returns `401` without an
+IAM principal, `403` when the engine denies access, `404` when the host cannot
+find the requested resource, and `500` when no resolver bean is registered.
+Applications retain ownership of authentication filters, route-to-resource
+mapping, and business handlers. Direct `AuthorizationEngine.decide(...)` use
+remains available for non-MVC or exceptional flows.
+
 Run the document and session acceptance suite against temporary MySQL and
 Redis containers:
 

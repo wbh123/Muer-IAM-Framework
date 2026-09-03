@@ -15,7 +15,7 @@
 - Public types live under `io.github.iamstarter.autoconfigure.web` and are available through `iam-spring-boot-starter`.
 - The adapter delegates only to `AuthorizationEngine`; it never treats roles as authorization input.
 - Hosts resolve all business resources through `MvcResourceDescriptorResolver`.
-- Annotated handlers return `401` without an IAM Principal, `403` on engine denial, and `500` when a host resolver is missing or returns empty.
+- Annotated handlers return `401` without an IAM Principal, `403` on engine denial, `404` when the host resolver cannot find the resource, and `500` when a host resolver is missing.
 - The feature is Servlet/MVC-only. Direct `AuthorizationEngine.decide` use remains supported.
 - Do not log or expose opaque tokens.
 
@@ -94,7 +94,7 @@ git commit -m "feat: define declarative MVC permission API"
 assertTrue(interceptor.preHandle(request, response, unannotatedHandler));
 assertFalse(interceptor.preHandle(request, unauthorizedResponse, readHandler));
 assertEquals(401, unauthorizedResponse.getStatus());
-assertEquals(500, missingResourceResponse.getStatus());
+assertEquals(404, missingResourceResponse.getStatus());
 assertEquals(403, deniedResponse.getStatus());
 verify(engine).decide(principal, new AuthorizationRequest(
         "document:update", "EXAMPLE", "WEB", resource, ScopeAccess.WRITE));
@@ -115,8 +115,8 @@ Expected: compilation failure because `IamAuthorizationInterceptor` is absent.
 
 `preHandle` returns true for an unannotated handler. For annotated handlers it
 must: locate method annotation before type annotation; require an authenticated
-`IamPrincipal` or send `401`; require a resolver and non-empty descriptor or
-send `500`; call `engine.decide` using principal domain/client, annotation
+`IamPrincipal` or send `401`; require a resolver or send `500`; return `404`
+when a resolver cannot find the resource; call `engine.decide` using principal domain/client, annotation
 permission/access, and resolved resource; send `403` on denial; otherwise
 return true. `IamAuthorizationWebMvcConfiguration` implements
 `WebMvcConfigurer` and registers the interceptor. Add both beans in
@@ -207,7 +207,7 @@ Expected: README check failure until the new contract is documented.
 
 - [ ] **Step 3: Add concise usage documentation**
 
-Show annotation and resolver examples, state the 401/403/500 behavior, and
+Show annotation and resolver examples, state the 401/403/404/500 behavior, and
 correct the target architecture example wording to include documents, projects,
 and departments.
 

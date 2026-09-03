@@ -171,9 +171,9 @@ iam:
 The starter provides the Bearer filter, principal resolver, engine, session
 service, login auditing, Redis store and authenticated/anonymous security
 integration. It does not own application route allow lists. Controller and
-service enforcement use the engine directly (with a future
-`@RequirePermission` adapter allowed); role expressions are not a fine-grained
-security boundary.
+service enforcement may use the engine directly or the Servlet MVC
+`@RequirePermission` adapter with a host `MvcResourceDescriptorResolver`; role
+expressions are not a fine-grained security boundary.
 
 ## Adapter migration
 
