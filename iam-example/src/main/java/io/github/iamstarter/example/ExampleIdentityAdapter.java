@@ -13,7 +13,9 @@ public class ExampleIdentityAdapter {
     private static final Map<String, AppUser> USERS = Map.of(
             "author-a", new AppUser(101L, "author-a", "demo-pass", true, "Author A"),
             "reader-b", new AppUser(102L, "reader-b", "demo-pass", true, "Reader B"),
-            "disabled-c", new AppUser(103L, "disabled-c", "demo-pass", false, "Disabled C"));
+            "disabled-c", new AppUser(103L, "disabled-c", "demo-pass", false, "Disabled C"),
+            "operator-a", new AppUser(101L, "operator-a", "demo-pass", true, "Operator A"),
+            "operator-b", new AppUser(102L, "operator-b", "demo-pass", true, "Operator B"));
 
     @Bean
     IdentityAuthenticator exampleIdentityAuthenticator() {
@@ -23,8 +25,10 @@ public class ExampleIdentityAdapter {
                 return Optional.empty();
             }
             var profileId = user.id() == 101L ? 401L : 403L;
-            var templateVersionId = user.id() == 101L ? 302L : 301L;
-            return Optional.of(new IamPrincipal(user.id(), "app-user-" + user.id(),
+            boolean independentConsumer = "author-a".equals(user.username());
+            var templateVersionId = independentConsumer ? 302L : 301L;
+            var identityId = independentConsumer ? "app-user-" + user.id() : "identity-" + user.username();
+            return Optional.of(new IamPrincipal(user.id(), identityId,
                     "EXAMPLE", profileId, templateVersionId, request.clientType(), 1L));
         };
     }
