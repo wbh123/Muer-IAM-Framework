@@ -76,6 +76,7 @@ class IamConsumerIntegrationTest {
         var crossProjectRead = request("/api/documents/2001", "GET", reader.token(), null);
         assertEquals(403, crossProjectRead.statusCode(), crossProjectRead.body());
         assertEquals(401, request("/api/documents/1001", "GET", null, null).statusCode());
+        assertEquals(401, request("/api/documents/1001", "GET", "invalid-opaque-token", null).statusCode());
     }
 
     @Test

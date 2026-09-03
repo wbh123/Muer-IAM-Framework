@@ -31,7 +31,10 @@ without importing IAM persistence or implementation classes:
 The isolated Testcontainers fixture uses `author-a` as a project `101`
 administrator and `reader-b` as a project `101` reader. A request for document
 `2001` (project `202`) is denied even though `reader-b` has a valid token.
-The fixture is test-only; these identities are not local deployment accounts.
+`author-a` can also switch to a same-user read-only Profile; the replacement
+token loses write access while the original administrator session remains
+valid. The fixture is test-only; these identities are not local deployment
+accounts.
 
 Host code depends on public IAM API/SPI types only. Check that boundary before
 publishing changes:
