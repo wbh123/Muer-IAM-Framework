@@ -18,11 +18,14 @@ public final class IamAuthorizationInterceptor implements HandlerInterceptor {
     private final AuthorizationEngine authorization;
     @Nullable
     private final MvcResourceDescriptorResolver resources;
+    private final IamAuthorizationFailureHandler failures;
 
     public IamAuthorizationInterceptor(AuthorizationEngine authorization,
-                                       @Nullable MvcResourceDescriptorResolver resources) {
+                                       @Nullable MvcResourceDescriptorResolver resources,
+                                       IamAuthorizationFailureHandler failures) {
         this.authorization = Objects.requireNonNull(authorization, "authorization must not be null");
         this.resources = resources;
+        this.failures = Objects.requireNonNull(failures, "failures must not be null");
     }
 
     @Override
@@ -31,14 +34,18 @@ public final class IamAuthorizationInterceptor implements HandlerInterceptor {
         var requirement = requirement(method);
         if (requirement == null) return true;
         var principal = principal();
-        if (principal == null) return deny(response, HttpServletResponse.SC_UNAUTHORIZED);
-        if (resources == null) return deny(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        if (principal == null) return deny(request, response, HttpServletResponse.SC_UNAUTHORIZED,
+                IamAuthorizationFailure.UNAUTHENTICATED);
+        if (resources == null) return deny(request, response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                IamAuthorizationFailure.RESOURCE_RESOLUTION_UNAVAILABLE);
         var resource = resources.resolve(request, method);
-        if (resource.isEmpty()) return deny(response, HttpServletResponse.SC_NOT_FOUND);
+        if (resource.isEmpty()) return deny(request, response, HttpServletResponse.SC_NOT_FOUND,
+                IamAuthorizationFailure.RESOURCE_NOT_FOUND);
         var decision = authorization.decide(principal, new AuthorizationRequest(
                 requirement.value(), principal.identityDomain(), principal.clientType(),
                 resource.orElseThrow(), requirement.access()));
-        return decision.allowed() || deny(response, HttpServletResponse.SC_FORBIDDEN);
+        return decision.allowed() || deny(request, response, HttpServletResponse.SC_FORBIDDEN,
+                IamAuthorizationFailure.ACCESS_DENIED);
     }
 
     @Nullable
@@ -54,8 +61,9 @@ public final class IamAuthorizationInterceptor implements HandlerInterceptor {
                 && authentication.getPrincipal() instanceof IamPrincipal principal ? principal : null;
     }
 
-    private static boolean deny(HttpServletResponse response, int status) throws IOException {
-        response.sendError(status);
+    private boolean deny(HttpServletRequest request, HttpServletResponse response,
+                         int status, IamAuthorizationFailure failure) throws IOException {
+        failures.write(request, response, status, failure);
         return false;
     }
 }

@@ -26,6 +26,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 class IamAuthorizationInterceptorTest {
@@ -40,51 +41,67 @@ class IamAuthorizationInterceptorTest {
     @Test
     void ignores_unannotated_handlers() throws Exception {
         var engine = mock(AuthorizationEngine.class);
-        var interceptor = new IamAuthorizationInterceptor(engine, (request, method) -> Optional.of(resource));
+        var failures = mock(IamAuthorizationFailureHandler.class);
+        var interceptor = new IamAuthorizationInterceptor(engine, (request, method) -> Optional.of(resource), failures);
 
         assertTrue(interceptor.preHandle(new MockHttpServletRequest(), new MockHttpServletResponse(), unannotatedHandler()));
         verify(engine, never()).decide(any(), any());
+        verifyNoInteractions(failures);
     }
 
     @Test
     void rejects_annotated_handler_without_an_iam_principal() throws Exception {
-        var interceptor = new IamAuthorizationInterceptor(mock(AuthorizationEngine.class), (request, method) -> Optional.of(resource));
+        var engine = mock(AuthorizationEngine.class);
+        var failures = mock(IamAuthorizationFailureHandler.class);
+        var interceptor = new IamAuthorizationInterceptor(engine, (request, method) -> Optional.of(resource), failures);
+        var request = new MockHttpServletRequest();
         var response = new MockHttpServletResponse();
 
-        assertFalse(interceptor.preHandle(new MockHttpServletRequest(), response, handler("read")));
-        assertEquals(401, response.getStatus());
+        assertFalse(interceptor.preHandle(request, response, handler("read")));
+        verify(failures).write(request, response, 401, IamAuthorizationFailure.UNAUTHENTICATED);
+        verifyNoInteractions(engine);
     }
 
     @Test
     void returns_not_found_when_the_host_cannot_resolve_the_resource() throws Exception {
         authenticate();
-        var interceptor = new IamAuthorizationInterceptor(mock(AuthorizationEngine.class), (request, method) -> Optional.empty());
+        var engine = mock(AuthorizationEngine.class);
+        var failures = mock(IamAuthorizationFailureHandler.class);
+        var interceptor = new IamAuthorizationInterceptor(engine, (request, method) -> Optional.empty(), failures);
+        var request = new MockHttpServletRequest();
         var response = new MockHttpServletResponse();
 
-        assertFalse(interceptor.preHandle(new MockHttpServletRequest(), response, handler("read")));
-        assertEquals(404, response.getStatus());
+        assertFalse(interceptor.preHandle(request, response, handler("read")));
+        verify(failures).write(request, response, 404, IamAuthorizationFailure.RESOURCE_NOT_FOUND);
+        verifyNoInteractions(engine);
     }
 
     @Test
     void fails_closed_when_an_annotated_handler_has_no_resource_resolver() throws Exception {
         authenticate();
-        var interceptor = new IamAuthorizationInterceptor(mock(AuthorizationEngine.class), null);
+        var engine = mock(AuthorizationEngine.class);
+        var failures = mock(IamAuthorizationFailureHandler.class);
+        var interceptor = new IamAuthorizationInterceptor(engine, null, failures);
+        var request = new MockHttpServletRequest();
         var response = new MockHttpServletResponse();
 
-        assertFalse(interceptor.preHandle(new MockHttpServletRequest(), response, handler("read")));
-        assertEquals(500, response.getStatus());
+        assertFalse(interceptor.preHandle(request, response, handler("read")));
+        verify(failures).write(request, response, 500, IamAuthorizationFailure.RESOURCE_RESOLUTION_UNAVAILABLE);
+        verifyNoInteractions(engine);
     }
 
     @Test
     void denies_engine_rejection_and_uses_method_annotation_over_type_annotation() throws Exception {
         authenticate();
         var engine = mock(AuthorizationEngine.class);
+        var failures = mock(IamAuthorizationFailureHandler.class);
         when(engine.decide(any(), any())).thenReturn(new AuthorizationDecision(false, "SCOPE_DENIED", List.of()));
-        var interceptor = new IamAuthorizationInterceptor(engine, (request, method) -> Optional.of(resource));
+        var interceptor = new IamAuthorizationInterceptor(engine, (request, method) -> Optional.of(resource), failures);
+        var servletRequest = new MockHttpServletRequest();
         var response = new MockHttpServletResponse();
 
-        assertFalse(interceptor.preHandle(new MockHttpServletRequest(), response, handler("update")));
-        assertEquals(403, response.getStatus());
+        assertFalse(interceptor.preHandle(servletRequest, response, handler("update")));
+        verify(failures).write(servletRequest, response, 403, IamAuthorizationFailure.ACCESS_DENIED);
         var request = ArgumentCaptor.forClass(AuthorizationRequest.class);
         verify(engine).decide(org.mockito.ArgumentMatchers.eq(principal), request.capture());
         assertEquals("document:update", request.getValue().permissionCode());
@@ -95,10 +112,12 @@ class IamAuthorizationInterceptorTest {
     void permits_an_allowed_request() throws Exception {
         authenticate();
         var engine = mock(AuthorizationEngine.class);
+        var failures = mock(IamAuthorizationFailureHandler.class);
         when(engine.decide(any(), any())).thenReturn(new AuthorizationDecision(true, "ALLOWED", List.of()));
-        var interceptor = new IamAuthorizationInterceptor(engine, (request, method) -> Optional.of(resource));
+        var interceptor = new IamAuthorizationInterceptor(engine, (request, method) -> Optional.of(resource), failures);
 
         assertTrue(interceptor.preHandle(new MockHttpServletRequest(), new MockHttpServletResponse(), handler("read")));
+        verifyNoInteractions(failures);
     }
 
     private void authenticate() {
