@@ -2,9 +2,14 @@ name: Verify IAM Starter
 
 on:
   push:
-    branches: [main, develop/**, feature/**]
+    branches:
+      - main
+      - 'develop/**'
+      - 'feature/**'
+      - 'codex/**'
   pull_request:
     branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -65,12 +70,9 @@ jobs:
           cache: maven
 
       - name: Check Docker availability
-        id: docker
-        continue-on-error: true
         run: docker info
 
       - name: Run MySQL and Redis consumer walkthrough
-        if: steps.docker.outcome == 'success'
         run: >-
           mvn -B -pl iam-example -am -Pintegration
           -Dtest=IamStarterConsumptionTest,IamSecurityIntegrationTest
