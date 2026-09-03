@@ -2,7 +2,7 @@ name: Verify IAM Starter
 
 on:
   push:
-    branches: [main, develop/**, feature/**]
+    branches: [main, develop/**, feature/**, codex/**]
   pull_request:
     branches: [main]
 
