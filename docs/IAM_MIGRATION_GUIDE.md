@@ -73,6 +73,14 @@ cannot find the requested resource, and `500` when no resolver is registered.
 Direct engine invocation remains the correct option outside MVC or when a
 single request needs exceptional authorization flow.
 
+The default `IamAuthorizationFailureHandler` writes a safe `ProblemDetail`
+body with a generic title/detail, request path, and one stable code:
+`IAM_UNAUTHENTICATED`, `IAM_ACCESS_DENIED`, `IAM_RESOURCE_NOT_FOUND`, or
+`IAM_RESOURCE_RESOLUTION_UNAVAILABLE`. A consuming application may replace
+that handler with its own bean to adopt a shared error envelope. Replacement
+must not disclose bearer tokens, principals, permissions, resources, scopes,
+or authorization decision details.
+
 ## Rollback
 
 Rollback changes only the endpoint's enforcement selector back to the existing

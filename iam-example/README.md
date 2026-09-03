@@ -69,6 +69,26 @@ Applications retain ownership of authentication filters, route-to-resource
 mapping, and business handlers. Direct `AuthorizationEngine.decide(...)` use
 remains available for non-MVC or exceptional flows.
 
+The starter's default `IamAuthorizationFailureHandler` writes an RFC 9457
+`ProblemDetail` response. It contains only the HTTP status, a generic title and
+detail, the request path, and one stable code: `IAM_UNAUTHENTICATED` (401),
+`IAM_ACCESS_DENIED` (403), `IAM_RESOURCE_NOT_FOUND` (404), or
+`IAM_RESOURCE_RESOLUTION_UNAVAILABLE` (500). It never returns the bearer token,
+principal, permission, resource, scope, or engine-decision details.
+
+An application with an established error envelope can replace the default with
+one bean; this changes response formatting only, not interceptor decisions:
+
+```java
+@Bean
+IamAuthorizationFailureHandler authorizationFailures() {
+    return (request, response, status, failure) -> {
+        response.setStatus(status);
+        // Write the application's safe error envelope using failure.code().
+    };
+}
+```
+
 Run the document and session acceptance suite against temporary MySQL and
 Redis containers:
 
