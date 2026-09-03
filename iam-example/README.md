@@ -18,6 +18,37 @@ The showcase uses anonymous demonstration data only:
 These credentials exist solely for this consumer example. Do not copy them into
 a real application or use them as deployment credentials.
 
+## Independent document consumer
+
+The same application also contains a deliberately small, host-owned document
+surface. It demonstrates how a third-party service protects its own routes
+without importing IAM persistence or implementation classes:
+
+- `GET /public/health` is public.
+- `GET /api/documents/{id}` requires `document:read` and PROJECT READ scope.
+- `POST /api/documents/{id}` requires `document:update` and PROJECT WRITE scope.
+
+The isolated Testcontainers fixture uses `author-a` as a project `101`
+administrator and `reader-b` as a project `101` reader. A request for document
+`2001` (project `202`) is denied even though `reader-b` has a valid token.
+The fixture is test-only; these identities are not local deployment accounts.
+
+Host code depends on public IAM API/SPI types only. Check that boundary before
+publishing changes:
+
+```bash
+bash scripts/verify-consumer-public-api.sh
+```
+
+Run the document and session acceptance suite against temporary MySQL and
+Redis containers:
+
+```bash
+mvn -pl iam-example -am -Pintegration \
+  -Dtest=IamConsumerIntegrationTest \
+  -Dsurefire.failIfNoSpecifiedTests=false test
+```
+
 ## Run it with infrastructure
 
 The application needs MySQL for durable IAM state and Redis for the opaque-

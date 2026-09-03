@@ -48,10 +48,11 @@ A reusable Identity and Access Management framework for Spring Boot applications
 
 See [IAM_INTEGRATION_GUIDE.md](docs/IAM_INTEGRATION_GUIDE.md) for complete
 configuration and the [iam-example consumer showcase](iam-example/README.md)
-for a copyable login, scoped order read, denied request, profile switch,
-runtime diagnostics, and session-revocation walkthrough. Its fast smoke check
-is container-free; its separate Docker/Testcontainers command proves the
-complete HTTP flow against MySQL and Redis.
+for a copyable login, generic document permission/scope flow, scoped order
+read, denied request, profile switch, runtime diagnostics, and session-
+revocation walkthrough. Its fast smoke check is container-free; its separate
+Docker/Testcontainers command proves the complete HTTP flow against MySQL and
+Redis.
 
 ## Project maintenance
 
