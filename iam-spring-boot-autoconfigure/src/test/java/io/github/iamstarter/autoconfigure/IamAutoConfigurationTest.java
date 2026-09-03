@@ -21,6 +21,8 @@ import io.github.iamstarter.persistence.MyBatisPermissionTemplateVersionReposito
 import io.github.iamstarter.persistence.MyBatisSessionRepository;
 import io.github.iamstarter.persistence.RedisTokenStore;
 import io.github.iamstarter.autoconfigure.web.IamAuthorizationInterceptor;
+import io.github.iamstarter.autoconfigure.web.IamAuthorizationFailureHandler;
+import io.github.iamstarter.autoconfigure.web.ProblemDetailIamAuthorizationFailureHandler;
 import org.apache.ibatis.session.SqlSessionFactory;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.AfterEach;
@@ -176,6 +178,32 @@ class IamAutoConfigurationTest {
     }
 
     @Test
+    void servlet_application_registers_the_default_authorization_failure_handler() {
+        new WebApplicationContextRunner()
+                .withUserConfiguration(AdapterConfiguration.class)
+                .withConfiguration(org.springframework.boot.autoconfigure.AutoConfigurations.of(
+                        SecurityAutoConfiguration.class, ServletWebSecurityAutoConfiguration.class,
+                        IamAutoConfiguration.class))
+                .run(context -> assertEquals(ProblemDetailIamAuthorizationFailureHandler.class,
+                        context.getBean(IamAuthorizationFailureHandler.class).getClass()));
+    }
+
+    @Test
+    void host_authorization_failure_handler_replaces_the_default() {
+        new WebApplicationContextRunner()
+                .withUserConfiguration(AdapterConfiguration.class, CustomFailureHandlerConfiguration.class)
+                .withConfiguration(org.springframework.boot.autoconfigure.AutoConfigurations.of(
+                        SecurityAutoConfiguration.class, ServletWebSecurityAutoConfiguration.class,
+                        IamAutoConfiguration.class))
+                .run(context -> {
+                    assertTrue(context.containsBean("customFailureHandler"));
+                    assertFalse(context.containsBean("iamAuthorizationFailureHandler"));
+                    assertEquals(context.getBean("customFailureHandler", IamAuthorizationFailureHandler.class),
+                            context.getBean(IamAuthorizationFailureHandler.class));
+                });
+    }
+
+    @Test
     void bearer_principal_cannot_be_replaced_by_forged_user_parameter() throws Exception {
         var authentication = mock(AuthenticationService.class);
         var principal = new IamPrincipal(7L, "identity-7", "SECURITY", 31L, 9L, "WEB", 4L);
@@ -252,6 +280,14 @@ class IamAutoConfigurationTest {
                 return Optional.of(new IamPrincipal(
                     7L, "identity-7", "EXAMPLE", 31L, 9L, request.clientType(), 4L));
             };
+        }
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    static class CustomFailureHandlerConfiguration {
+        @Bean
+        IamAuthorizationFailureHandler customFailureHandler() {
+            return (request, response, status, failure) -> response.setStatus(status);
         }
     }
 }

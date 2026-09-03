@@ -37,7 +37,9 @@ import io.github.iamstarter.persistence.MyBatisIamUserRepository;
 import io.github.iamstarter.persistence.MyBatisIdentityRepository;
 import io.github.iamstarter.autoconfigure.web.IamAuthorizationInterceptor;
 import io.github.iamstarter.autoconfigure.web.IamAuthorizationWebMvcConfiguration;
+import io.github.iamstarter.autoconfigure.web.IamAuthorizationFailureHandler;
 import io.github.iamstarter.autoconfigure.web.MvcResourceDescriptorResolver;
+import io.github.iamstarter.autoconfigure.web.ProblemDetailIamAuthorizationFailureHandler;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.builder.xml.XMLMapperBuilder;
 import org.apache.ibatis.io.Resources;
@@ -62,6 +64,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import tools.jackson.databind.ObjectMapper;
 
 import java.time.Clock;
 import java.util.Optional;
@@ -223,11 +226,19 @@ public class IamAutoConfiguration {
 
     @Bean
     @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
+    @ConditionalOnMissingBean(IamAuthorizationFailureHandler.class)
+    IamAuthorizationFailureHandler iamAuthorizationFailureHandler(ObjectProvider<ObjectMapper> json) {
+        return new ProblemDetailIamAuthorizationFailureHandler(json.getIfAvailable(ObjectMapper::new));
+    }
+
+    @Bean
+    @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
     @ConditionalOnBean(AuthorizationEngine.class)
     @ConditionalOnMissingBean(IamAuthorizationInterceptor.class)
     IamAuthorizationInterceptor iamAuthorizationInterceptor(AuthorizationEngine authorization,
-                                                             ObjectProvider<MvcResourceDescriptorResolver> resources) {
-        return new IamAuthorizationInterceptor(authorization, resources.getIfAvailable());
+                                                             ObjectProvider<MvcResourceDescriptorResolver> resources,
+                                                             IamAuthorizationFailureHandler failures) {
+        return new IamAuthorizationInterceptor(authorization, resources.getIfAvailable(), failures);
     }
 
     @Bean
