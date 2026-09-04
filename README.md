@@ -17,6 +17,14 @@ A reusable Identity and Access Management framework for Spring Boot applications
 - **Audit** stores generic events and multiple related subjects.
 - **Diagnostics** projects the exact runtime authorization decision.
 
+## First use
+
+Start with the source-verified [Quick Start](docs/QUICK_START.md), then use
+the [public API reference](docs/PUBLIC_API.md) to implement the host adapters.
+The 0.1.0 candidate scope and known limitations are in the
+[release notes](docs/RELEASE_NOTES_0.1.0.md); migration ownership and staged
+adoption are in the [migration guide](docs/IAM_MIGRATION_GUIDE.md).
+
 ## Five-minute integration
 
 1. Add the single dependency:

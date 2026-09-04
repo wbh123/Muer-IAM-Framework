@@ -3,6 +3,7 @@ set -euo pipefail
 
 repository_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 readme="$repository_root/iam-example/README.md"
+root_readme="$repository_root/README.md"
 
 require() {
   local description="$1"
@@ -37,5 +38,38 @@ require 'authorization failure handler SPI' 'IamAuthorizationFailureHandler'
 require 'problem detail response' 'ProblemDetail'
 require 'stable forbidden failure code' 'IAM_ACCESS_DENIED'
 require 'stable missing-resource failure code' 'IAM_RESOURCE_NOT_FOUND'
+
+require_root() {
+  local description="$1"
+  local expression="$2"
+  if ! grep -Eq -- "$expression" "$root_readme"; then
+    printf 'Missing repository release reference for: %s\n' "$description" >&2
+    exit 1
+  fi
+}
+
+require_file() {
+  local description="$1"
+  local path="$2"
+  if [[ ! -f "$repository_root/$path" ]]; then
+    printf 'Missing repository release file for: %s (%s)\n' "$description" "$path" >&2
+    exit 1
+  fi
+}
+
+require_root 'quick-start link' 'docs/QUICK_START\.md'
+require_root 'public API link' 'docs/PUBLIC_API\.md'
+require_root '0.1.0 release-notes link' 'docs/RELEASE_NOTES_0\.1\.0\.md'
+require_file 'quick-start document' 'docs/QUICK_START.md'
+require_file 'public API document' 'docs/PUBLIC_API.md'
+require_file 'release notes document' 'docs/RELEASE_NOTES_0.1.0.md'
+require_file 'release validation report' 'docs/validation/iam-0.1.0-release-report.md'
+
+while IFS= read -r source_path; do
+  if [[ ! -f "$repository_root/$source_path" ]]; then
+    printf 'Invalid source path in PUBLIC_API.md: %s\n' "$source_path" >&2
+    exit 1
+  fi
+done < <(grep -oE 'iam-[A-Za-z0-9._/-]+\.java' "$repository_root/docs/PUBLIC_API.md" | sort -u)
 
 printf 'Showcase README checks passed.\n'
