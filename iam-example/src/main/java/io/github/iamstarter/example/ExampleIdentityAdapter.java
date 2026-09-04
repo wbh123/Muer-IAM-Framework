@@ -11,6 +11,7 @@ import java.util.Map;
 @Configuration(proxyBeanMethods = false)
 public class ExampleIdentityAdapter {
     private static final Map<String, AppUser> USERS = Map.of(
+            "alice", new AppUser(101L, "alice", "demo-pass", true, "Alice"),
             "author-a", new AppUser(101L, "author-a", "demo-pass", true, "Author A"),
             "reader-b", new AppUser(102L, "reader-b", "demo-pass", true, "Reader B"),
             "disabled-c", new AppUser(103L, "disabled-c", "demo-pass", false, "Disabled C"),
