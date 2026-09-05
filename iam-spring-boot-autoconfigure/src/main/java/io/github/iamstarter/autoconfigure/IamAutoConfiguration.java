@@ -303,6 +303,7 @@ public class IamAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
+    @ConditionalOnBean({IamUserRepository.class, IdentityRepository.class})
     AccountGovernanceService iamAccountGovernanceService(IamUserRepository users, IdentityRepository identities,
                                                          AuthorizationVersionService versions,
                                                          ObjectProvider<UserQueryRepository> queries) {
