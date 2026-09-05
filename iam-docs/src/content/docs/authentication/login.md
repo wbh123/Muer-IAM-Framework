@@ -1,31 +1,59 @@
 ---
 title: 登录
-description: 说明如何通过 POST /iam/auth/login 完成身份认证并获取 IAM 令牌与会话。
+description: 通过 POST /iam/auth/login 完成身份认证并获取 IAM Token 与 Session。
 sidebar:
   order: 1
 ---
 
 ## 解决什么问题
 
-应用需要把「用户名 + 密码 + 客户端类型」转换为可信的 `IamPrincipal`，并拿到可用于后续请求的访问令牌。`login` 是 IAM 认证链的起点。
+应用需要把“宿主凭据 + Client Type”转换为可信的 `IamPrincipal`，并得到后续请求使用的不透明 Token。登录是 IAM 认证链的起点。
 
 ## 关键概念
 
-- **LoginRequest**：record，必填 `username`、`password`、`clientType`；便捷构造器 `(username,password,clientType)` 与 `(username,password,clientType,clientInstance)`。完整组件另含 `clientInstance`、`ipAddress`、`userAgent`、`deviceType`、`osName`、`browserName`、`appVersion`、`requestId`。
-- **AuthenticationResult**：record `(accessToken, sessionId, expiresAt, principal)`，是登录与切换身份的返回。
-- **登录流程**：`POST /iam/auth/login` → IAM → `IdentityAuthenticator` → 宿主用户服务 → `IamPrincipal` → IAM 令牌 / 会话。
+- **LoginRequest**：必填 `username`、`password`、`clientType`；还可携带 `clientInstance` 等审计元数据；
+- **AuthenticationResult**：`(accessToken, sessionId, expiresAt, principal)`；
+- **流程**：`POST /iam/auth/login` → IAM Client Type 校验 → `IdentityAuthenticator` → 宿主身份服务 → `IamPrincipal` → Token / Session。
 
-## 示例
+## 请求接口
 
-```bash
-curl -X POST https://iam.example.com/iam/auth/login \
-  -H 'Content-Type: application/json' \
-  -d '{"username":"alice","password":"demo-pass","clientType":"WEB"}'
+| 项目 | 内容 |
+| --- | --- |
+| Method | `POST` |
+| Path | `/iam/auth/login` |
+| Bearer Token | 不需要 |
+| 成功 | HTTP `200` |
+| 失败 | HTTP `401` |
+
+请求体示例：
+
+```json
+{
+  "username": "alice",
+  "password": "demo-pass",
+  "clientType": "WEB"
+}
 ```
 
-返回 `LoginResponse` 必填：`accessToken`、`sessionId`、`expiresAt`、`principal`；`principal` 必填 `userId,identityId,identityDomain,clientType,authorizationVersion`，可空 `activeProfileId,templateVersionId`。
+## 预期结果
+
+成功时返回：
+
+- `accessToken`：后续请求使用的不透明 Token；
+- `sessionId`：当前 Session ID；
+- `expiresAt`：Token 过期时间；
+- `principal`：当前 `IamPrincipal`。
+
+后续受保护请求携带：
+
+```text
+Authorization: Bearer <accessToken>
+```
+
+`alice / demo-pass` 只是 `iam-example` 的演示身份。生产系统继续使用自己的用户表、密码校验或企业身份源。
 
 ## 源码
 
-- LoginRequest / AuthenticationResult：<https://github.com/wbh123/iam/blob/main/iam-authentication/src/main/java/io/github/iamstarter/authentication/LoginRequest.java>
-- 登录端点：<https://github.com/wbh123/iam/blob/main/iam-management-web/src/main/resources/openapi/iam.yaml>
+- `LoginRequest`：<https://github.com/wbh123/iam/blob/main/iam-authentication/src/main/java/io/github/iamstarter/authentication/LoginRequest.java>
+- `IdentityAuthenticator`：<https://github.com/wbh123/iam/blob/main/iam-authentication/src/main/java/io/github/iamstarter/authentication/IdentityAuthenticator.java>
+- OpenAPI：<https://github.com/wbh123/iam/blob/main/iam-management-web/src/main/resources/openapi/iam.yaml>
