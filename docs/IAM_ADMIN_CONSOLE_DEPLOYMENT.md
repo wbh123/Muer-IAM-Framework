@@ -1,12 +1,12 @@
-# IAM Admin Console 部署指南（development）
+# IAM Admin Console 部署与验收指南
 
-`iam-admin-web` 是 IAM Starter 的**可选**管理控制台。它不要求 Docker，产物是纯静态
+`iam-admin-web` 是 IAM 0.1.0 的**可选**管理控制台。它不要求 Docker，产物是纯静态
 `dist/`，可以交给 Nginx / Apache / CDN，也可以由 Spring Boot 静态托管。
 
 ```
 ┌────────────────────────────┐        ┌──────────────────────────────┐
-│  Browser / IAM Admin SPA   │  /iam  │  Spring Boot (IAM /iam/**)    │
-│  static: dist/             │ ─────▶ │  /iam/auth, /iam/admin, ...    │
+│  Browser / IAM Admin SPA   │  /iam  │  Spring Boot (IAM /iam/**)  │
+│  static: dist/             │ ─────▶ │  /iam/auth, /iam/admin, ... │
 └────────────────────────────┘        └──────────────────────────────┘
 ```
 
@@ -17,24 +17,25 @@
 ```bash
 cd iam-admin-web
 
-npm ci                 # 与 package-lock.json 一致
-npm run api:generate   # 由 ../iam-management-web/src/main/resources/openapi/iam.yaml 生成 TypeScript client（不提交）
+npm ci
+npm run api:generate
 npm run type-check
 npm run test
-npm run build          # 产出 dist/
+npm run build
 ```
 
 `dist/` 是唯一需要部署的静态产物。`src/api/generated/` 属于生成物，不提交仓库。
 
+普通部署者不需要运行仓库完整测试；上面的 `type-check/test/build` 主要用于开发者和发布验收。若只是部署已构建好的 `dist/`，可直接部署静态产物。
+
 ## 2. 后端要求
 
 - Spring Boot 宿主应用引入 `iam-spring-boot-starter`，提供 MySQL（IAM schema 迁移）与 Redis。
-- 宿主提供 `IdentityAuthenticator` 与 `ResourceHierarchyProvider` 适配器；IAM 自己不做
-  用户名/密码验证。
-- 管理端能访问 `/iam/**`，并拿到具有 `iam.admin.*` 权限的 Profile。也就是说“IAM 管理
-  IAM”：登录用户的 active profile 对应的 Template Version 必须包含所需的
-  `iam.admin.*` permission code，且其 resource scope 通过宿主 hierarchy 适配器判定为
-  覆盖管理目标（例如给 Profile 授予 `IAM_ADMIN_CONSOLE` 类 scope）。
+- 宿主提供 `IdentityAuthenticator` 与 `ResourceHierarchyProvider` 适配器；IAM 自己不做用户名/密码验证。
+- 管理端能访问 `/iam/**`，并拿到具有 `iam.admin.*` 权限的 Profile。
+- 每条 `/iam/admin/**` 请求仍由 `AuthorizationEngine` 按 Permission + Scope + Policy 重新授权。
+
+MySQL / Redis 可以手动安装、使用已有内网服务、云服务或容器。Admin Console 不要求 Docker。
 
 ## 3. Nginx 参考配置
 
@@ -43,21 +44,17 @@ server {
     listen 443 ssl http2;
     server_name iam.example.com;
 
-    # TLS 必须；生产禁用 TLSv1 / TLSv1.1
     ssl_certificate     /etc/letsencrypt/live/iam.example.com/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/iam.example.com/privkey.pem;
     ssl_protocols       TLSv1.2 TLSv1.3;
 
-    # 前端静态文件（iam-admin-web/dist）
     root /srv/iam-admin-web/dist;
     index index.html;
 
-    # SPA history 回退
     location / {
         try_files $uri $uri/ /index.html;
     }
 
-    # 反向代理到 Spring Boot（IAM 路由固定前缀 /iam）
     location /iam/ {
         proxy_pass http://127.0.0.1:8080;
         proxy_http_version 1.1;
@@ -65,22 +62,18 @@ server {
         proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_set_header X-Real-IP         $remote_addr;
-        # opaque Bearer token 通过 Authorization 头传递，绝不落入 URL/cookie
         proxy_pass_header Authorization;
     }
 }
 ```
 
-也可把前端挂在 `/admin/`：`location /admin/ { alias /srv/iam-admin-web/dist/; try_files ... }`。
+也可把前端挂在 `/admin/`，但需要同步配置 Vite base、静态路径与 SPA history fallback。
 
 ### 代理头 / CORS / 同源
 
 - 生产推荐**同源**：静态前端与 `/iam/**` 同一 Origin，无 CORS。
-- 若前端与 API 不同源，只对显式白名单 Origin 开放 CORS；**不要** `Access-Control-Allow-Origin: *`，
-  尤其不要配合 Bearer 凭证。
-- Spring Boot 侧若需要读取客户端 IP，从 `X-Forwarded-For` 信任的第一跳取值；该值也会被
-  login 记入 `iam_login_event.ip_address` 与 `iam_session.ip_address`。
-- 若宿主本身已在 Nginx 之后还有一层 LB，只信任内网入口写入的 `X-Forwarded-For`。
+- 若前端与 API 不同源，只对显式白名单 Origin 开放 CORS；不要使用 `Access-Control-Allow-Origin: *`。
+- 若宿主位于可信反向代理之后，按组织网络边界处理 `X-Forwarded-For` / `X-Forwarded-Proto`。
 
 ## 4. 前端环境变量
 
@@ -92,51 +85,41 @@ server {
 
 ## 5. CSP 与 Token 安全
 
-- 生产响应建议 CSP：
-  `default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'self'; frame-ancestors 'none'`
-  （Element Plus 内联样式需要 `style-src 'unsafe-inline'`；如不内联 CSS 可收紧）。
-- token 只存 `sessionStorage`，随 `Authorization: Bearer` 头发送；**禁止**：
-  - 前端 console.log token；
+- 生产建议配置 CSP，并根据实际静态资源来源收紧 `script-src/connect-src/frame-ancestors`。
+- token 只存 `sessionStorage`，随 `Authorization: Bearer` 头发送；禁止：
+  - `console.log(token)`；
   - token 出现在 URL query；
   - 错误日志/审计元数据携带 token；
   - 用 Cookie 伪装 IAM session。
 - 登出必须调用 `POST /iam/auth/logout`，而不是只清浏览器。
 
-## 6. Spring Boot 静态托管（可选，不推荐生产）
+## 6. Spring Boot 静态托管（可选）
 
-```java
-registry.addResourceHandler("/admin/**")
-        .addResourceLocations("file:/srv/iam-admin-web/dist/");
-```
+可以由宿主应用或外部 Web Server 托管 `dist/`。生产环境更推荐独立静态服务器/CDN + 反向代理，而不是把前端构建工具带入后端运行环境。
 
-## 7. 说明与边界
+## 7. 本地手工启动（iam-example）
 
-- Starter 正常运行**不依赖** admin 前端；只部署后端时 `/iam/**` Management API 依然可用。
-- 管理控制台自身的每条 `/iam/admin/**` 请求都会再次经过 `AuthorizationEngine` 细粒度
-  授权。菜单隐藏只是 UI 优化，不是安全边界。
+先准备：
 
-## 8. 本地开发启动体验（iam-example，Explicit Opt-In）
+- MySQL 8.x 空数据库；
+- Redis 7；
+- Java 21；
+- Node.js 22+；
+- npm。
 
-> ⚠️ `admin-demo / demo-pass` **只**用于本地开发与演示，生产环境不会自动创建该账户。
-
-同时满足下面两个条件才会创建开发管理员：
+后端常用环境变量：
 
 ```text
-spring.profiles.active=dev   (或 SPRING_PROFILES_ACTIVE=dev)
-iam.example.seed-admin=true  (或 IAM_EXAMPLE_SEED_ADMIN=true)
+SPRING_PROFILES_ACTIVE=dev
+IAM_EXAMPLE_SEED_ADMIN=true
+IAM_EXAMPLE_JDBC_URL=jdbc:mysql://127.0.0.1:3306/iam_example
+IAM_EXAMPLE_DB_USERNAME=iam
+IAM_EXAMPLE_DB_PASSWORD=<your-password>
+IAM_EXAMPLE_REDIS_HOST=127.0.0.1
+IAM_EXAMPLE_REDIS_PORT=6379
 ```
 
-默认均为 `false`：普通 dev 与“只有配置项、没开 dev profile”都不会执行 seed。
-
-后端（iam-example）：
-
-```bash
-SPRING_PROFILES_ACTIVE=dev IAM_EXAMPLE_SEED_ADMIN=true \
-  IAM_EXAMPLE_JDBC_URL=jdbc:mysql://localhost:3306/iam_example ... \
-  mvn -pl iam-example -am spring-boot:run
-```
-
-前端：
+启动 `IamExampleApplication` 后，再启动前端：
 
 ```bash
 cd iam-admin-web
@@ -145,56 +128,97 @@ npm run api:generate
 npm run dev
 ```
 
-然后用下面的凭据在 Web 页面登录（Client Type 选择 `WEB`）：
+浏览器访问 Vite 输出地址，通常为 `http://localhost:5173`。
+
+### 开发演示管理员
+
+> ⚠️ `admin-demo / demo-pass` 只用于本地开发与演示，生产环境不会自动创建该账户。
+
+必须同时满足：
+
+```text
+SPRING_PROFILES_ACTIVE=dev
+IAM_EXAMPLE_SEED_ADMIN=true
+```
+
+登录信息：
 
 ```text
 username: admin-demo
 password: demo-pass
+clientType: WEB
 ```
 
-Seed 会创建（id 均为 iam-example 专用，不会出现在宿主生产 schema）：
+Seed 创建 IAM Admin Template、Profile 以及示例管理 Scope；每个 `/iam/admin/**` 请求仍经 `AuthorizationEngine` 授权，不存在 Role bypass。
 
-- 用户 `admin-demo` + Identity `identity-admin-demo`（EXAMPLE 域）；
-- `IAM Admin Console` Template 的 PUBLISHED v1，包含全部真实 `iam.admin.*`
-  permission code（以源码为准，共 18 个：overview/user/identity/permission/
-  template/profile/scope/session/audit/diagnostics/authorization-version…）；
-- Profile `admin-console`，Scope `IAM_ADMIN:*` READ + WRITE —— 该 Scope 只对
-  `IAM_*` 管理资源生效，不覆盖宿主业务资源（PROJECT 等仍需各自 scope）。
+## 8. 手工验收清单
 
-> `iam-admin-web` 里的菜单按 `/iam/auth/capabilities` 渲染；后端不做任何角色旁路，
-> 每条 `/iam/admin/**` 依旧经 `AuthorizationEngine` 授权。
+普通使用者无需跑仓库完整 CI。建议在专用开发数据库完成以下浏览器验收：
+
+### 登录与导航
+
+- `admin-demo / demo-pass / WEB` 可以登录；
+- Dashboard 正常加载；
+- Users、Permissions、Templates、Profiles、Sessions、Audit、Diagnostics 页面可进入；
+- `/account` 在登录后可访问。
+
+### 用户与授权配置
+
+- 用户列表和详情可读取；
+- Identity / Profile / Session 子信息可读取；
+- 修改一个开发 Profile 或 Scope 后保存成功，刷新页面仍能读取新值；
+- Template/Profile 的只读与可编辑状态符合后端真实状态约束。
+
+### Session 与 Audit
+
+- 撤销一个测试 Session 后，目标 Session 对应 Token 失效；
+- 其他独立 Session 不被连带撤销；
+- Audit 页面能够查询到相关管理操作。
+
+### Diagnostics 与权限边界
+
+- Diagnostics 能返回 ALLOW/DENY、decisionCode 和决策步骤；
+- `POST /iam/authorization/diagnostics` 仍是当前 Principal 的 self-diagnostics；
+- 对缺少某项 `iam.admin.*` Capability 的测试用户，前端路由进入 403；
+- 即使绕过前端直接请求 `/iam/admin/**`，后端也必须返回 403。
+
+### Logout
+
+- 点击退出后前端状态清理；
+- 后端 logout 已执行；
+- 原 Token 不能继续访问受保护接口。
+
+如果这些路径符合预期，就足以完成普通手工验收；Testcontainers、Independent Consumer 等完整回归由项目 CI 负责。
 
 ## 9. 生产第一个管理员（部署期 Bootstrap）
 
-生产环境**没有**默认账户、**没有**万能密码，也**不提供**类似
-`POST /iam/bootstrap/admin` 的公开 HTTP 初始化端点（避免首次启动暴露、初始化竞态与
-安全风险）。第一个管理员应通过受控的部署流程创建，例如：受控 SQL / migration /
-deployment seeder，或宿主系统自己的 initial provisioning。
+生产环境**没有**默认账户、没有万能密码，也不提供类似
+`POST /iam/bootstrap/admin` 的公开 HTTP 初始化端点。
 
-推荐流程：
+第一个管理员应通过受控流程创建，例如：
 
 ```text
 创建业务用户
     ↓
 创建 Identity
     ↓
-创建「IAM Admin」Permission Template + PUBLISHED Version（18 个 iam.admin.*）
+创建 IAM Admin Permission Template + PUBLISHED Version
     ↓
 创建 Admin Profile 并绑定该 Version
     ↓
-按宿主 hierarchy 授予管理所需的 Resource Scope（含 READ/WRITE 与资源范围）
+按宿主 hierarchy 授予管理所需 Resource Scope
     ↓
-启动 Admin Console，用该账户登录
+启动 Admin Console
     ↓
-后续管理员由 Console 内部管理
+之后由 Console 管理其他管理员
 ```
 
-要点：
+可使用受控 SQL、migration、deployment seeder 或宿主系统自己的 initial provisioning。
 
-- Permission Code 必须与后端源码一致，不要自己造码（模板权限以真实 `iam.admin.*`
-  为准，见 `docs/PUBLIC_API.md` 与 OpenAPI）。
-- Resource Scope 不是 bypass：必须让 profile 的 scope 覆盖你要管理的目标；示例应用用
-  `IAM_ADMIN:*` 覆盖 `IAM_*` 资源，是**示例宿主**的 hierarchy 规则，生产宿主需按自己的
-  资源模型定义等价规则。
-- 管理账户的初始凭据由你的 provisioning 流程发放与轮换；IAM 侧只认
-  `IdentityAuthenticator` 的验证结果。
+Permission Code 必须与当前后端源码/OpenAPI 一致；Resource Scope 也不能作为 bypass，生产宿主必须按自己的资源层级实现 `ResourceHierarchyProvider`。
+
+## 10. 说明与边界
+
+- Admin Console 是 0.1.0 正式能力，但仍是可选客户端；Starter 正常运行不依赖前端。
+- 管理控制台页面隐藏和 Router Guard 只属于 UX，真实权限始终由后端执行。
+- 生产账户凭据由宿主 `IdentityAuthenticator` 对接的身份源负责，IAM 不保存宿主密码。
