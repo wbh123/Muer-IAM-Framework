@@ -8,7 +8,7 @@
 | Maven version | `0.1.0-SNAPSHOT` |
 | Runtime baseline | Java 21 (OpenJDK 21.0.12), Spring Boot 4.0.0, MySQL 8.4, Redis 7 |
 | Local build toolchain | Maven 3.8.7, OpenJDK 21, Node v26.3.1 |
-| Remote CI head SHA | `0fefa88` (see "Remote CI" below) |
+| Remote CI head SHA | `ba9da82` (see "Remote CI evidence" below) |
 | Remote CI | See "Remote CI evidence" section — all green |
 | Tag / publication | Not created |
 
@@ -67,16 +67,20 @@ results at the pushed head.
 
 ## Remote CI evidence
 
-Observed after pushing `release/0.1.0` at head SHA `0fefa8888480d96b25f865bbeae24db7614d9a83`.
+Observed after pushing `release/0.1.0`; the two verification workflows are green at the
+branch head SHA `ba9da8226bd94a2d64f4f5359a3d63ad899fec4b`.
 
 | Workflow | Run ID | Head SHA | Conclusion | Jobs |
 | --- | --- | --- | --- | --- |
-| Verify IAM Starter | 33941185772 | `0fefa88` | success | `verify` (success), `Independent Consumer acceptance` (success), `Docker/Testcontainers consumer showcase` (success) |
-| Verify IAM Documentation | 33941185821 | `0fefa88` | success | `docs` (success) |
+| Verify IAM Starter | 33941675963 | `ba9da82` | success | `verify` (success), `Independent Consumer acceptance` (success), `Docker/Testcontainers consumer showcase` (success) |
+| Verify IAM Documentation | 33941675940 | `ba9da82` | success | `docs` (success) |
 
-The remote `verify` job's `Verify project identity` step (PowerShell identity scans:
-`test-identity-check.ps1`, `test-rename-project.ps1`, `verify-no-legacy-identifiers.ps1`)
-passed on the runner. No step used `continue-on-error` and no verification was relaxed.
+The earlier blocker re-check (the commit immediately preceding this report, `0fefa88`)
+also passed both workflows; this report records the head `ba9da82` runs that sit on the
+branch tip. The remote `verify` job's `Verify project identity` step (PowerShell
+identity scans: `test-identity-check.ps1`, `test-rename-project.ps1`,
+`verify-no-legacy-identifiers.ps1`) passed on the runner. No step used
+`continue-on-error` and no verification was relaxed.
 
 ## Conclusion
 
