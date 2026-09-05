@@ -7,14 +7,24 @@ sidebar:
 
 ## 授权决策码（AuthorizationDecision.decisionCode）
 
-来自 `DefaultAuthorizationEngine`：
+`AuthorizationDecision.allowed=false` 时，`decisionCode` 标明拒绝原因。以下枚举来自
+`DefaultAuthorizationEngine`，按其校验顺序排列（遇到首个不满足即返回，`steps` 记录已检查的步骤）：
 
-- `ALLOWED`：允许。
+- `IDENTITY_DOMAIN_MISMATCH`：`principal.identityDomain` 与请求 `domain` 不匹配。
+- `CLIENT_TYPE_MISMATCH`：`principal.clientType` 与请求 `clientType` 不匹配（需与 `iam.client-types` 精确匹配）。
+- `PROFILE_MISSING`：令牌未携带 `activeProfileId`，或活动 Profile 无法解析。
+- `PROFILE_UNAVAILABLE`：解析活动 Profile 时底层抛异常。
+- `PROFILE_OWNER_MISMATCH`：Profile 的 `profileId`/`userId` 与令牌主体不一致。
+- `PROFILE_DISABLED`：Profile `enabled=false`。
+- `PROFILE_REVOKED`：Profile `revoked=true`。
+- `PROFILE_CLIENT_DENIED`：Profile 的 `clientTypes` 不含令牌的 `clientType`。
+- `PROFILE_NOT_YET_VALID`：`validFrom` 晚于当前时间。
+- `PROFILE_EXPIRED`：`validUntil` 已早于当前时间。
+- `PROFILE_TEMPLATE_MISMATCH`：Profile 的模板版本与令牌 `templateVersionId` 不一致。
 - `PERMISSION_DENIED`：主体缺少该 `permissionCode`。
 - `SCOPE_DENIED`：权限存在，但不在 `ResourceScope` 范围内或被 `accessMode` 限制。
-- `IDENTITY_DOMAIN_MISMATCH`：身份域不匹配。
-- `CLIENT_TYPE_MISMATCH`：客户端类型不匹配（需与 `iam.client-types` 精确匹配）。
-- Profile 系列：Profile 被禁用/撤销或不在有效期（`enabled=false`、`revoked=true`、`validFrom/validUntil` 越界）。
+- `ALLOWED`：`allowed=true`，全部检查通过。
+- 扩展策略：若宿主注册 `AuthorizationPolicy` 且策略返回拒绝，`decisionCode` 为该策略的 `code()`。
 
 ## HTTP ProblemDetail 错误码
 
