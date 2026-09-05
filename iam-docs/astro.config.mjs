@@ -105,6 +105,13 @@ export default defineConfig({
           ],
         },
         {
+          label: '管理控制台',
+          items: [
+            { label: 'Management Console', slug: 'management/console' },
+            { label: '安装与部署', slug: 'management/deploy' },
+          ],
+        },
+        {
           label: '参考',
           items: [
             { label: 'Configuration', slug: 'reference/configuration' },

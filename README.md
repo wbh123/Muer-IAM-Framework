@@ -84,6 +84,15 @@ See [IAM_INTEGRATION_GUIDE.md](docs/IAM_INTEGRATION_GUIDE.md) for infrastructure
 
 Applications normally depend only on `iam-spring-boot-starter`. Internal modules separate the dependency-free domain, authentication, authorization, session, audit, diagnostics, MyBatis persistence, OpenAPI web contract and Spring Boot automatic configuration.
 
+## IAM Admin Console
+
+`iam-admin-web/` is an **optional** management console for the Management API exposed by the starter. It is a standard Vue 3 + TypeScript + Element Plus SPA whose API client is generated from the same
+[`iam.yaml`](iam-management-web/src/main/resources/openapi/iam.yaml) contract the Java side implements.
+
+- The Starter works **without** the admin frontend: depending on `iam-spring-boot-starter` never requires serving `iam-admin-web`. The console is an optional management client, not a startup dependency.
+- Every console page talks to `/iam/**` Management API, and every `/iam/admin/**` call is re-authorized by the `AuthorizationEngine` with fine-grained `iam.admin.*` permissions. Menu visibility is UI-only; it never replaces backend enforcement.
+- See [IAM Admin Console Deployment](docs/IAM_ADMIN_CONSOLE_DEPLOYMENT.md) for Nginx / reverse-proxy guidance, and the iam-docs “管理控制台” section for pages and permission model.
+
 ## Security defaults
 
 The starter uses an isolated `/iam/**` stateless security chain. Login is anonymous; every other IAM route requires a resolved Bearer principal. Host business routes remain host-owned and must explicitly reuse the IAM filter or principal resolver in their own security chain. The default hierarchy provider denies access until a host adapter is supplied.

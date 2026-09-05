@@ -1,7 +1,7 @@
-# IAM 0.1.0 Public API Reference
+# IAM 0.2.0 Public API Reference
 
-本页只列出当前源码中供消费应用使用的稳定候选 API/SPI。版本仍为
-`0.1.0-SNAPSHOT`，因此“稳定”表示本次发布候选的消费边界，而不是已经发布的二进制
+本页只列出当前源码中供消费应用使用的稳定候选 API/SPI。版本为
+`0.2.0-SNAPSHOT`，因此“稳定”表示本次开发候选的消费边界，而不是已经发布的二进制
 兼容承诺。所有路径和状态以
 [`iam.yaml`](../iam-management-web/src/main/resources/openapi/iam.yaml) 为准。
 
@@ -19,6 +19,14 @@
 | 认证与会话模型 | `AuthenticationResult`、`AuthSession`、`TokenRecord` | `iam-authentication/src/main/java/io/github/iamstarter/authentication/AuthenticationResult.java` |
 | profile 与模板模型 | `AuthorizationProfile`、`PermissionTemplateVersion`、`TemplateVersionStatus` | `iam-authorization/src/main/java/io/github/iamstarter/authorization/AuthorizationProfile.java` |
 | 审计模型 | `AuditRecord`、`AuditSubjectLink`、`AuditSubjectRelation` | `iam-audit/src/main/java/io/github/iamstarter/audit/AuditRecord.java` |
+| 管理读侧 SPI（0.2.0） | `UserQueryRepository`、`OverviewRepository` | `iam-core/src/main/java/io/github/iamstarter/core/port/UserQueryRepository.java` |
+| 管理读侧 SPI（0.2.0） | `AuthorizationProfileQueryRepository`、`PermissionTemplateQueryRepository`、`PermissionTemplate`、`PermissionSummary` | `iam-authorization/src/main/java/io/github/iamstarter/authorization/` |
+| 管理读侧 SPI（0.2.0） | `SessionQueryRepository` | `iam-session/src/main/java/io/github/iamstarter/session/SessionQueryRepository.java` |
+| 管理读侧 SPI（0.2.0） | `AuditQueryRepository`、`AuditEvent`、`AuditEventFilter`、`AuditEventPage` | `iam-audit/src/main/java/io/github/iamstarter/audit/` |
+
+管理查询 SPI 与既有可写 port 相互独立：自行实现持久化的宿主无需修改既有 port 实现，
+只需在需要管理读能力时提供上述新 SPI 的 bean（默认 MyBatis 实现使用同一个
+`SqlSessionFactory`）。
 
 直接使用 `AuthorizationEngine` 时，调用方提供 `IamPrincipal` 和
 `AuthorizationRequest`，并读取 `AuthorizationDecision`。使用 MVC 注解时，
@@ -72,7 +80,10 @@
 | Sessions | `revokeOtherSessions` | `POST /iam/sessions/revoke-others` | 204 | 401 |
 | Authorization | `listMyAuthorizationProfiles` | `GET /iam/authorization/profiles` | 200 | — |
 | Authorization | `switchAuthorizationProfile` | `POST /iam/authorization/profiles/{profileId}/switch` | 200 | 401, 404 |
-| Authorization | `evaluateAuthorization` | `POST /iam/authorization/diagnostics` | 200 | — |
+| Authorization | `evaluateAuthorization` | `POST /iam/authorization/diagnostics` | 200 | 401, 403 |
+
+> 0.2.0 起 `evaluateAuthorization` 需要 `iam.admin.diagnostics` permission；403 表示当前
+> principal 未被授予诊断权限。
 | Administration | `savePermissionTemplateVersion` | `PUT /iam/admin/templates/{versionId}` | 204 | 401, 403 |
 | Administration | `listUsers` | `GET /iam/admin/users` | 200 | 401, 403 |
 | Administration | `saveUser` | `PUT /iam/admin/users/{userId}` | 204 | 401, 403 |
@@ -87,6 +98,33 @@
 `GET /iam/sessions` 的 `userId` query 参数已经 deprecated 且被忽略；当前 principal
 始终决定所列 session 的归属。请求与响应 schema、参数限制和完整描述见
 [`iam.yaml`](../iam-management-web/src/main/resources/openapi/iam.yaml)。
+
+### 0.2.0 管理查询端点（Admin Console 支撑）
+
+| 分组 | 操作 | 路径 | 权限 |
+| --- | --- | --- | --- |
+| Capabilities | `getCurrentCapabilities` | `GET /iam/auth/capabilities` | 本人可见，无需 admin 权限 |
+| Management Users | `getUser` | `GET /iam/admin/users/{userId}` | `iam.admin.user.read` |
+| Management Identity | `getIdentity` | `GET /iam/admin/identities/{identityId}` | `iam.admin.identity.read` |
+| Management Permissions | `listPermissions` | `GET /iam/admin/permissions` | `iam.admin.permission.read` |
+| Management Templates | `listPermissionTemplates` | `GET /iam/admin/templates` | `iam.admin.template.read` |
+| Management Templates | `getPermissionTemplate` | `GET /iam/admin/templates/{templateId}` | `iam.admin.template.read` |
+| Management Templates | `listPermissionTemplateVersions` | `GET /iam/admin/templates/{templateId}/versions` | `iam.admin.template.read` |
+| Management Templates | `getPermissionTemplateVersion` | `GET /iam/admin/template-versions/{versionId}` | `iam.admin.template.read` |
+| Management Profiles | `listAuthorizationProfiles` | `GET /iam/admin/profiles` | `iam.admin.profile.read` |
+| Management Profiles | `getAuthorizationProfile` | `GET /iam/admin/profiles/{profileId}` | `iam.admin.profile.read` |
+| Management Profiles | `getAuthorizationProfileScopes` | `GET /iam/admin/profiles/{profileId}/scopes` | `iam.admin.scope.read` |
+| Management Profiles | `listUserAuthorizationProfiles` | `GET /iam/admin/users/{userId}/profiles` | `iam.admin.profile.read` |
+| Management Sessions | `adminListSessions` | `GET /iam/admin/sessions` | `iam.admin.session.read` |
+| Management Sessions | `getAdminSession` | `GET /iam/admin/sessions/{sessionId}` | `iam.admin.session.read` |
+| Management Sessions | `listUserSessions` | `GET /iam/admin/users/{userId}/sessions` | `iam.admin.session.read` |
+| Management Audit | `listAuditEvents` | `GET /iam/admin/audit-events` | `iam.admin.audit.read` |
+| Management Audit | `getAuditEvent` | `GET /iam/admin/audit-events/{eventId}` | `iam.admin.audit.read` |
+| Management Overview | `getAdminOverview` | `GET /iam/admin/overview` | `iam.admin.overview.read` |
+
+`GET /iam/admin/users` 追加了可选过滤 `username` / `userType` / `enabled`；既有的
+`afterUserId` / `limit` 保持不变。管理查询仅返回状态与元数据：Session 永不包含 token /
+Redis key；Audit 事件只读。`SessionResponse` 追加只读字段 `status` 与 `revokeReason`。
 
 ## 非稳定边界
 

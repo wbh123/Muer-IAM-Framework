@@ -415,7 +415,16 @@ iam-admin-web/
 
 ## 12. 后续项（本轮记录、延后执行）
 
-- Playwright E2E smoke（依赖稳定可种子化后端环境）。
+- Playwright E2E smoke（依赖稳定可种子化后端环境）。本轮记录的两个 smoke 场景：
+
+  1. `login → dashboard → users → open user detail`：登录（WEB client type），断言
+     dashboard 计数卡与最近 Audit 渲染，进入用户列表，打开某用户详情 Tabs。
+  2. `login → sessions → revoke`：登录后进入 Session 管理，选择一条 ACTIVE Session，
+     触发“撤销”Dialog 并确认，断言该行状态变为非 ACTIVE（列表刷新）。
+
+  延后原因：需要一个可重复种子化的 MySQL + Redis 后端（含带 `iam.admin.*` 的 profile
+  与覆盖管理目标的 scope）；当前示例数据面向业务 Demo，尚未提供“控制台管理员”种子。
+
 - 完整英文 i18n（架构预留在 vite 层面，本轮默认中文）。
 - 部署示例（Nginx/反向代理/静态托管）见 `docs/IAM_ADMIN_CONSOLE_DEPLOYMENT.md`
   （本轮交付）。
