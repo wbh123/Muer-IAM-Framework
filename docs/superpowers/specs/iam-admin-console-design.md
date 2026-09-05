@@ -1,8 +1,9 @@
-# IAM Admin Console 设计（0.2.0 development）
+# IAM Admin Console 设计（development）
 
 > 目标分支：`feature/iam-admin-console`（基于 `main` = 0.1.0 release candidate）
-> 目标版本：`0.2.0-SNAPSHOT`
-> 状态：设计基线（正式开发前必须完成）
+> 版本：并入 `0.1.0-SNAPSHOT` 开发（2026-09-05 决定：版本保持在 0.1.0，撤销原计划的
+> 0.2.0-SNAPSHOT bump；`git revert c9d2409`）
+> 状态：已实现（READY FOR ADMIN CONSOLE REVIEW）
 
 ---
 
@@ -109,7 +110,7 @@ OpenAPI iam.yaml
 
 ### 3.2 读能力落位
 
-管理查询多数落在既有关联聚合上。0.2.0 仍为 `SNAPSHOT`（PUBLIC_API 明示“稳定候选，
+管理查询多数落在既有关联聚合上。开发线仍为 `0.1.0-SNAPSHOT`（PUBLIC_API 明示“稳定候选，
 非二进制兼容承诺”），因此采用**在既有公开 port 上追加只读方法**，并同步更新
 `docs/PUBLIC_API.md`：
 
@@ -181,7 +182,7 @@ Problem Detail `409 CONFLICT`（code `IAM_TEMPLATE_VERSION_IMMUTABLE`），不�
 
 ---
 
-## 4. Management API 清单（0.2.0 新增/扩展）
+## 4. Management API 清单（Admin Console 新增/扩展）
 
 > 全部新增操作不删除、不重定义既有 10 个 admin 端点。
 
@@ -395,8 +396,8 @@ iam-admin-web/
 ## 10. 版本与分支
 
 - `main` = 0.1.0 RC 线（`0.1.0-SNAPSHOT`）。开发分支 `feature/iam-admin-console`。
-- 根 POM 版本升至 `0.2.0-SNAPSHOT`（各子模块 parent 版本同步更新）；不修改 0.1.0
-  授权语义。
+- 开发版本保持 `0.1.0-SNAPSHOT`（执行时通过 `git revert c9d2409` 撤销 0.2.0-SNAPSHOT
+  bump，根 POM 与各子模块 parent 版本一致）；不修改 0.1.0 授权语义。
 - 完成后停在 `READY FOR ADMIN CONSOLE REVIEW`，不自动 merge main、不打 tag、不建
   Release。
 

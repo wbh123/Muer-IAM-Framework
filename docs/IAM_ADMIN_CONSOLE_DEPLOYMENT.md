@@ -1,4 +1,4 @@
-# IAM Admin Console 部署指南（0.2.0 development）
+# IAM Admin Console 部署指南（development）
 
 `iam-admin-web` 是 IAM Starter 的**可选**管理控制台。它不要求 Docker，产物是纯静态
 `dist/`，可以交给 Nginx / Apache / CDN，也可以由 Spring Boot 静态托管。

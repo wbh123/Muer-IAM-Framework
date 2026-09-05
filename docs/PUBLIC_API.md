@@ -1,7 +1,7 @@
-# IAM 0.2.0 Public API Reference
+# IAM 0.1.0 Public API Reference
 
 本页只列出当前源码中供消费应用使用的稳定候选 API/SPI。版本为
-`0.2.0-SNAPSHOT`，因此“稳定”表示本次开发候选的消费边界，而不是已经发布的二进制
+`0.1.0-SNAPSHOT`，因此“稳定”表示本次开发候选的消费边界，而不是已经发布的二进制
 兼容承诺。所有路径和状态以
 [`iam.yaml`](../iam-management-web/src/main/resources/openapi/iam.yaml) 为准。
 
@@ -19,10 +19,10 @@
 | 认证与会话模型 | `AuthenticationResult`、`AuthSession`、`TokenRecord` | `iam-authentication/src/main/java/io/github/iamstarter/authentication/AuthenticationResult.java` |
 | profile 与模板模型 | `AuthorizationProfile`、`PermissionTemplateVersion`、`TemplateVersionStatus` | `iam-authorization/src/main/java/io/github/iamstarter/authorization/AuthorizationProfile.java` |
 | 审计模型 | `AuditRecord`、`AuditSubjectLink`、`AuditSubjectRelation` | `iam-audit/src/main/java/io/github/iamstarter/audit/AuditRecord.java` |
-| 管理读侧 SPI（0.2.0） | `UserQueryRepository`、`OverviewRepository` | `iam-core/src/main/java/io/github/iamstarter/core/port/UserQueryRepository.java` |
-| 管理读侧 SPI（0.2.0） | `AuthorizationProfileQueryRepository`、`PermissionTemplateQueryRepository`、`PermissionTemplate`、`PermissionSummary` | `iam-authorization/src/main/java/io/github/iamstarter/authorization/` |
-| 管理读侧 SPI（0.2.0） | `SessionQueryRepository` | `iam-session/src/main/java/io/github/iamstarter/session/SessionQueryRepository.java` |
-| 管理读侧 SPI（0.2.0） | `AuditQueryRepository`、`AuditEvent`、`AuditEventFilter`、`AuditEventPage` | `iam-audit/src/main/java/io/github/iamstarter/audit/` |
+| 管理读侧 SPI（Admin Console） | `UserQueryRepository`、`OverviewRepository` | `iam-core/src/main/java/io/github/iamstarter/core/port/UserQueryRepository.java` |
+| 管理读侧 SPI（Admin Console） | `AuthorizationProfileQueryRepository`、`PermissionTemplateQueryRepository`、`PermissionTemplate`、`PermissionSummary` | `iam-authorization/src/main/java/io/github/iamstarter/authorization/` |
+| 管理读侧 SPI（Admin Console） | `SessionQueryRepository` | `iam-session/src/main/java/io/github/iamstarter/session/SessionQueryRepository.java` |
+| 管理读侧 SPI（Admin Console） | `AuditQueryRepository`、`AuditEvent`、`AuditEventFilter`、`AuditEventPage` | `iam-audit/src/main/java/io/github/iamstarter/audit/` |
 
 管理查询 SPI 与既有可写 port 相互独立：自行实现持久化的宿主无需修改既有 port 实现，
 只需在需要管理读能力时提供上述新 SPI 的 bean（默认 MyBatis 实现使用同一个
@@ -82,7 +82,7 @@
 | Authorization | `switchAuthorizationProfile` | `POST /iam/authorization/profiles/{profileId}/switch` | 200 | 401, 404 |
 | Authorization | `evaluateAuthorization` | `POST /iam/authorization/diagnostics` | 200 | 401, 403 |
 
-> 0.2.0 起 `evaluateAuthorization` 需要 `iam.admin.diagnostics` permission；403 表示当前
+> 自本次开发起 `evaluateAuthorization` 需要 `iam.admin.diagnostics` permission；403 表示当前
 > principal 未被授予诊断权限。
 | Administration | `savePermissionTemplateVersion` | `PUT /iam/admin/templates/{versionId}` | 204 | 401, 403 |
 | Administration | `listUsers` | `GET /iam/admin/users` | 200 | 401, 403 |
@@ -99,7 +99,7 @@
 始终决定所列 session 的归属。请求与响应 schema、参数限制和完整描述见
 [`iam.yaml`](../iam-management-web/src/main/resources/openapi/iam.yaml)。
 
-### 0.2.0 管理查询端点（Admin Console 支撑）
+### 管理查询端点（Admin Console 支撑）
 
 | 分组 | 操作 | 路径 | 权限 |
 | --- | --- | --- | --- |
