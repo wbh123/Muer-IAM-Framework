@@ -122,6 +122,14 @@ paths:
     post:
       tags: [Authorization]
       operationId: evaluateAuthorization
+      description: >
+        Authenticated self diagnostics. Any authenticated principal may project
+        its OWN runtime authorization decision (read-only, no state change).
+        The projection always uses the principal from the security context; no
+        userId/profileId/principal may be supplied to diagnose someone else.
+        This endpoint does not require any iam.admin.* permission. Unauthenticated
+        requests receive 401. (The iam.admin.diagnostics capability only controls
+        whether the Admin Console shows its Diagnostics page.)
       requestBody:
         required: true
         content:
@@ -133,6 +141,8 @@ paths:
           content:
             application/json:
               schema: {$ref: '#/components/schemas/AuthorizationDecisionResponse'}
+        '401':
+          description: Authentication required
   /iam/admin/templates/{versionId}:
     put:
       tags: [Administration]

@@ -80,10 +80,13 @@
 | Sessions | `revokeOtherSessions` | `POST /iam/sessions/revoke-others` | 204 | 401 |
 | Authorization | `listMyAuthorizationProfiles` | `GET /iam/authorization/profiles` | 200 | — |
 | Authorization | `switchAuthorizationProfile` | `POST /iam/authorization/profiles/{profileId}/switch` | 200 | 401, 404 |
-| Authorization | `evaluateAuthorization` | `POST /iam/authorization/diagnostics` | 200 | 401, 403 |
+| Authorization | `evaluateAuthorization` | `POST /iam/authorization/diagnostics` | 200 | 401 |
 
-> 自本次开发起 `evaluateAuthorization` 需要 `iam.admin.diagnostics` permission；403 表示当前
-> principal 未被授予诊断权限。
+> `evaluateAuthorization` 是 **Authenticated Self Diagnostics**：任意已认证 principal 都可
+> 诊断**自己**的授权决策（只读投影，不改任何状态）。它只针对 SecurityContext 当前
+> principal，不接受 `userId` / `profileId` / `principal` 来诊断他人；未认证 → 401。
+> Admin Console 的 Diagnostics 页面是否展示由 capability `iam.admin.diagnostics`
+> 控制 —— 页面展示与后端 self-diagnostics 访问条件是不同概念。
 | Administration | `savePermissionTemplateVersion` | `PUT /iam/admin/templates/{versionId}` | 204 | 401, 403 |
 | Administration | `listUsers` | `GET /iam/admin/users` | 200 | 401, 403 |
 | Administration | `saveUser` | `PUT /iam/admin/users/{userId}` | 204 | 401, 403 |

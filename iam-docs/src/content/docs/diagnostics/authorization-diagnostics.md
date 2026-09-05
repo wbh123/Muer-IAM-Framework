@@ -28,6 +28,11 @@ sidebar:
 | Auth | Bearer Token |
 | 成功 | HTTP `200`，返回 `AuthorizationDecision` |
 
+> 该接口是 **Authenticated Self Diagnostics**：任意已认证 principal 都可以诊断
+> **自己**的授权决策，不要求任何 `iam.admin.*` permission；请求永远针对 SecurityContext
+> 当前 principal，不能通过请求体指定他人。Admin Console 的 Diagnostics 页面是否展示由
+> capability `iam.admin.diagnostics` 控制 —— 页面展示与 API 访问条件是不同概念。
+
 请求体示例：
 
 ```json

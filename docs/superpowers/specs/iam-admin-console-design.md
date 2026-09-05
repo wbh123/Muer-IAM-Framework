@@ -173,12 +173,19 @@ controller 未映射该异常（默认 500）。本轮**保留语义不变**，�
 Problem Detail `409 CONFLICT`（code `IAM_TEMPLATE_VERSION_IMMUTABLE`），不改状态机。
 不做“未经测试的行为变更”，不新增 RETIRED → PUBLISHED 禁令。
 
-### 3.6 Diagnostics 权限收紧
+### 3.6 Diagnostics：保持 Authenticated Self Diagnostics（兼容性恢复）
 
-现有 `POST /iam/authorization/diagnostics` 仅要求认证。按 §3.6 要求，新增权限
-`iam.admin.diagnostics`：该端点继续可用但必须命中该 permission。这属于 0.1.0 行为收紧，
-会同步更新 docs（自服务诊断不在本轮提供，Authorization Playground 面向具备
-`iam.admin.diagnostics` 的管理者）。
+既有 `POST /iam/authorization/diagnostics` 的 0.1.0 公共语义是「已认证 principal 诊断
+**自己**的授权决策」（200），未认证 → 401。实现阶段一度误加了 `iam.admin.diagnostics`
+门禁导致普通用户 403、破坏 Consumer Contract —— 最终恢复原语义，**不加任何
+`iam.admin.*` 权限门禁**。要点：
+
+- 诊断目标永远是 SecurityContext 当前 principal；请求体不允许携带
+  `userId` / `profileId` / `principal` 去诊断他人。
+- `iam.admin.diagnostics` 仅保留为 Admin Console 是否展示 Diagnostics 页面的
+  capability（前端菜单优化），与后端 self-diagnostics API 访问条件是**不同概念**。
+- 未来若需管理员诊断其他主体，另开
+  `POST /iam/admin/authorization/diagnostics`（Roadmap，本轮不实现）。
 
 ---
 

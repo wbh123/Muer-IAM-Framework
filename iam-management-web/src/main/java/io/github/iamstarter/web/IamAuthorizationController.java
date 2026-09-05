@@ -1,7 +1,6 @@
 package io.github.iamstarter.web;
 
 import io.github.iamstarter.authorization.AuthorizationRequest;
-import io.github.iamstarter.authorization.AuthorizationEngine;
 import io.github.iamstarter.authorization.AuthorizationProfile;
 import io.github.iamstarter.authorization.AuthorizationProfileService;
 import io.github.iamstarter.authentication.AuthorizationProfileSwitchService;
@@ -23,29 +22,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Date;
 
+/**
+ * Authorization self-service endpoints. {@code evaluateAuthorization} is
+ * <em>authenticated self diagnostics</em>: any valid {@link IamPrincipal} may
+ * project their own authorization decision without any {@code iam.admin.*}
+ * permission. It never accepts a userId/profileId to diagnose someone else.
+ */
 @RestController
 public class IamAuthorizationController implements AuthorizationApi {
     private final AuthorizationDiagnosticsService diagnostics;
     private final AuthorizationProfileService profiles;
     private final AuthorizationProfileSwitchService profileSwitches;
-    private final AuthorizationEngine authorization;
 
     public IamAuthorizationController(AuthorizationDiagnosticsService diagnostics,
                                       AuthorizationProfileService profiles,
                                       AuthorizationProfileSwitchService profileSwitches) {
-        this(diagnostics, profiles, profileSwitches,
-                (principal, request) -> new io.github.iamstarter.authorization.AuthorizationDecision(
-                        false, "PERMISSION_DENIED", List.of()));
-    }
-
-    public IamAuthorizationController(AuthorizationDiagnosticsService diagnostics,
-                                      AuthorizationProfileService profiles,
-                                      AuthorizationProfileSwitchService profileSwitches,
-                                      AuthorizationEngine authorization) {
         this.diagnostics = diagnostics;
         this.profiles = profiles;
         this.profileSwitches = profileSwitches;
-        this.authorization = authorization;
     }
 
     @Override
@@ -53,15 +47,6 @@ public class IamAuthorizationController implements AuthorizationApi {
         var principal = currentPrincipal();
         if (principal == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-        var diagnostic = new AuthorizationRequest(
-                "iam.admin.diagnostics",
-                principal.identityDomain(),
-                principal.clientType(),
-                new ResourceDescriptor("IAM_DIAGNOSTICS", "console", List.of(), Map.of()),
-                ScopeAccess.READ);
-        if (!authorization.decide(principal, diagnostic).allowed()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         var authorizationRequest = new AuthorizationRequest(
                 request.getPermissionCode(),

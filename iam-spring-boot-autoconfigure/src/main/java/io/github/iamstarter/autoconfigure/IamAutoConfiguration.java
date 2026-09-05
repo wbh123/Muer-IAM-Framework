@@ -363,9 +363,8 @@ public class IamAutoConfiguration {
     @ConditionalOnMissingBean
     IamAuthorizationController iamAuthorizationController(AuthorizationDiagnosticsService diagnostics,
                                                           AuthorizationProfileService profiles,
-                                                          AuthorizationProfileSwitchService switches,
-                                                          AuthorizationEngine authorization) {
-        return new IamAuthorizationController(diagnostics, profiles, switches, authorization);
+                                                          AuthorizationProfileSwitchService switches) {
+        return new IamAuthorizationController(diagnostics, profiles, switches);
     }
 
     @Bean
