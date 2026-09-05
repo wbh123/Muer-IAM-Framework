@@ -5,25 +5,38 @@ import io.github.iamstarter.core.model.IamPrincipal;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.Optional;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Configuration(proxyBeanMethods = false)
 public class ExampleIdentityAdapter {
-    private static final Map<String, AppUser> USERS = Map.of(
-            "alice", new AppUser(101L, "alice", "demo-pass", true, "Alice"),
-            "author-a", new AppUser(101L, "author-a", "demo-pass", true, "Author A"),
-            "reader-b", new AppUser(102L, "reader-b", "demo-pass", true, "Reader B"),
-            "disabled-c", new AppUser(103L, "disabled-c", "demo-pass", false, "Disabled C"),
-            "operator-a", new AppUser(101L, "operator-a", "demo-pass", true, "Operator A"),
-            "operator-b", new AppUser(102L, "operator-b", "demo-pass", true, "Operator B"));
+    private static Map<String, AppUser> baseUsers() {
+        return Map.of(
+                "alice", new AppUser(101L, "alice", "demo-pass", true, "Alice"),
+                "author-a", new AppUser(101L, "author-a", "demo-pass", true, "Author A"),
+                "reader-b", new AppUser(102L, "reader-b", "demo-pass", true, "Reader B"),
+                "disabled-c", new AppUser(103L, "disabled-c", "demo-pass", false, "Disabled C"),
+                "operator-a", new AppUser(101L, "operator-a", "demo-pass", true, "Operator A"),
+                "operator-b", new AppUser(102L, "operator-b", "demo-pass", true, "Operator B"));
+    }
+
+    /** Plain entry point used by unit-style tests when no admin demo account exists. */
+    public IdentityAuthenticator exampleIdentityAuthenticator() {
+        return exampleIdentityAuthenticator(Optional.empty());
+    }
 
     @Bean
-    IdentityAuthenticator exampleIdentityAuthenticator() {
+    IdentityAuthenticator exampleIdentityAuthenticator(Optional<AdminDemoAccount> adminDemo) {
+        var users = new HashMap<>(baseUsers());
+        adminDemo.ifPresent(account -> users.put(account.user().username(), account.user()));
         return request -> {
-            var user = USERS.get(request.username());
+            var user = users.get(request.username());
             if (user == null || !user.enabled() || !user.password().equals(request.password())) {
                 return Optional.empty();
+            }
+            if (adminDemo.isPresent() && adminDemo.get().user().username().equals(request.username())) {
+                return Optional.of(adminDemo.get().principal(request.clientType()));
             }
             var profileId = user.id() == 101L ? 401L : 403L;
             boolean independentConsumer = "author-a".equals(user.username());
