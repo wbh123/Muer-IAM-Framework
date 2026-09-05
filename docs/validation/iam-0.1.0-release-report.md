@@ -7,7 +7,7 @@
 | Branch | `release/0.1.0` |
 | Maven version | `0.1.0-SNAPSHOT` |
 | Runtime baseline | Java 21 (OpenJDK 21.0.12), Spring Boot 4.0.0, MySQL 8.4, Redis 7 |
-| Local build toolchain | Maven 3.8.7, Node v26.3.1 (wust conda env) |
+| Local build toolchain | Maven 3.8.7, OpenJDK 21, Node v26.3.1 |
 | Remote CI | `Pending` (push not yet observed) |
 | Tag / publication | Not created |
 
