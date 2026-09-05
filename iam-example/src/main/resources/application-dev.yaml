@@ -1,3 +1,4 @@
 iam:
   example:
     seed-demo: ${IAM_EXAMPLE_SEED_DEMO:false}
+    seed-admin: ${IAM_EXAMPLE_SEED_ADMIN:false}

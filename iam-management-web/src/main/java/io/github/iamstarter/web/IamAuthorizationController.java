@@ -22,6 +22,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Date;
 
+/**
+ * Authorization self-service endpoints. {@code evaluateAuthorization} is
+ * <em>authenticated self diagnostics</em>: any valid {@link IamPrincipal} may
+ * project their own authorization decision without any {@code iam.admin.*}
+ * permission. It never accepts a userId/profileId to diagnose someone else.
+ */
 @RestController
 public class IamAuthorizationController implements AuthorizationApi {
     private final AuthorizationDiagnosticsService diagnostics;

@@ -11,6 +11,7 @@
         <dependency><groupId>io.github.iamstarter</groupId><artifactId>iam-authentication</artifactId><version>${project.version}</version></dependency>
         <dependency><groupId>io.github.iamstarter</groupId><artifactId>iam-authorization</artifactId><version>${project.version}</version></dependency>
         <dependency><groupId>io.github.iamstarter</groupId><artifactId>iam-session</artifactId><version>${project.version}</version></dependency>
+        <dependency><groupId>io.github.iamstarter</groupId><artifactId>iam-audit</artifactId><version>${project.version}</version></dependency>
         <dependency><groupId>io.github.iamstarter</groupId><artifactId>iam-diagnostics</artifactId><version>${project.version}</version></dependency>
         <dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-web</artifactId></dependency>
         <dependency><groupId>org.springframework.security</groupId><artifactId>spring-security-core</artifactId></dependency>

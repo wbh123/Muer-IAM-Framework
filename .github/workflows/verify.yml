@@ -53,6 +53,21 @@ jobs:
       - name: Package the consumable Starter
         run: mvn -B -pl iam-spring-boot-starter -am package -DskipTests
 
+  management-verify:
+    name: Verify IAM Management API
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Test management module and its domain dependencies
+        run: mvn -B -pl iam-management-web -am test
+
   showcase-integration:
     name: Docker/Testcontainers consumer showcase
     runs-on: ubuntu-latest
@@ -72,6 +87,12 @@ jobs:
         run: >-
           mvn -B -pl iam-example -am -Pintegration
           -Dtest=IamStarterConsumptionTest,IamSecurityIntegrationTest
+          -Dsurefire.failIfNoSpecifiedTests=false test
+
+      - name: Verify opt-in admin demo seeder isolation
+        run: >-
+          mvn -B -pl iam-example -am -Pintegration
+          -Dtest=AdminConsoleDemoSeedIntegrationTest
           -Dsurefire.failIfNoSpecifiedTests=false test
 
   consumer-integration:

@@ -1,0 +1,49 @@
+name: Verify IAM Admin Console
+
+on:
+  push:
+    branches: [main, feature/iam-admin-console, feature/**]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  admin-web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: iam-admin-web/package-lock.json
+
+      # openapi-generator-cli needs a JVM to turn iam.yaml into the TS client.
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Install frontend dependencies
+        run: npm ci
+        working-directory: iam-admin-web
+
+      - name: Generate TypeScript client from OpenAPI contract
+        run: npm run api:generate
+        working-directory: iam-admin-web
+
+      - name: Type check
+        run: npm run type-check
+        working-directory: iam-admin-web
+
+      - name: Test
+        run: npm test
+        working-directory: iam-admin-web
+
+      - name: Build
+        run: npm run build
+        working-directory: iam-admin-web

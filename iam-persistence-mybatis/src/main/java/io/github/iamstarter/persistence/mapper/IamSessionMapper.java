@@ -12,6 +12,15 @@ public interface IamSessionMapper {
 
     List<AuthSession> findActiveForUser(@Param("userId") long userId);
 
+    List<AuthSession> findByUserId(@Param("userId") long userId);
+
+    List<AuthSession> search(@Param("afterLoginAt") Instant afterLoginAt,
+                             @Param("afterSessionId") String afterSessionId,
+                             @Param("limit") int limit,
+                             @Param("userId") Long userId,
+                             @Param("clientType") String clientType,
+                             @Param("active") Boolean active);
+
     int insert(AuthSession session);
 
     int update(AuthSession session);

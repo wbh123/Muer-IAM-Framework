@@ -6,7 +6,8 @@
 2. 配置 Spring Boot 应用；
 3. 接入宿主身份与资源范围 SPI；
 4. 启动应用；
-5. 通过几个 HTTP 接口确认认证与授权行为符合预期。
+5. 通过几个 HTTP 接口确认认证与授权行为符合预期；
+6. 如需可视化管理，再启动 0.1.0 随附的可选 IAM Admin Console。
 
 当前版本仍是 `0.1.0-SNAPSHOT`（Release Candidate），尚未作为正式 Maven 发行版发布。
 
@@ -21,6 +22,8 @@
 - Redis 7。
 
 使用 IAM 不要求安装 Docker，也不要求运行框架仓库中的 Testcontainers 或完整集成测试。
+
+如果还要使用 Admin Console，需要额外准备 Node.js 22+ 与 npm。
 
 ## 2. 准备 MySQL
 
@@ -253,7 +256,7 @@ Profile Switch **不会提升或覆盖原 Token**。原 Reader Token 仍然保�
 }
 ```
 
-**预期结果**：HTTP `200`，返回真实 `AuthorizationDecision`。例如 Reader 缺少 `document:update` 时，`allowed=false`，常见 `decisionCode=PERMISSION_DENIED`。
+**预期结果**：HTTP `200`，返回当前 Principal 的真实 `AuthorizationDecision`。例如 Reader 缺少 `document:update` 时，`allowed=false`，常见 `decisionCode=PERMISSION_DENIED`。
 
 ### 9.6 撤销 Session
 
@@ -288,9 +291,61 @@ Profile Switch **不会提升或覆盖原 Token**。原 Reader Token 仍然保�
 
 如果本机没有 MySQL / Redis，也可以选择使用 `examples/quickstart/docker-compose.yml` 快速启动它们；这是可选方案，不是 IAM 的部署要求。
 
-## 11. 什么时候算接入成功
+## 11. 启动并手工验收 IAM Admin Console（可选）
 
-对于普通使用者，完成以下几点即可：
+0.1.0 同时提供 `iam-admin-web`，但它只是可选管理客户端，不影响 Starter 的独立使用。
+
+### 11.1 准备本地管理员
+
+若使用 `iam-example` 验收控制台，可在**专用开发数据库**中显式开启管理员种子：
+
+```text
+SPRING_PROFILES_ACTIVE=dev
+IAM_EXAMPLE_SEED_ADMIN=true
+```
+
+同时使用前面的 MySQL/Redis 配置启动 `IamExampleApplication`。只有 `dev` Profile 与 `seed-admin=true` 同时存在时才会创建：
+
+```text
+username: admin-demo
+password: demo-pass
+clientType: WEB
+```
+
+生产环境不会自动创建这个账号，也不存在公开的管理员 bootstrap HTTP 接口。
+
+### 11.2 启动前端
+
+```bash
+cd iam-admin-web
+npm ci
+npm run api:generate
+npm run dev
+```
+
+浏览器打开 Vite 输出地址，通常为 `http://localhost:5173`。
+
+### 11.3 建议手工验收路径
+
+无需跑仓库完整自动化测试。浏览器中按下面路径确认即可：
+
+1. 使用 `admin-demo / demo-pass / WEB` 登录，进入 Dashboard；
+2. 打开用户列表与用户详情，Identity/Profile/Session 信息可以正常读取；
+3. 打开 Permission、Template、Profile 页面，确认列表和详情能够加载；
+4. 修改一个开发 Profile 或 Scope，保存后刷新仍能读取新值；
+5. 在 Session 页面撤销一个测试 Session，确认目标会话失效；
+6. 在 Audit 页面确认相关管理操作产生可查询审计记录；
+7. 在 Diagnostics 页面输入 Permission/Resource 条件，能够显示 ALLOW/DENY 和决策步骤；
+8. 使用缺少某项 `iam.admin.*` Capability 的测试 Profile 访问对应路由，前端应进入 403，后端接口也必须返回 403；
+9. 点击退出后，前端清理会话且后端 Session/Token 不再可继续使用。
+
+管理控制台页面隐藏、菜单和路由 Guard 只是用户体验层；真正授权始终由后端 `AuthorizationEngine` 执行。
+
+完整部署、Nginx、CSP、生产首个管理员初始化见 [IAM_ADMIN_CONSOLE_DEPLOYMENT.md](IAM_ADMIN_CONSOLE_DEPLOYMENT.md)。
+
+## 12. 什么时候算接入成功
+
+对于普通 Starter 使用者，完成以下几点即可：
 
 - Spring Boot 应用能正常启动；
 - IAM Flyway migration 成功，或你已经按组织流程手动管理 schema；
@@ -299,6 +354,12 @@ Profile Switch **不会提升或覆盖原 Token**。原 Reader Token 仍然保�
 - 携带 Token 访问 `GET /iam/auth/me` 能得到正确 Principal；
 - 你的一个业务接口能按 `@RequirePermission` / `AuthorizationEngine` 得到符合预期的允许或拒绝结果。
 
+如果同时使用 Admin Console，再额外确认：
+
+- 控制台可以登录并加载主要管理页面；
+- 管理写操作可持久化；
+- Session revoke、Audit、Diagnostics、403 权限边界符合预期。
+
 无需运行 IAM 仓库的完整 Testcontainers 验收套件。
 
-更多内容见 [IAM_INTEGRATION_GUIDE.md](IAM_INTEGRATION_GUIDE.md)、[PUBLIC_API.md](PUBLIC_API.md) 与文档站的 MySQL / Redis / Configuration 页面。
+更多内容见 [IAM_INTEGRATION_GUIDE.md](IAM_INTEGRATION_GUIDE.md)、[PUBLIC_API.md](PUBLIC_API.md)、[IAM_ADMIN_CONSOLE_DEPLOYMENT.md](IAM_ADMIN_CONSOLE_DEPLOYMENT.md) 与文档站。

@@ -159,9 +159,55 @@ class IamAuthorizationControllerTest {
                 .andExpect(status().isNotFound());
     }
 
+    @Test
+    void diagnostics_is_self_service_and_does_not_require_the_admin_diagnostics_permission() throws Exception {
+        // A reader without iam.admin.diagnostics must still be able to project its
+        // OWN decision (200), never a 403: this is the 0.1.0 public contract.
+        var principal = new IamPrincipal(7L, "identity-7", "SECURITY", 31L, 9L, "WEB", 4L);
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(principal, null, List.of()));
+        var capturedPrincipal = new AtomicReference<IamPrincipal>();
+        var capturedRequest = new AtomicReference<AuthorizationRequest>();
+        var diagnostics = new AuthorizationDiagnosticsService((actualPrincipal, request) -> {
+            capturedPrincipal.set(actualPrincipal);
+            capturedRequest.set(request);
+            return new AuthorizationDecision(false, "SCOPE_DENIED",
+                    List.of(new AuthorizationDecisionStep("scope", false, "outside assigned scope")));
+        });
+        // No AuthorizationEngine is wired at all - the endpoint must not consult one.
+        var mvc = MockMvcBuilders.standaloneSetup(controller(diagnostics, List.of())).build();
+
+        mvc.perform(post("/iam/authorization/diagnostics")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "permissionCode":"asset.read",
+                                  "domain":"SECURITY",
+                                  "clientType":"WEB",
+                                  "resourceType":"ASSET",
+                                  "resourceId":"asset-3",
+                                  "scopeAccess":"READ"
+                                }
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.allowed").value(false))
+                .andExpect(jsonPath("$.decisionCode").value("SCOPE_DENIED"))
+                .andExpect(jsonPath("$.steps[0].code").value("scope"))
+                .andExpect(jsonPath("$.steps[0].passed").value(false));
+
+        // The projected decision must always belong to the SecurityContext principal.
+        assertEquals(7L, capturedPrincipal.get().userId());
+        assertEquals("asset.read", capturedRequest.get().permissionCode());
+        assertEquals("asset-3", capturedRequest.get().resource().resourceId());
+    }
+
     private static IamAuthorizationController controller(AuthorizationDiagnosticsService diagnostics,
                                                          List<AuthorizationProfile> initial) {
         var profiles = profileService(initial);
+        return new IamAuthorizationController(diagnostics, profiles, switchService(profiles));
+    }
+
+    private static AuthorizationProfileSwitchService switchService(AuthorizationProfileService profiles) {
         TokenStore tokens = new TokenStore() {
             public Optional<TokenRecord> resolve(String token) { return Optional.empty(); }
             public void save(String token, TokenRecord record, Duration ttl) { }
@@ -173,8 +219,7 @@ class IamAuthorizationControllerTest {
         var authentication = new AuthenticationService(tokens, userId -> 5L, request -> Optional.empty(),
                 Clock.fixed(Instant.parse("2026-08-27T00:00:00Z"), ZoneOffset.UTC), Duration.ofHours(8),
                 () -> "switched-token", () -> "switched-session");
-        return new IamAuthorizationController(diagnostics, profiles,
-                new AuthorizationProfileSwitchService(profiles, authentication));
+        return new AuthorizationProfileSwitchService(profiles, authentication);
     }
 
     private static AuthorizationProfileService profileService(List<AuthorizationProfile> initial) {

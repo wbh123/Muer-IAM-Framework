@@ -4,11 +4,14 @@ import io.github.iamstarter.authentication.AuthenticationService;
 import io.github.iamstarter.authentication.IdentityAuthenticator;
 import io.github.iamstarter.authentication.AuthorizationProfileSwitchService;
 import io.github.iamstarter.authentication.AccountGovernanceService;
+import io.github.iamstarter.audit.AuditQueryRepository;
 import io.github.iamstarter.authorization.AuthorizationEngine;
 import io.github.iamstarter.authorization.AuthorizationPolicy;
+import io.github.iamstarter.authorization.AuthorizationProfileQueryRepository;
 import io.github.iamstarter.authorization.AuthorizationProfileRepository;
 import io.github.iamstarter.authorization.AuthorizationVersionRepository;
 import io.github.iamstarter.authorization.DefaultAuthorizationEngine;
+import io.github.iamstarter.authorization.PermissionTemplateQueryRepository;
 import io.github.iamstarter.authorization.PermissionTemplateVersionRepository;
 import io.github.iamstarter.authorization.AuthorizationProfileService;
 import io.github.iamstarter.authorization.AuthorizationScopeMutation;
@@ -17,7 +20,10 @@ import io.github.iamstarter.authorization.PermissionTemplateService;
 import io.github.iamstarter.core.port.ResourceHierarchyProvider;
 import io.github.iamstarter.core.port.IamUserRepository;
 import io.github.iamstarter.core.port.IdentityRepository;
+import io.github.iamstarter.core.port.OverviewRepository;
+import io.github.iamstarter.core.port.UserQueryRepository;
 import io.github.iamstarter.diagnostics.AuthorizationDiagnosticsService;
+import io.github.iamstarter.session.SessionQueryRepository;
 import io.github.iamstarter.session.SessionRepository;
 import io.github.iamstarter.session.SessionService;
 import io.github.iamstarter.session.TokenStore;
@@ -25,7 +31,20 @@ import io.github.iamstarter.session.LoginEventRepository;
 import io.github.iamstarter.web.IamAdministrationController;
 import io.github.iamstarter.web.IamAuthenticationController;
 import io.github.iamstarter.web.IamAuthorizationController;
+import io.github.iamstarter.web.IamCapabilitiesController;
+import io.github.iamstarter.web.IamManagementAuditController;
+import io.github.iamstarter.web.IamManagementOverviewController;
+import io.github.iamstarter.web.IamManagementProfilesController;
+import io.github.iamstarter.web.IamManagementSessionsController;
+import io.github.iamstarter.web.IamManagementTemplatesController;
+import io.github.iamstarter.web.IamManagementUsersController;
 import io.github.iamstarter.web.IamSessionController;
+import io.github.iamstarter.persistence.MyBatisAuthorizationProfileQueryRepository;
+import io.github.iamstarter.persistence.MyBatisAuditQueryRepository;
+import io.github.iamstarter.persistence.MyBatisOverviewRepository;
+import io.github.iamstarter.persistence.MyBatisPermissionTemplateQueryRepository;
+import io.github.iamstarter.persistence.MyBatisSessionQueryRepository;
+import io.github.iamstarter.persistence.MyBatisUserQueryRepository;
 import io.github.iamstarter.persistence.MyBatisAuthorizationProfileRepository;
 import io.github.iamstarter.persistence.MyBatisAuthorizationScopeMutation;
 import io.github.iamstarter.persistence.MyBatisAuthorizationVersionRepository;
@@ -86,6 +105,8 @@ public class IamAutoConfiguration {
             "mapper/iam/IamAuthorizationVersionMapper.xml",
             "mapper/iam/IamAuthorizationProfileMapper.xml",
             "mapper/iam/IamPermissionTemplateVersionMapper.xml",
+            "mapper/iam/IamPermissionTemplateQueryMapper.xml",
+            "mapper/iam/IamOverviewMapper.xml",
             "mapper/iam/IamAuditMapper.xml");
 
     @Bean
@@ -284,8 +305,9 @@ public class IamAutoConfiguration {
     @ConditionalOnMissingBean
     @ConditionalOnBean({IamUserRepository.class, IdentityRepository.class})
     AccountGovernanceService iamAccountGovernanceService(IamUserRepository users, IdentityRepository identities,
-                                                         AuthorizationVersionService versions) {
-        return new AccountGovernanceService(users, identities, versions);
+                                                         AuthorizationVersionService versions,
+                                                         ObjectProvider<UserQueryRepository> queries) {
+        return new AccountGovernanceService(users, identities, versions, queries.getIfAvailable());
     }
 
     @Bean
@@ -355,6 +377,115 @@ public class IamAutoConfiguration {
                                                             ObjectProvider<AccountGovernanceService> accounts) {
         return new IamAdministrationController(authorization, templates, profiles, versions, sessions,
                 accounts.getIfAvailable());
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnBean(SqlSessionFactory.class)
+    UserQueryRepository iamUserQueryRepository(SqlSessionFactory sessions) {
+        return new MyBatisUserQueryRepository(sessions);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnBean(SqlSessionFactory.class)
+    AuthorizationProfileQueryRepository iamAuthorizationProfileQueryRepository(SqlSessionFactory sessions) {
+        return new MyBatisAuthorizationProfileQueryRepository(sessions);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnBean(SqlSessionFactory.class)
+    SessionQueryRepository iamSessionQueryRepository(SqlSessionFactory sessions) {
+        return new MyBatisSessionQueryRepository(sessions);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnBean(SqlSessionFactory.class)
+    PermissionTemplateQueryRepository iamPermissionTemplateQueryRepository(SqlSessionFactory sessions) {
+        return new MyBatisPermissionTemplateQueryRepository(sessions);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnBean(SqlSessionFactory.class)
+    AuditQueryRepository iamAuditQueryRepository(SqlSessionFactory sessions) {
+        return new MyBatisAuditQueryRepository(sessions);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnBean(SqlSessionFactory.class)
+    OverviewRepository iamOverviewRepository(SqlSessionFactory sessions) {
+        return new MyBatisOverviewRepository(sessions);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnBean({UserQueryRepository.class, AuthorizationEngine.class})
+    IamManagementUsersController iamManagementUsersController(AuthorizationEngine authorization,
+                                                              UserQueryRepository users,
+                                                              IdentityRepository identities) {
+        return new IamManagementUsersController(authorization, users, identities);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnBean({PermissionTemplateQueryRepository.class, AuthorizationEngine.class})
+    IamManagementTemplatesController iamManagementTemplatesController(
+            AuthorizationEngine authorization,
+            PermissionTemplateQueryRepository templates) {
+        return new IamManagementTemplatesController(authorization, templates);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnBean({AuthorizationProfileQueryRepository.class, UserQueryRepository.class,
+            AuthorizationProfileRepository.class, AuthorizationEngine.class})
+    IamManagementProfilesController iamManagementProfilesController(
+            AuthorizationEngine authorization,
+            AuthorizationProfileQueryRepository query,
+            AuthorizationProfileRepository profiles,
+            UserQueryRepository users) {
+        return new IamManagementProfilesController(authorization, query, profiles, users);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnBean({SessionQueryRepository.class, UserQueryRepository.class, AuthorizationEngine.class})
+    IamManagementSessionsController iamManagementSessionsController(
+            AuthorizationEngine authorization,
+            SessionQueryRepository sessions,
+            UserQueryRepository users) {
+        return new IamManagementSessionsController(authorization, sessions, users);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnBean({AuditQueryRepository.class, AuthorizationEngine.class})
+    IamManagementAuditController iamManagementAuditController(
+            AuthorizationEngine authorization,
+            AuditQueryRepository audits) {
+        return new IamManagementAuditController(authorization, audits);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnBean({OverviewRepository.class, AuthorizationEngine.class})
+    IamManagementOverviewController iamManagementOverviewController(
+            AuthorizationEngine authorization,
+            OverviewRepository overview) {
+        return new IamManagementOverviewController(authorization, overview);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnBean({AuthorizationProfileRepository.class, PermissionTemplateVersionRepository.class})
+    IamCapabilitiesController iamCapabilitiesController(
+            AuthorizationProfileRepository profiles,
+            PermissionTemplateVersionRepository versions) {
+        return new IamCapabilitiesController(profiles, versions);
     }
 
     private static String randomId() {
