@@ -2,40 +2,64 @@
 title: 项目结构
 description: 了解 IAM 的多模块 Maven 布局、宿主应用需要关心的边界，以及演示模块的角色。
 sidebar:
-  order: 4
+  order: 5
 ---
 
 ## 它解决什么问题
 
-IAM 是多模块 Maven 工程。理解哪些模块是「内部实现」、哪些是「宿主可直接依赖的边界」，可以避免把内部包误引入生产应用。
+IAM 是一个多模块 Maven 工程，但普通宿主应用通常只需要依赖 `iam-spring-boot-starter`。了解模块边界有助于避免业务代码直接依赖内部实现。
 
-## 模块布局
+## 宿主应用真正需要关心的模块
 
-仓库根下包含以下模块：
+### `iam-spring-boot-starter`
 
-| 模块 | 角色 |
-| --- | --- |
-| `iam-core` | 核心模型与端口（`IamPrincipal`、`ResourceDescriptor`、`ResourceHierarchyProvider`） |
-| `iam-authentication` | 认证与登录（`IdentityAuthenticator`、`LoginRequest`、`AuthenticationResult`） |
-| `iam-authorization` | 授权引擎与模型（`AuthorizationEngine`、`AuthorizationProfile`、`PermissionTemplateVersion`） |
-| `iam-session` | 会话与令牌（`AuthSession`、`TokenRecord`） |
-| `iam-persistence-mybatis` | Schema 迁移与持久化 |
-| `iam-diagnostics` | 授权诊断 |
-| `iam-management-web` | 管理 HTTP 端点（[OpenAPI](https://github.com/wbh123/iam/blob/main/iam-management-web/src/main/resources/openapi/iam.yaml)） |
-| `iam-spring-boot-autoconfigure` | 自动装配 Web 层（`IamProperties`、`IamBearerTokenFilter`、`RequirePermission`、`MvcResourceDescriptorResolver`、`IamAuthorizationInterceptor`） |
-| `iam-spring-boot-starter` | 聚合依赖，宿主唯一需要引入的模块 |
-| `iam-example` | 唯一消费应用，演示完整链路与 SPI 实现 |
-| `iam-audit` / `iam-tests` | 审计与测试支撑 |
+业务应用的统一依赖入口。
 
-## 宿主边界
+### `iam-spring-boot-autoconfigure`
 
-- **只依赖** `iam-spring-boot-starter`；不要直接依赖 `iam-persistence-mybatis` 或内部实现模块。
-- 用脚本 `scripts/verify-consumer-public-api.sh` 验证消费应用未导入 IAM 内部包。
+负责 Spring Boot 自动配置、Bearer Token 解析、声明式 MVC 授权等集成能力。宿主通常通过 Starter 间接获得它。
 
-## 演示数据位于何处
+### 公共模型 / SPI
 
-`iam-example` 中的 [`QuickStartDemoSeeder`](https://github.com/wbh123/iam/blob/main/iam-example/src/main/java/io/github/iamstarter/example/QuickStartDemoSeeder.java) 写入演示用户、profile 与文档，仅在 `dev` profile 且 `iam.example.seed-demo=true` 时运行，**切勿用于生产**。
+业务代码可能直接使用这些公共类型：
+
+- `IamPrincipal`
+- `IdentityAuthenticator`
+- `AuthorizationEngine`
+- `ResourceHierarchyProvider`
+- `ResourceDescriptor`
+- `@RequirePermission`
+- `MvcResourceDescriptorResolver`
+
+稳定候选边界见[Public API](/reference/public-api/)。
+
+## 内部模块
+
+仓库还包含认证、授权、Session、Audit、Diagnostics、MyBatis Persistence、Management Web 等模块，用来隔离不同职责。
+
+普通 Consumer 不应为了“方便”直接导入：
+
+- MyBatis Mapper；
+- Repository implementation；
+- persistence implementation；
+- `internal` / `impl` 包。
+
+## `iam-example` 的角色
+
+`iam-example` 是仓库中的 Consumer Showcase，用于证明 Starter 可以被独立 Spring Boot 应用消费。
+
+它同时提供 QuickStart 的 Alice / Document 示例，但**不是**要求用户照搬的生产项目模板。生产应用应该保留自己的用户模型、业务资源和部署方式，只接入 IAM 公共 API / SPI。
+
+## 文档与测试的边界
+
+- 用户文档负责说明如何配置、启动和调用 IAM；
+- `iam-example` 展示真实接入方式；
+- Testcontainers、独立 Consumer 验收与完整回归由项目 CI 负责。
+
+因此普通使用者无需复制仓库测试环境，也不需要为了部署 IAM 运行所有测试。
 
 ## 下一步
 
-按[快速开始](/getting-started/quick-start/)跑通；理解术语请从[Identity 与 Principal](/concepts/identity-principal/)开始。
+- 手动准备运行环境：[手动部署](/getting-started/manual-deployment/)
+- 查看 Starter 配置：[配置参考](/reference/configuration/)
+- 查看公共 API：[Public API](/reference/public-api/)
