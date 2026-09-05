@@ -1,6 +1,12 @@
 # IAM Spring Boot Starter
 
-A reusable Identity and Access Management framework for Spring Boot applications, providing authentication, fine-grained authorization, permission templates, authorization profiles, resource scopes, distributed session management, security auditing and explainable authorization decisions.
+A reusable Identity and Access Management framework for Spring Boot applications, providing authentication, fine-grained authorization, permission templates, authorization profiles, resource scopes, distributed session management, security auditing, explainable authorization decisions, Management APIs and an optional web management console.
+
+## 0.1.0 scope
+
+`0.1.0` is the first complete release baseline and includes the embeddable Starter, Management API, documentation site and the optional IAM Admin Console. The console is part of the 0.1.0 product scope, but it is **not** a runtime dependency of applications that only need the Starter.
+
+The repository remains `0.1.0-SNAPSHOT` until the final release gate, tag and publication are explicitly approved.
 
 ## Capabilities
 
@@ -14,10 +20,12 @@ A reusable Identity and Access Management framework for Spring Boot applications
 - **Session** governance provides durable MySQL state and Redis token indexes.
 - **Audit** stores generic events and multiple related subjects.
 - **Diagnostics** projects the exact runtime authorization decision.
+- **Management API** exposes user, identity, permission, template, profile, scope, session, audit and overview operations under `/iam/**`.
+- **Admin Console** provides an optional Vue 3 management client backed by the same OpenAPI contract and backend authorization engine.
 
 ## First use
 
-Start with the source-verified [Quick Start](docs/QUICK_START.md), then use the [public API reference](docs/PUBLIC_API.md) to implement the host adapters.
+Start with the source-verified [Quick Start](docs/QUICK_START.md), then use the [public API reference](docs/PUBLIC_API.md) to implement host adapters.
 
 The 0.1.0 candidate scope and known limitations are in the [release notes](docs/RELEASE_NOTES_0.1.0.md); migration ownership and staged adoption are in the [migration guide](docs/IAM_MIGRATION_GUIDE.md).
 
@@ -29,9 +37,9 @@ npm ci
 npm run dev
 ```
 
-The documentation includes a manual deployment guide for MySQL, Redis and Spring Boot configuration. Docker is optional and is not required to use IAM.
+The documentation includes manual deployment guidance for MySQL, Redis, Spring Boot and the Admin Console. Docker is optional and is not required to use IAM.
 
-## Five-minute integration
+## Five-minute Starter integration
 
 1. Add the single dependency:
 
@@ -74,6 +82,51 @@ Using Docker, Testcontainers, or the repository's complete verification suite is
 
 See [IAM_INTEGRATION_GUIDE.md](docs/IAM_INTEGRATION_GUIDE.md) for infrastructure and SPI configuration and [iam-example](iam-example/README.md) for a maintainer-facing consumer showcase.
 
+## IAM Admin Console
+
+`iam-admin-web/` is the **optional management console shipped with 0.1.0**. It is a Vue 3 + TypeScript + Element Plus SPA whose API client is generated from the same [`iam.yaml`](iam-management-web/src/main/resources/openapi/iam.yaml) contract implemented by the Java Management API.
+
+The console covers Dashboard, Users and Identities, Permission Explorer, Permission Templates, Authorization Profiles and Scopes, Sessions, Audit, Diagnostics and current-user account/profile operations.
+
+### Local development demo
+
+The example application can explicitly seed a development-only administrator. Both settings are required:
+
+```text
+SPRING_PROFILES_ACTIVE=dev
+IAM_EXAMPLE_SEED_ADMIN=true
+```
+
+Then use:
+
+```text
+username: admin-demo
+password: demo-pass
+clientType: WEB
+```
+
+This account is **never** auto-created in production. Do not copy these credentials into a real deployment.
+
+Start the backend with your manually configured MySQL and Redis, then run the frontend:
+
+```bash
+cd iam-admin-web
+npm ci
+npm run api:generate
+npm run dev
+```
+
+Use the Vite address shown in the terminal (normally `http://localhost:5173`). A manual acceptance pass should at least cover login, Dashboard load, User/Profile/Session/Audit pages, one Profile/Scope edit, one Session revoke, Diagnostics, 403 route handling and logout.
+
+### Production boundary
+
+- The Starter works **without** the admin frontend: depending on `iam-spring-boot-starter` never requires serving `iam-admin-web`.
+- Every `/iam/admin/**` request is re-authorized by `AuthorizationEngine` with fine-grained `iam.admin.*` permissions and resource scopes. Menu or route hiding is only a frontend usability guard.
+- Production has no default administrator and no public bootstrap endpoint. The first administrator must be provisioned through controlled SQL/migration/deployment seeding or the host application's own initial provisioning flow.
+- `POST /iam/authorization/diagnostics` remains authenticated self-diagnostics for the current principal and does not require an admin permission.
+
+See [IAM Admin Console Deployment](docs/IAM_ADMIN_CONSOLE_DEPLOYMENT.md) for Nginx/reverse-proxy guidance, token/CSP rules, local demo startup and production administrator bootstrap.
+
 ## Project maintenance
 
 - [Contributing](CONTRIBUTING.md) defines branch and compatibility rules.
@@ -82,16 +135,7 @@ See [IAM_INTEGRATION_GUIDE.md](docs/IAM_INTEGRATION_GUIDE.md) for infrastructure
 
 ## Modules
 
-Applications normally depend only on `iam-spring-boot-starter`. Internal modules separate the dependency-free domain, authentication, authorization, session, audit, diagnostics, MyBatis persistence, OpenAPI web contract and Spring Boot automatic configuration.
-
-## IAM Admin Console
-
-`iam-admin-web/` is an **optional** management console for the Management API exposed by the starter. It is a standard Vue 3 + TypeScript + Element Plus SPA whose API client is generated from the same
-[`iam.yaml`](iam-management-web/src/main/resources/openapi/iam.yaml) contract the Java side implements.
-
-- The Starter works **without** the admin frontend: depending on `iam-spring-boot-starter` never requires serving `iam-admin-web`. The console is an optional management client, not a startup dependency.
-- Every console page talks to `/iam/**` Management API, and every `/iam/admin/**` call is re-authorized by the `AuthorizationEngine` with fine-grained `iam.admin.*` permissions. Menu visibility is UI-only; it never replaces backend enforcement.
-- See [IAM Admin Console Deployment](docs/IAM_ADMIN_CONSOLE_DEPLOYMENT.md) for Nginx / reverse-proxy guidance, and the iam-docs “管理控制台” section for pages and permission model.
+Applications normally depend only on `iam-spring-boot-starter`. Internal modules separate the dependency-free domain, authentication, authorization, session, audit, diagnostics, MyBatis persistence, OpenAPI web contract and Spring Boot automatic configuration. `iam-admin-web` and `iam-docs` are repository-level companion applications, not Maven runtime modules.
 
 ## Security defaults
 
