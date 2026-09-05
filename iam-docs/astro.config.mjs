@@ -30,6 +30,7 @@ export default defineConfig({
             { label: '快速开始', slug: 'getting-started/quick-start' },
             { label: '安装', slug: 'getting-started/installation' },
             { label: '基础配置', slug: 'getting-started/configuration' },
+            { label: '手动部署', slug: 'getting-started/manual-deployment' },
             { label: '工程结构', slug: 'getting-started/project-structure' },
           ],
         },
