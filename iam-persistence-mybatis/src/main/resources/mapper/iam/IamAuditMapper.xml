@@ -44,7 +44,10 @@
     <select id="findEvents" resultMap="eventRow">
         SELECT <include refid="auditColumns"/>
         FROM iam_audit_log log
-        WHERE log.id &lt; #{maxLogId}
+        WHERE 1 = 1
+        <if test="maxLogId != null and maxLogId > 0">
+            AND log.id &lt; #{maxLogId}
+        </if>
         <if test="actionCode != null and actionCode != ''">
             AND log.action_code = #{actionCode}
         </if>

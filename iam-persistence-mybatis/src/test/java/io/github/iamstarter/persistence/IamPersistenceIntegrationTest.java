@@ -24,6 +24,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import io.github.iamstarter.session.AuthSession;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -340,6 +342,8 @@ class IamPersistenceIntegrationTest {
                 "mapper/iam/IamAuthorizationVersionMapper.xml",
                 "mapper/iam/IamAuthorizationProfileMapper.xml",
                 "mapper/iam/IamPermissionTemplateVersionMapper.xml",
+                "mapper/iam/IamPermissionTemplateQueryMapper.xml",
+                "mapper/iam/IamOverviewMapper.xml",
                 "mapper/iam/IamAuditMapper.xml")) {
             try (var reader = Resources.getResourceAsReader(resource)) {
                 new XMLMapperBuilder(reader, configuration, resource,
@@ -347,6 +351,111 @@ class IamPersistenceIntegrationTest {
             }
         }
         return new SqlSessionFactoryBuilder().build(configuration);
+    }
+
+    @Test
+    void management_query_repositories_serve_console_reads() throws Exception {
+        // Seed a dedicated management-console fixture with unique identifiers.
+        executeSql("""
+                INSERT INTO iam_user (id, username, user_type, enabled)
+                VALUES (301, 'mgmt-active', 'MEMBER', TRUE)
+                """);
+        executeSql("""
+                INSERT INTO iam_user (id, username, user_type, enabled)
+                VALUES (302, 'mgmt-disabled', 'MEMBER', FALSE)
+                """);
+        executeSql("INSERT INTO iam_permission (id, permission_code, display_name) VALUES (360, 'mgmt:read', 'Read mgmt')");
+        executeSql("INSERT INTO iam_permission_template (id, template_key, display_name, description) "
+                + "VALUES (350, 'template-mgmt', 'Mgmt Template', 'Management demo')");
+        executeSql("INSERT INTO iam_permission_template_version (id, template_id, version_number, status, published_at) "
+                + "VALUES (351, 350, 1, 'PUBLISHED', CURRENT_TIMESTAMP(6)), (352, 350, 2, 'DRAFT', NULL)");
+        executeSql("INSERT INTO iam_template_permission (template_version_id, permission_id) VALUES (352, 360)");
+        executeSql("""
+                INSERT INTO iam_authorization_profile
+                    (id, user_id, template_version_id, profile_key, display_name, client_types,
+                     enabled, valid_until)
+                VALUES (370, 301, 352, 'mgmt-profile', 'Mgmt Profile', '["WEB","MOBILE"]', TRUE,
+                        DATE_ADD(CURRENT_TIMESTAMP(6), INTERVAL 1 DAY))
+                """);
+        executeSql("INSERT INTO iam_authorization_scope (profile_id, resource_type, resource_id, scope_access) "
+                + "VALUES (370, 'PROJECT', '101', 'READ')");
+        executeSql("""
+                INSERT INTO iam_session
+                    (session_id, user_id, client_type, client_instance, ip_address, user_agent,
+                     login_at, last_seen_at, expires_at, revoked_at, revoke_reason)
+                VALUES ('session-301-active', 301, 'WEB', 'browser-1', '203.0.113.1', 'ua/1',
+                        DATE_SUB(CURRENT_TIMESTAMP(6), INTERVAL 1 HOUR),
+                        DATE_SUB(CURRENT_TIMESTAMP(6), INTERVAL 1 MINUTE),
+                        DATE_ADD(CURRENT_TIMESTAMP(6), INTERVAL 1 DAY), NULL, NULL),
+                       ('session-301-revoked', 301, 'MOBILE', 'browser-2', '203.0.113.2', 'ua/2',
+                        DATE_SUB(CURRENT_TIMESTAMP(6), INTERVAL 2 HOUR),
+                        DATE_SUB(CURRENT_TIMESTAMP(6), INTERVAL 90 MINUTE),
+                        DATE_ADD(CURRENT_TIMESTAMP(6), INTERVAL 1 DAY),
+                        DATE_SUB(CURRENT_TIMESTAMP(6), INTERVAL 30 MINUTE), 'ADMIN_ACTION')
+                """);
+
+        var users = new MyBatisUserQueryRepository(sessionFactory());
+        assertEquals(301L, users.search(0L, 10, "mgmt", "MEMBER", true).getFirst().userId());
+        assertEquals(302L, users.search(0L, 10, null, null, false).getFirst().userId());
+
+        var templates = new MyBatisPermissionTemplateQueryRepository(sessionFactory());
+        assertEquals(List.of(350L), templates.listTemplates(0L, 10).stream()
+                .map(template -> template.templateId()).toList());
+        assertEquals(350L, templates.findTemplate(350L).orElseThrow().templateId());
+        var versions = templates.findVersionsByTemplate(350L);
+        assertEquals(2, versions.size());
+        assertEquals(352L, versions.getFirst().versionId());
+        assertEquals(Set.of("mgmt:read"), templates.findVersionById(352L).orElseThrow().permissions());
+        var permissionPage = templates.listPermissions("mgmt", null, 0L, 10);
+        assertEquals(1, permissionPage.items().size());
+        assertEquals("mgmt:read", permissionPage.items().getFirst().permissionCode());
+        assertEquals(1L, permissionPage.items().getFirst().inUseCount());
+
+        var profiles = new MyBatisAuthorizationProfileQueryRepository(sessionFactory());
+        var foundProfiles = profiles.search(0L, 10, null, null, true, false, "WEB");
+        assertEquals(370L, foundProfiles.getFirst().profileId());
+        assertEquals(Set.of("WEB", "MOBILE"), foundProfiles.getFirst().clientTypes());
+        assertEquals(List.of(), profiles.search(0L, 10, null, null, true, true, null));
+
+        var sessions = new MyBatisSessionQueryRepository(sessionFactory());
+        assertEquals(Set.of("session-301-active"), sessions.search(null, null, 10, 301L, null, true)
+                .stream().map(AuthSession::sessionId).collect(java.util.stream.Collectors.toSet()));
+        assertEquals(Set.of("session-301-revoked"), sessions.search(null, null, 10, 301L, null, false)
+                .stream().map(AuthSession::sessionId).collect(java.util.stream.Collectors.toSet()));
+        var activeFirstPage = sessions.search(null, null, 1, 301L, null, null);
+        assertEquals(1, activeFirstPage.size());
+        var secondPage = sessions.search(activeFirstPage.getFirst().loginAt(),
+                activeFirstPage.getFirst().sessionId(), 10, 301L, null, null);
+        assertEquals(1, secondPage.size());
+        assertEquals("session-301-revoked", secondPage.getFirst().sessionId());
+        assertEquals("ADMIN_ACTION", secondPage.getFirst().revokeReason());
+
+        var overview = new MyBatisOverviewRepository(sessionFactory());
+        assertTrue(overview.load().activeSessions() >= 1);
+        assertTrue(overview.load().activeProfiles() >= 1);
+        assertTrue(overview.load().totalUsers() > 0);
+    }
+
+    @Test
+    void management_audit_queries_read_back_immutable_events() throws Exception {
+        var append = new MyBatisAuditRepository(sessionFactory());
+        var record = new io.github.iamstarter.audit.AuditRecord(
+                "audit-mgmt-1", "user:301", "user.enable", "USER", "301", "SUCCESS", "request-mgmt",
+                Map.of(), Map.of(), Map.of("reason", "console"),
+                Instant.parse("2026-08-30T06:00:00Z"));
+        append.append(record, List.of(new io.github.iamstarter.audit.AuditSubjectLink(
+                "USER", "301", io.github.iamstarter.audit.AuditSubjectRelation.PRIMARY)));
+
+        var queries = new MyBatisAuditQueryRepository(sessionFactory());
+        var detail = queries.findById("audit-mgmt-1").orElseThrow();
+        assertEquals("user.enable", detail.action());
+        assertEquals("console", detail.metadata().get("reason"));
+        assertEquals("301", detail.subjects().getFirst().subjectId());
+
+        var page = queries.findEvents(new io.github.iamstarter.audit.AuditEventFilter(
+                301L, null, null, "user.enable", "USER", "301", null, null), 0L, 10);
+        assertEquals(1, page.events().size());
+        assertEquals("audit-mgmt-1", page.events().getFirst().eventId());
     }
 
     private record StoredAudit(String operator, String beforeName, String afterName, String source,
