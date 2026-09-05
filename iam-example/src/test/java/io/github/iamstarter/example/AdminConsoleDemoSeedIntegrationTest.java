@@ -15,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AdminConsoleDemoSeedIntegrationTest {
+    private static final String FOREIGN_ADMIN_PERMISSION = "iam.admin.extension.read";
     private static final MySQLContainer<?> MYSQL = new MySQLContainer<>(DockerImageName.parse("mysql:8.4"))
             .withDatabaseName("iam_admin_seed")
             .withUsername("iam")
@@ -43,6 +44,9 @@ class AdminConsoleDemoSeedIntegrationTest {
         }
         try (var propertyOnly = start(false, true)) {
             assertAdminSeedAbsent(propertyOnly);
+            propertyOnly.getBean(JdbcTemplate.class).update(
+                    "INSERT INTO iam_permission (permission_code, display_name) VALUES (?, ?)",
+                    FOREIGN_ADMIN_PERMISSION, "Host extension admin permission");
         }
 
         try (var enabled = start(true, true)) {
@@ -59,11 +63,16 @@ class AdminConsoleDemoSeedIntegrationTest {
             assertEquals(List.of("PUBLISHED"), jdbc.queryForList(
                     "SELECT status FROM iam_permission_template_version WHERE id = ?",
                     String.class, AdminDemoSeedConstants.TEMPLATE_VERSION_ID));
+            assertEquals(List.of(FOREIGN_ADMIN_PERMISSION), jdbc.queryForList(
+                    "SELECT permission_code FROM iam_permission WHERE permission_code = ?",
+                    String.class, FOREIGN_ADMIN_PERMISSION));
             assertEquals(AdminDemoSeedConstants.permissionCodes(), jdbc.queryForList("""
-                    SELECT permission_code FROM iam_permission
-                    WHERE permission_code LIKE 'iam.admin.%'
-                    ORDER BY permission_code
-                    """, String.class));
+                    SELECT p.permission_code
+                    FROM iam_template_permission tp
+                    JOIN iam_permission p ON p.id = tp.permission_id
+                    WHERE tp.template_version_id = ?
+                    ORDER BY p.permission_code
+                    """, String.class, AdminDemoSeedConstants.TEMPLATE_VERSION_ID));
             assertEquals(AdminDemoSeedConstants.permissionCodes().size(),
                     jdbc.queryForObject("SELECT COUNT(*) FROM iam_template_permission WHERE template_version_id = ?",
                             Integer.class, AdminDemoSeedConstants.TEMPLATE_VERSION_ID));
