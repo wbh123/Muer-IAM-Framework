@@ -21,6 +21,8 @@ class IamMapperContractTest {
                 "mapper/iam/IamAuthorizationVersionMapper.xml",
                 "mapper/iam/IamAuthorizationProfileMapper.xml",
                 "mapper/iam/IamPermissionTemplateVersionMapper.xml",
+                "mapper/iam/IamPermissionTemplateQueryMapper.xml",
+                "mapper/iam/IamOverviewMapper.xml",
                 "mapper/iam/IamAuditMapper.xml")) {
             try (var reader = Resources.getResourceAsReader(resource)) {
                 new XMLMapperBuilder(reader, configuration, resource, configuration.getSqlFragments()).parse();
@@ -33,5 +35,17 @@ class IamMapperContractTest {
                 "io.github.iamstarter.persistence.mapper.IamSessionMapper.touch"));
         assertTrue(configuration.hasStatement(
                 "io.github.iamstarter.persistence.mapper.IamUserMapper.findPage"));
+        assertTrue(configuration.hasStatement(
+                "io.github.iamstarter.persistence.mapper.IamUserMapper.search"));
+        assertTrue(configuration.hasStatement(
+                "io.github.iamstarter.persistence.mapper.IamAuthorizationProfileMapper.search"));
+        assertTrue(configuration.hasStatement(
+                "io.github.iamstarter.persistence.mapper.IamSessionMapper.search"));
+        assertTrue(configuration.hasStatement(
+                "io.github.iamstarter.persistence.mapper.IamPermissionTemplateQueryMapper.listPermissions"));
+        assertTrue(configuration.hasStatement(
+                "io.github.iamstarter.persistence.mapper.IamOverviewMapper.load"));
+        assertTrue(configuration.hasStatement(
+                "io.github.iamstarter.persistence.mapper.IamAuditMapper.findEvents"));
     }
 }

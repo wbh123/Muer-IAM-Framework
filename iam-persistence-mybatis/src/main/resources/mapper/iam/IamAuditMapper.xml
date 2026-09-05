@@ -91,7 +91,7 @@
         </foreach>
         ORDER BY id
     </select>
-</mapper>
+
     <insert id="insertAudit">
         INSERT INTO iam_audit_log
             (event_id, operator_ref, action_code, resource_type, resource_id, result_code, request_id,
