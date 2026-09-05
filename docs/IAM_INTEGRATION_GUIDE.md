@@ -12,9 +12,36 @@ A consuming Spring Boot application declares one IAM production dependency:
 </dependency>
 ```
 
-Java 21, Spring Boot 4, a MySQL `DataSource`, and a `StringRedisTemplate` are
-required by the default adapters. Applications can replace any default port
-bean when another implementation is needed.
+Java 21, Spring Boot 4, a MySQL `DataSource`, and a `StringRedisTemplate` are required by the default adapters.
+
+IAM does **not** require Docker. MySQL and Redis may come from local installations, internal services, managed cloud services, containers, or Kubernetes. What matters is that the host Spring Boot application can connect to them with standard Spring Boot configuration.
+
+## Infrastructure preparation
+
+### MySQL
+
+The release validation baseline uses MySQL 8.4. An existing compatible MySQL 8.x instance can be reused.
+
+A simple database and account can be prepared manually:
+
+```sql
+CREATE DATABASE iam_host
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_0900_ai_ci;
+
+CREATE USER 'iam_app'@'localhost' IDENTIFIED BY 'change-me';
+GRANT ALL PRIVILEGES ON iam_host.* TO 'iam_app'@'localhost';
+```
+
+Use a real application host or controlled network instead of `localhost` when MySQL is remote. Production credentials must not reuse documentation passwords.
+
+By default IAM uses the host `DataSource` and runs its Flyway migrations automatically. No manual IAM table creation is normally required.
+
+### Redis
+
+The release validation baseline uses Redis 7. IAM does not require pre-created keys or data structures.
+
+For a same-host deployment, Redis can remain bound to the loopback interface. For remote deployments, expose it only on a controlled private network and enable authentication according to the deployment environment.
 
 ## Minimal configuration
 
@@ -22,12 +49,13 @@ bean when another implementation is needed.
 spring:
   datasource:
     url: jdbc:mysql://localhost:3306/iam_host
-    username: iam
+    username: iam_app
     password: ${IAM_DB_PASSWORD}
   data:
     redis:
       host: localhost
       port: 6379
+      password: ${IAM_REDIS_PASSWORD:}
 
 iam:
   enabled: true
@@ -36,37 +64,25 @@ iam:
     history-table: iam_flyway_schema_history
   token:
     ttl: 8h
-    redis-prefix: iam
+    redis-prefix: my-app:iam
   session:
     enabled: true
     touch-interval: 10m
-  client-types: [WEB]
+  client-types:
+    - WEB
 ```
 
-IAM migrations are loaded only from `classpath:db/iam/migration` and use their
-own history table. Set `iam.schema.enabled=false` only when the host deliberately
-manages the same IAM schema by another deployment process.
+IAM migrations are loaded only from `classpath:db/iam/migration` and use their own history table. Set `iam.schema.enabled=false` only when the host deliberately manages the same IAM schema through another deployment process and the schema has already been applied.
 
-`iam.token.ttl` must be a positive duration. Invalid values are rejected while
-the Spring application context is being created, before any token can be issued.
+`iam.token.ttl` must be positive. Invalid values are rejected when the Spring application context is created.
 
-`iam.client-types` is the starter login allow-list. A client type must match an
-entry exactly; other login attempts are rejected before the host
-`IdentityAuthenticator` is invoked. It must contain at least one non-blank
-entry. The default allow-list is `[WEB]`.
+`iam.client-types` is the starter login allow-list. A client type must match an entry exactly; other login attempts are rejected before the host `IdentityAuthenticator` is invoked. The default is `[WEB]`.
 
-`iam.token.redis-prefix` must be non-blank. Set a host-specific value when
-multiple IAM applications share the same Redis deployment, so their opaque
-token and reverse-index keys remain isolated.
-
-`iam.schema.history-table` must be non-blank. It is the Flyway history table
-for the IAM migration set and should remain distinct from a host application's
-own migration history.
+`iam.token.redis-prefix` must be non-blank. Use a host-specific value when multiple applications share Redis.
 
 ## Required identity adapter
 
-The host verifies its own credentials and projects the result into one generic
-principal. Returning an empty result rejects the login.
+The host verifies its own credentials and projects the result into one generic principal. Returning an empty result rejects the login.
 
 ```java
 @Bean
@@ -83,21 +99,13 @@ IdentityAuthenticator identityAuthenticator(AccountGateway accounts) {
 }
 ```
 
-The adapter must not place passwords, raw tokens, or sensitive device values in
-the principal. Profile, template, client and authorization-version values must
-match the IAM persistence projection.
+The adapter must not place passwords, raw tokens, or sensitive device values in the principal. Profile, template, client and authorization-version values must match the IAM persistence projection.
 
-The management login controller records `HttpServletRequest.getRemoteAddr()` as
-the remote address and does not trust forwarding headers by default. Deployments
-behind a trusted proxy should normalize the servlet remote address at the host
-container boundary. User agent, request ID and coarse client labels are audit
-metadata only and never become authorization inputs. The built-in controller
-removes control characters and bounds each value to the IAM schema width.
+The management login controller records `HttpServletRequest.getRemoteAddr()` as the remote address and does not trust forwarding headers by default. Deployments behind a trusted proxy should normalize the servlet remote address at the host container boundary.
 
 ## Resource and policy adapters
 
-The default `ResourceHierarchyProvider` denies hierarchy membership. A host
-that uses scoped resources supplies its own provider:
+The default `ResourceHierarchyProvider` denies hierarchy membership. A host that uses scoped resources supplies its own provider:
 
 ```java
 @Bean
@@ -106,9 +114,7 @@ ResourceHierarchyProvider resourceHierarchyProvider(ResourceGateway resources) {
 }
 ```
 
-Additional hard-deny or compliance behavior is registered through ordered
-`AuthorizationPolicy` beans. Policies can deny or annotate a decision; they do
-not bypass core identity, profile, permission or scope checks.
+Additional hard-deny or compliance behavior is registered through ordered `AuthorizationPolicy` beans. Policies can deny or annotate a decision; they do not bypass core identity, profile, permission or scope checks.
 
 ## HTTP and security behavior
 
@@ -121,10 +127,21 @@ The starter contributes a stateless security chain only for `/iam/**`:
 
 The complete contract is in `iam-management-web/src/main/resources/openapi/iam.yaml`.
 
+For deployment verification, users normally only need to confirm:
+
+1. the Spring Boot application starts successfully;
+2. MySQL and Redis connections succeed;
+3. IAM schema migration succeeds or is already managed externally;
+4. a valid user can call `POST /iam/auth/login` and receive `200`;
+5. the returned token can call `GET /iam/auth/me` and receive `200`;
+6. one representative business authorization path returns the expected allow or deny result.
+
+Users do not need to run the repository's full Testcontainers or independent-consumer test suites. Those are maintained by IAM project CI.
+
 ## Operational boundary
 
-Redis stores opaque tokens and reverse indexes; MySQL stores durable sessions,
-profiles, permission-template versions and audit data. MySQL remains the
-durable authority for authorization state. Changing authorization-relevant
-state must increment the user's authorization version so previously issued
-tokens become invalid.
+Redis stores opaque tokens and reverse indexes; MySQL stores durable sessions, profiles, permission-template versions and audit data. MySQL remains the durable authority for authorization state.
+
+Changing authorization-relevant state must increment the user's authorization version so previously issued tokens become invalid.
+
+For a Chinese step-by-step guide, see `docs/QUICK_START.md` and the documentation site's **手动部署**, **MySQL**, **Redis**, and **配置参考** pages.

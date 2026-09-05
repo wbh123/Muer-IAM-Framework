@@ -8,6 +8,20 @@ each host endpoint changes authority only after decision parity is measured.
 The source application's tables, tokens and routes remain authoritative until
 that endpoint is explicitly migrated.
 
+## Ownership and release boundary
+
+The consuming application owns credential verification, its business-resource
+lookup, endpoint rollout, rollback selector, and all host data migration.
+The starter owns only its generic IAM modules, its isolated migrations from
+`classpath:db/iam/migration`, and the `iam_flyway_schema_history` configured
+for those migrations. Do not treat default MyBatis mappers, migration objects,
+or IAM table layout as consumer extension APIs; the supported consumer boundary
+is listed in [PUBLIC_API.md](PUBLIC_API.md).
+
+The current candidate remains `0.1.0-SNAPSHOT`. It is not a published IAM
+service and this migration guide does not authorize replacing a host's existing
+security path in one change.
+
 ## Adapter map
 
 | Host responsibility | IAM adapter or model |
@@ -89,10 +103,8 @@ rollback. Keep audit and comparison evidence so the mismatch can be diagnosed.
 
 ## Current extraction status
 
-The generic starter and example remain isolated from host vocabulary. The host
-now contains a narrow bridge for the authorization-diagnostics catalog:
-principal, resource, hierarchy and policy adapters compare the legacy and IAM
-decisions for the same operator. The comparison is disabled by default through
-`iam.shadow.authorization-catalog.enabled` and records mismatches without
-changing the response or enforcement result. No existing endpoint has switched
-to IAM enforcement.
+This repository's `iam-example` is the current consumer demonstration. It
+verifies generic login, scoped document access, denied requests, profile switch,
+diagnostics, and session revocation. A real host must still establish its own
+decision-parity evidence before switching enforcement authority for any
+endpoint.

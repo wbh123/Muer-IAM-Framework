@@ -1,0 +1,38 @@
+name: Verify IAM Documentation
+
+on:
+  push:
+    branches: [main, release/**]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: iam-docs/package-lock.json
+
+      - name: Verify documentation workflow configuration
+        run: bash scripts/test-docs-workflow.sh
+
+      - name: Install documentation dependencies
+        working-directory: iam-docs
+        run: npm ci
+
+      - name: Type-check the documentation site
+        working-directory: iam-docs
+        run: npm run check
+
+      - name: Build the documentation site
+        working-directory: iam-docs
+        run: npm run build
