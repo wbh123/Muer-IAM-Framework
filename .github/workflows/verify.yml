@@ -2,7 +2,7 @@ name: Verify IAM Starter
 
 on:
   push:
-    branches: [main, develop/**, feature/**, codex/**]
+    branches: [main, develop/**, feature/**, codex/**, release/**]
   pull_request:
     branches: [main]
   workflow_dispatch:
