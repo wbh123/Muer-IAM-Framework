@@ -8,7 +8,8 @@
 | Maven version | `0.1.0-SNAPSHOT` |
 | Runtime baseline | Java 21 (OpenJDK 21.0.12), Spring Boot 4.0.0, MySQL 8.4, Redis 7 |
 | Local build toolchain | Maven 3.8.7, OpenJDK 21, Node v26.3.1 |
-| Remote CI | `Pending` (push not yet observed) |
+| Remote CI head SHA | `0fefa88` (see "Remote CI" below) |
+| Remote CI | See "Remote CI evidence" section — all green |
 | Tag / publication | Not created |
 
 ## Repository release references (Task 1)
@@ -48,22 +49,44 @@ developer entry, with the full reactor still building. No license claim was inve
 
 ## Gate and findings
 
-All local release-gate commands above passed. Identity scans
-(`test-identity-check.ps1`, `test-rename-project.ps1`, `verify-no-legacy-identifiers.ps1`)
-are PowerShell-based and run as part of the remote CI `verify` job; they have not been
-observed locally. Remote CI status remains `Pending` until the branch is pushed.
+All local release-gate commands above passed. The legacy-identifier blocker that had
+failed the remote `verify` job (a local-environment string in the prior version of this
+report) was removed, and the documentation Node toolchain was aligned to Node 22
+(Astro 7 requires `>= 22.12.0`);
+`scripts/test-docs-workflow.sh` now asserts Node 22 in both docs workflows and a
+`release/**` trigger in `verify.yml`. See "Remote CI evidence" below for the observed
+results at the pushed head.
 
 | Priority | Finding | Status |
 | --- | --- | --- |
 | P0 | None recorded | None |
 | P1 | No `LICENSE` file exists in the repository; publish/license metadata is omitted from the POM. This is a Central-publish blocker but does not affect the software build or tests. | Open — requires human decision |
 | P2 | Root POM developer entry records only a verified GitHub id (`wbh123`); full name and email are not published. | Informational |
-| P2 | Remote CI for `release/0.1.0` has not been observed. | Pending |
+| P2 | GitHub Actions deprecation notices: `actions/checkout@v4`/`actions/setup-java@v4` target Node 20 (forced onto Node 24 runners), and `setup-java@v4` is deprecated in favour of `v5`. Non-blocking technical debt for 0.2.0. | Informational |
 | P3 | Deferred work is tracked as 0.2.0 roadmap items, not 0.1.0. | Informational |
+
+## Remote CI evidence
+
+Observed after pushing `release/0.1.0` at head SHA `0fefa8888480d96b25f865bbeae24db7614d9a83`.
+
+| Workflow | Run ID | Head SHA | Conclusion | Jobs |
+| --- | --- | --- | --- | --- |
+| Verify IAM Starter | 33941185772 | `0fefa88` | success | `verify` (success), `Independent Consumer acceptance` (success), `Docker/Testcontainers consumer showcase` (success) |
+| Verify IAM Documentation | 33941185821 | `0fefa88` | success | `docs` (success) |
+
+The remote `verify` job's `Verify project identity` step (PowerShell identity scans:
+`test-identity-check.ps1`, `test-rename-project.ps1`, `verify-no-legacy-identifiers.ps1`)
+passed on the runner. No step used `continue-on-error` and no verification was relaxed.
 
 ## Conclusion
 
-Local gates are green and no P0 exists. One P1 (missing `LICENSE`) and remote-CI
-observation remain before this can be marked `READY FOR RELEASE`. Remote CI evidence
-must be collected by pushing `release/0.1.0`, then the release decision is handed to a
-human. No tag, artifact publication, or GitHub Release has been created.
+**Software release candidate**: `READY FOR HUMAN RELEASE APPROVAL` — all code, tests,
+docs, consumer-acceptance, Testcontainers and both remote CI workflows are green, with
+no P0. The only P1 is a missing `LICENSE`, which is a **public open-source / Maven
+Central distribution** matter, not a software-quality blocker.
+
+**Public Maven / open-source distribution**: `NOT READY` — a `LICENSE` decision by the
+project owner is required before any Central/OSI publication. This is intentionally kept
+open and not auto-created by the release tooling.
+
+No tag, artifact publication, or GitHub Release has been created.
