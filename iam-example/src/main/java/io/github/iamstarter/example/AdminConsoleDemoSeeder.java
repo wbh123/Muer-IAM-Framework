@@ -7,6 +7,8 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.StringJoiner;
 
 import static io.github.iamstarter.example.AdminDemoSeedConstants.ADMIN_PERMISSIONS;
@@ -49,9 +51,15 @@ final class AdminConsoleDemoSeeder implements ApplicationRunner {
                 AdminDemoSeedConstants.TEMPLATE_VERSION_ID);
         jdbc.update("DELETE FROM iam_permission_template WHERE id = ?",
                 AdminDemoSeedConstants.TEMPLATE_ID);
-        jdbc.update("DELETE FROM iam_permission WHERE permission_code LIKE 'iam.admin.%'");
+        deleteCanonicalDemoPermissions();
         jdbc.update("DELETE FROM iam_identity WHERE id = ?", AdminDemoSeedConstants.IDENTITY_ID);
         jdbc.update("DELETE FROM iam_user WHERE id = ?", AdminDemoSeedConstants.USER_ID);
+    }
+
+    private void deleteCanonicalDemoPermissions() {
+        var codes = canonicalPermissionCodes();
+        jdbc.update("DELETE FROM iam_permission WHERE permission_code IN (" + placeholders(codes.size()) + ")",
+                codes.toArray());
     }
 
     private void seedUserAndIdentity() {
@@ -69,7 +77,7 @@ final class AdminConsoleDemoSeeder implements ApplicationRunner {
 
     private void seedAdminPermissions() {
         var statement = new StringJoiner(", ", "INSERT INTO iam_permission (id, permission_code, display_name) VALUES ", "");
-        var params = new java.util.ArrayList<Object>();
+        var params = new ArrayList<Object>();
         long id = PERMISSION_ID_BASE;
         for (var entry : ADMIN_PERMISSIONS.entrySet()) {
             statement.add("(?, ?, ?)");
@@ -90,10 +98,26 @@ final class AdminConsoleDemoSeeder implements ApplicationRunner {
                     (id, template_id, version_number, status, published_at)
                 VALUES (?, ?, 1, 'PUBLISHED', CURRENT_TIMESTAMP(6))
                 """, AdminDemoSeedConstants.TEMPLATE_VERSION_ID, AdminDemoSeedConstants.TEMPLATE_ID);
+        linkCanonicalPermissionsToTemplate();
+    }
+
+    private void linkCanonicalPermissionsToTemplate() {
+        var codes = canonicalPermissionCodes();
+        var params = new ArrayList<Object>();
+        params.add(AdminDemoSeedConstants.TEMPLATE_VERSION_ID);
+        params.addAll(codes);
         jdbc.update("""
                 INSERT INTO iam_template_permission (template_version_id, permission_id)
-                SELECT ?, id FROM iam_permission WHERE permission_code LIKE 'iam.admin.%'
-                """, AdminDemoSeedConstants.TEMPLATE_VERSION_ID);
+                SELECT ?, id FROM iam_permission WHERE permission_code IN (%s)
+                """.formatted(placeholders(codes.size())), params.toArray());
+    }
+
+    private static List<String> canonicalPermissionCodes() {
+        return List.copyOf(ADMIN_PERMISSIONS.keySet());
+    }
+
+    private static String placeholders(int count) {
+        return String.join(", ", java.util.Collections.nCopies(count, "?"));
     }
 
     private void seedProfileAndScopes() {
