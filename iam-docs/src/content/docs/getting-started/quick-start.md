@@ -1,233 +1,27 @@
 ---
 title: 快速开始
-description: 从空环境启动 MySQL、Redis 与 Spring Boot，用真实 HTTP 请求验证登录、权限、scope、profile、诊断与 session 撤销。
+description: 手动准备 MySQL 与 Redis，完成 IAM Starter 的最小配置，并通过少量接口确认认证与授权行为。
 sidebar:
   order: 1
 ---
 
-本文用仓库中唯一的消费应用 `iam-example`，从空环境启动 MySQL 8.4、Redis 7 和 Spring Boot 4，然后通过真实 HTTP 请求验证登录、permission、scope、profile、诊断和 session 撤销。当前版本仍是 `0.1.0-SNAPSHOT`（Release Candidate），尚未发布到 Maven Central。
+这篇 QuickStart 的目标不是让使用者复现 IAM 仓库的完整测试，而是帮助你把 Starter 接进一个 Spring Boot 应用并成功启动。
 
-演示账号和密码均为匿名本地数据。演示种子会清空目标库中的 IAM 表，所以只能连接 QuickStart 专用数据库，绝不能用于共享、测试验收或生产数据库。种子同时受 `dev` profile 和 `iam.example.seed-demo=true` 保护；缺少任一条件时都不会运行。
-
-## 1. 前置条件
+你只需要准备：
 
 - Java 21；
+- Spring Boot 4；
 - Maven；
-- Docker 与 Docker Compose v2；
-- `curl` 和 `jq`。
+- 可连接的 MySQL 8.x（发布基线使用 MySQL 8.4）；
+- Redis 7。
 
-以下命令都从仓库根目录执行。先加载仅供本机演示的环境变量，再启动基础设施：
+:::note[Docker 不是前置条件]
+MySQL 和 Redis 可以来自本机安装、局域网服务器、云服务或容器。仓库中的 Docker Compose 只是可选的本地便利方案。
+:::
 
-```bash
-set -a
-source examples/quickstart/.env.example
-set +a
+## 1. 添加 Starter
 
-docker compose \
-  --env-file examples/quickstart/.env.example \
-  -f examples/quickstart/docker-compose.yml \
-  up -d --wait
-```
-
-Compose 仅启动 [`mysql:8.4`](https://github.com/wbh123/iam/blob/main/examples/quickstart/docker-compose.yml) 和 [`redis:7-alpine`](https://github.com/wbh123/iam/blob/main/examples/quickstart/docker-compose.yml)，端口只绑定本机回环地址。如默认的 `3306` 或 `6379` 已被占用，可复制 `.env.example` 为本地文件并修改 `IAM_EXAMPLE_DB_PORT` 或 `IAM_EXAMPLE_REDIS_PORT`，然后在后续命令中用该文件替换 `.env.example`；JDBC URL 会引用修改后的数据库端口。
-
-## 2. 构建并运行 `iam-example`
-
-`iam-example` 的生产依赖只有 `iam-spring-boot-starter`。构建可执行 jar：
-
-```bash
-mvn -B -pl iam-example -am -DskipTests package
-```
-
-保持环境变量已加载，在当前终端启动应用：
-
-```bash
-java -jar iam-example/target/iam-example-0.1.0-SNAPSHOT.jar
-```
-
-应用默认监听 `http://localhost:8080`。启动时 starter 执行 IAM schema 迁移，随后 [`QuickStartDemoSeeder`](https://github.com/wbh123/iam/blob/main/iam-example/src/main/java/io/github/iamstarter/example/QuickStartDemoSeeder.java) 写入 Alice、reader/editor profile、`document:read`/`document:update`、project `101` scope，以及宿主持有的文档 `1001`/`2001`。
-
-另开一个终端，设置请求地址：
-
-```bash
-export IAM_EXAMPLE_BASE_URL=http://localhost:8080
-```
-
-健康检查是宿主公开路由，不需要 token：
-
-```bash
-curl --fail-with-body -sS "$IAM_EXAMPLE_BASE_URL/public/health"
-# ok
-```
-
-## 3. 登录 reader profile
-
-凭据由宿主的 [`ExampleIdentityAdapter`](https://github.com/wbh123/iam/blob/main/iam-example/src/main/java/io/github/iamstarter/example/ExampleIdentityAdapter.java) 校验；starter 不保存明文密码。登录 Alice：
-
-```bash
-LOGIN_RESPONSE="$(curl --fail-with-body -sS \
-  -X POST "$IAM_EXAMPLE_BASE_URL/iam/auth/login" \
-  -H 'Content-Type: application/json' \
-  --data '{"username":"alice","password":"demo-pass","clientType":"WEB"}')"
-
-export IAM_READER_TOKEN="$(jq -r '.accessToken' <<<"$LOGIN_RESPONSE")"
-export IAM_READER_SESSION_ID="$(jq -r '.sessionId' <<<"$LOGIN_RESPONSE")"
-jq '{sessionId, expiresAt, principal}' <<<"$LOGIN_RESPONSE"
-```
-
-新 token 激活 profile `401`（`alice-reader-project-101`）。查看当前 principal：
-
-```bash
-curl --fail-with-body -sS \
-  "$IAM_EXAMPLE_BASE_URL/iam/auth/me" \
-  -H "Authorization: Bearer $IAM_READER_TOKEN" | jq
-```
-
-返回 `200`，其中 `activeProfileId` 为 `401`。也可查看当前账号可切换的两个 profile：
-
-```bash
-curl --fail-with-body -sS \
-  "$IAM_EXAMPLE_BASE_URL/iam/authorization/profiles" \
-  -H "Authorization: Bearer $IAM_READER_TOKEN" | jq
-```
-
-## 4. 验证 permission 与 project scope
-
-文档路由由宿主 [`DocumentController`](https://github.com/wbh123/iam/blob/main/iam-example/src/main/java/io/github/iamstarter/example/DocumentController.java) 持有，并用 `@RequirePermission` 声明 permission；[`ExampleDocumentResourceResolver`](https://github.com/wbh123/iam/blob/main/iam-example/src/main/java/io/github/iamstarter/example/ExampleDocumentResourceResolver.java) 把路径变量解析成带 `PROJECT` 父路径的 `ResourceDescriptor`。
-
-reader 具有 project `101` 的 READ scope，因此读取文档 `1001` 返回 `200`：
-
-```bash
-curl --fail-with-body -sS \
-  "$IAM_EXAMPLE_BASE_URL/api/documents/1001" \
-  -H "Authorization: Bearer $IAM_READER_TOKEN" | jq
-```
-
-reader 没有 `document:update`，写入同一文档返回 `403`：
-
-```bash
-curl -sS -o /dev/null -w '%{http_code}\n' \
-  -X POST "$IAM_EXAMPLE_BASE_URL/api/documents/1001" \
-  -H 'Content-Type: application/json' \
-  -H "Authorization: Bearer $IAM_READER_TOKEN" \
-  --data '{"status":"PUBLISHED"}'
-# 403
-```
-
-文档 `2001` 属于 project `202`；即使 reader token 有效，跨 project 读取仍返回 `403`：
-
-```bash
-curl -sS -o /dev/null -w '%{http_code}\n' \
-  "$IAM_EXAMPLE_BASE_URL/api/documents/2001" \
-  -H "Authorization: Bearer $IAM_READER_TOKEN"
-# 403
-```
-
-## 5. 查看真实授权诊断
-
-诊断接口调用同一个 `AuthorizationEngine`，不会在文档或前端重新计算授权。用 reader token 诊断 project `101` 上的写入请求：
-
-```bash
-curl --fail-with-body -sS \
-  -X POST "$IAM_EXAMPLE_BASE_URL/iam/authorization/diagnostics" \
-  -H 'Content-Type: application/json' \
-  -H "Authorization: Bearer $IAM_READER_TOKEN" \
-  --data '{
-    "permissionCode":"document:update",
-    "domain":"EXAMPLE",
-    "clientType":"WEB",
-    "resourceType":"PROJECT",
-    "resourceId":"101",
-    "scopeAccess":"WRITE"
-  }' | jq
-```
-
-响应为 `200`，业务决定中的 `allowed` 为 `false`，`decisionCode` 为 `PERMISSION_DENIED`。
-
-## 6. 切换到 editor profile
-
-profile 切换不会修改 reader token，而是创建一个独立 session 和替代 token。切换到 profile `402`（`alice-editor-project-101`）：
-
-```bash
-EDITOR_RESPONSE="$(curl --fail-with-body -sS \
-  -X POST "$IAM_EXAMPLE_BASE_URL/iam/authorization/profiles/402/switch" \
-  -H "Authorization: Bearer $IAM_READER_TOKEN")"
-
-export IAM_EDITOR_TOKEN="$(jq -r '.accessToken' <<<"$EDITOR_RESPONSE")"
-export IAM_EDITOR_SESSION_ID="$(jq -r '.sessionId' <<<"$EDITOR_RESPONSE")"
-jq '{sessionId, expiresAt, principal}' <<<"$EDITOR_RESPONSE"
-```
-
-editor 具有 `document:update` 与 project `101` WRITE scope，写入返回 `200`：
-
-```bash
-curl --fail-with-body -sS \
-  -X POST "$IAM_EXAMPLE_BASE_URL/api/documents/1001" \
-  -H 'Content-Type: application/json' \
-  -H "Authorization: Bearer $IAM_EDITOR_TOKEN" \
-  --data '{"status":"PUBLISHED"}' | jq
-```
-
-原 reader token 没有被提升，重复写入仍返回 `403`：
-
-```bash
-curl -sS -o /dev/null -w '%{http_code}\n' \
-  -X POST "$IAM_EXAMPLE_BASE_URL/api/documents/1001" \
-  -H 'Content-Type: application/json' \
-  -H "Authorization: Bearer $IAM_READER_TOKEN" \
-  --data '{"status":"REVIEWED"}'
-# 403
-```
-
-## 7. 只撤销 editor session
-
-用 editor token 撤销其自己的 session：
-
-```bash
-curl -sS -o /dev/null -w '%{http_code}\n' \
-  -X POST "$IAM_EXAMPLE_BASE_URL/iam/sessions/$IAM_EDITOR_SESSION_ID/revoke" \
-  -H 'Content-Type: application/json' \
-  -H "Authorization: Bearer $IAM_EDITOR_TOKEN" \
-  --data '{"reason":"QUICKSTART_COMPLETE"}'
-# 204
-```
-
-editor token 已失效，读取返回 `401`：
-
-```bash
-curl -sS -o /dev/null -w '%{http_code}\n' \
-  "$IAM_EXAMPLE_BASE_URL/api/documents/1001" \
-  -H "Authorization: Bearer $IAM_EDITOR_TOKEN"
-# 401
-```
-
-独立的 reader session 不受影响，原 token 仍返回 `200`：
-
-```bash
-curl -sS -o /dev/null -w '%{http_code}\n' \
-  "$IAM_EXAMPLE_BASE_URL/api/documents/1001" \
-  -H "Authorization: Bearer $IAM_READER_TOKEN"
-# 200
-```
-
-这条完整路径由 [`IamConsumerIntegrationTest`](https://github.com/wbh123/iam/blob/main/iam-example/src/test/java/io/github/iamstarter/example/IamConsumerIntegrationTest.java) 在 MySQL 8.4 与 Redis 7 Testcontainers 上验证。
-
-## 8. 停止与重置
-
-先在运行应用的终端按 `Ctrl-C`，再停止容器：
-
-```bash
-docker compose \
-  --env-file examples/quickstart/.env.example \
-  -f examples/quickstart/docker-compose.yml \
-  down
-```
-
-需要同时删除本地演示数据卷时，使用同一命令并追加 `--volumes`。
-
-## 9. 迁移到自己的宿主应用
-
-生产应用通常只依赖 starter：
+当前版本为 `0.1.0-SNAPSHOT`（Release Candidate），尚未发布到 Maven Central。
 
 ```xml
 <dependency>
@@ -237,46 +31,271 @@ docker compose \
 </dependency>
 ```
 
-最小连接配置与 `iam-example` 的 [`application.yaml`](https://github.com/wbh123/iam/blob/main/iam-example/src/main/resources/application.yaml) 一致：
+业务应用通常只依赖这个 Starter，不要直接依赖 IAM 的 Mapper、Repository 实现或 `internal` 包。
+
+## 2. 准备 MySQL
+
+IAM 使用宿主应用的 `DataSource` 保存 Session、Profile、Permission Template、Scope 和审计数据。
+
+如果你已经有 MySQL，只需要为应用准备一个可以建表和读写数据的数据库账号。例如：
+
+```sql
+CREATE DATABASE iam_host
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_0900_ai_ci;
+
+CREATE USER 'iam_app'@'localhost' IDENTIFIED BY 'change-me';
+GRANT ALL PRIVILEGES ON iam_host.* TO 'iam_app'@'localhost';
+```
+
+如果应用与数据库不在同一台机器，请把 `localhost` 改成真实应用主机或受控网段。生产环境不要使用示例密码，也不要为了方便直接开放公网数据库访问。
+
+默认：
+
+```yaml
+iam:
+  schema:
+    enabled: true
+```
+
+Starter 会自动执行 `classpath:db/iam/migration` 中的 Flyway migration，并使用独立的 `iam_flyway_schema_history`。因此一般**不需要手工创建 IAM 表**。
+
+如果你的团队已经由 DBA 或统一迁移平台管理 IAM schema，再设置 `iam.schema.enabled=false`。
+
+完整说明见[手动部署](/getting-started/manual-deployment/)和[MySQL 存储](/operations/mysql/)。
+
+## 3. 准备 Redis
+
+Redis 用作不透明 Token 的快速索引。已有 Redis 7 可以直接使用，不需要预创建 Key。
+
+你需要知道：
+
+| 项目 | 示例 |
+| --- | --- |
+| Host | `127.0.0.1` |
+| Port | `6379` |
+| Password | 由实际环境决定 |
+| Database | 默认 `0` 即可 |
+| IAM Key Prefix | 默认 `iam` |
+
+多应用共享 Redis 时，建议为不同应用设置不同的 `iam.token.redis-prefix`。生产 Redis 应放在受控网络中，不要直接暴露公网。
+
+## 4. 配置 application.yml
 
 ```yaml
 spring:
   datasource:
-    url: ${IAM_EXAMPLE_JDBC_URL:jdbc:mysql://localhost:3306/iam_example}
-    username: ${IAM_EXAMPLE_DB_USERNAME:iam}
-    password: ${IAM_EXAMPLE_DB_PASSWORD:iam-secret}
+    url: jdbc:mysql://127.0.0.1:3306/iam_host
+    username: iam_app
+    password: ${IAM_DB_PASSWORD}
   data:
     redis:
-      host: ${IAM_EXAMPLE_REDIS_HOST:localhost}
-      port: ${IAM_EXAMPLE_REDIS_PORT:6379}
+      host: 127.0.0.1
+      port: 6379
+      password: ${IAM_REDIS_PASSWORD:}
 
 iam:
   enabled: true
+  schema:
+    enabled: true
+    history-table: iam_flyway_schema_history
   token:
     ttl: 8h
+    redis-prefix: iam
+  session:
+    enabled: true
+    touch-interval: 10m
+  client-types:
+    - WEB
 ```
 
-自己的应用还必须提供：
+MySQL / Redis 在其他机器时只需替换地址、端口和凭据。IAM 不要求基础设施通过 Docker 部署。
 
-1. `IdentityAuthenticator`：宿主校验凭据并投影 `IamPrincipal`，参考 [`ExampleIdentityAdapter`](https://github.com/wbh123/iam/blob/main/iam-example/src/main/java/io/github/iamstarter/example/ExampleIdentityAdapter.java)；
-2. `ResourceHierarchyProvider`：宿主判断资源是否位于 scope 内，参考 [`ExampleResourceHierarchyAdapter`](https://github.com/wbh123/iam/blob/main/iam-example/src/main/java/io/github/iamstarter/example/ExampleResourceHierarchyAdapter.java)；
-3. 对 `/api/**` 等宿主业务路由启用 Bearer filter，参考 [`ExampleSecurityConfiguration`](https://github.com/wbh123/iam/blob/main/iam-example/src/main/java/io/github/iamstarter/example/ExampleSecurityConfiguration.java)；
-4. MVC 路由使用 `@RequirePermission` 时提供 `MvcResourceDescriptorResolver`，参考上面的 document resolver。
+## 5. 提供 IdentityAuthenticator
 
-不要把 `QuickStartDemoSeeder`、`alice/demo-pass` 或演示数据库凭据复制到生产应用。完整的稳定候选类型、配置与 HTTP 状态见 [公开 API](/reference/public-api/)，迁移所有权见 [IAM 迁移指南](https://github.com/wbh123/iam/blob/main/docs/IAM_MIGRATION_GUIDE.md)。
+宿主继续拥有自己的用户表和认证来源。IAM 只要求宿主验证凭据后投影一个 `IamPrincipal`。
 
-## 10. 自动验证
-
-运行 QuickStart HTTP 验收：
-
-```bash
-mvn -B -pl iam-example -am -Pintegration \
-  -Dtest=IamConsumerIntegrationTest \
-  -Dsurefire.failIfNoSpecifiedTests=false test
+```java
+@Bean
+IdentityAuthenticator identityAuthenticator(AccountGateway accounts) {
+    return request -> accounts.verify(request.username(), request.password())
+            .map(account -> new IamPrincipal(
+                    account.id(),
+                    account.identityKey(),
+                    account.identityDomain(),
+                    account.activeProfileId(),
+                    account.templateVersionId(),
+                    request.clientType(),
+                    account.authorizationVersion()));
+}
 ```
 
-验证消费应用没有导入 IAM 持久化或内部实现：
+`iam.client-types` 由 IAM 层统一检查，`IdentityAuthenticator` 不需要重复维护 Client Type 白名单。
 
-```bash
-bash scripts/verify-consumer-public-api.sh
+进一步阅读：[IdentityAuthenticator](/authentication/identity-authenticator/)。
+
+## 6. 配置业务资源范围
+
+使用 Scope 时，宿主实现 `ResourceHierarchyProvider`：
+
+```java
+@Bean
+ResourceHierarchyProvider resourceHierarchyProvider(ResourceGateway resources) {
+    return resources::isWithinScope;
+}
 ```
+
+使用声明式 MVC 授权时，再提供 `MvcResourceDescriptorResolver`，把业务对象映射成 IAM 的 `ResourceDescriptor`。
+
+```java
+@GetMapping("/api/documents/{id}")
+@RequirePermission("document:read")
+public Document get(@PathVariable String id) {
+    return documentService.get(id);
+}
+```
+
+IAM 不查询你的 Document / Project 表。宿主告诉 IAM “这个资源是什么、属于哪里”，IAM 再判断“当前 Principal 能不能访问”。
+
+## 7. 启动应用
+
+可以直接在 IDE 中运行 Spring Boot 主类，也可以使用你现有项目的 JAR / 服务部署方式。
+
+首次启动且 `iam.schema.enabled=true` 时，确认：
+
+- MySQL 连接成功；
+- Redis 连接成功；
+- IAM Flyway migration 成功；
+- Spring Boot 应用正常启动。
+
+普通使用者无需运行 IAM 仓库的 Testcontainers、Consumer Acceptance 或完整测试套件；这些由项目 CI 持续验证。
+
+## 8. 登录
+
+可以使用 Postman、Apifox、IDE HTTP Client 等任意 HTTP 客户端。
+
+**接口**：`POST /iam/auth/login`
+
+**请求体**：
+
+```json
+{
+  "username": "alice",
+  "password": "demo-pass",
+  "clientType": "WEB"
+}
+```
+
+**预期结果**：
+
+- 合法凭据返回 HTTP `200`；
+- 响应包含 `accessToken`、`sessionId`、`expiresAt`、`principal`；
+- 后续受保护接口使用 `Authorization: Bearer <accessToken>`。
+
+> `alice / demo-pass` 是 `iam-example` 的本地演示账号。自己的业务系统应使用自己的身份源。
+
+## 9. 读取当前 Principal
+
+**接口**：`GET /iam/auth/me`
+
+**请求方式**：Bearer Token。
+
+**预期结果**：HTTP `200`，返回当前 `IamPrincipal`。
+
+到这里已经可以确认基础认证链路接入成功。
+
+## 10. 验证声明式权限
+
+`iam-example` 提供一个简单 Document 场景：
+
+- Document `1001` 属于 Project `101`；
+- Document `2001` 属于 Project `202`；
+- Reader Profile 只有 `document:read` 和 Project 101 READ Scope；
+- Editor Profile 额外具有 `document:update` 和 Project 101 WRITE Scope。
+
+| 接口 | 方法 | Reader 预期 | Editor 预期 |
+| --- | --- | --- | --- |
+| `/api/documents/1001` | GET | `200` | `200` |
+| `/api/documents/1001` | POST | `403` | `200` |
+| `/api/documents/2001` | GET | `403` | `403` |
+
+更新文档时，请求体示例：
+
+```json
+{
+  "status": "PUBLISHED"
+}
+```
+
+这一组结果同时说明 Permission 与 Resource Scope 都在生效。
+
+## 11. 切换 Profile
+
+**接口**：`POST /iam/authorization/profiles/{profileId}/switch`
+
+`iam-example` 的 Editor Profile ID 为 `402`。
+
+**预期结果**：HTTP `200`，返回新的 Token 和新的 Session。
+
+Profile Switch 不会修改原 Reader Token，因此：
+
+- 新 Editor Token 可以更新 Document 1001；
+- 原 Reader Token 仍然不能更新 Document 1001。
+
+## 12. 查看授权诊断
+
+**接口**：`POST /iam/authorization/diagnostics`
+
+请求体示例：
+
+```json
+{
+  "permissionCode": "document:update",
+  "domain": "EXAMPLE",
+  "clientType": "WEB",
+  "resourceType": "PROJECT",
+  "resourceId": "101",
+  "scopeAccess": "WRITE"
+}
+```
+
+**预期结果**：HTTP `200`，返回真实 `AuthorizationDecision`。Reader 缺少更新权限时，`allowed=false`，常见 `decisionCode` 为 `PERMISSION_DENIED`。
+
+## 13. 撤销 Session
+
+**接口**：`POST /iam/sessions/{sessionId}/revoke`
+
+**预期结果**：成功返回 HTTP `204`。该 Session 对应的 Token 之后访问受保护接口返回 `401`，同一用户的其他独立 Session 不受影响。
+
+## 14. 直接运行 iam-example
+
+如果想体验上述 Alice 场景，可以手动准备 MySQL / Redis，然后在 IDE Run Configuration 或服务环境中配置：
+
+| 环境变量 | 示例 |
+| --- | --- |
+| `IAM_EXAMPLE_JDBC_URL` | `jdbc:mysql://127.0.0.1:3306/iam_example` |
+| `IAM_EXAMPLE_DB_USERNAME` | `iam` |
+| `IAM_EXAMPLE_DB_PASSWORD` | `your-password` |
+| `IAM_EXAMPLE_REDIS_HOST` | `127.0.0.1` |
+| `IAM_EXAMPLE_REDIS_PORT` | `6379` |
+| `SPRING_PROFILES_ACTIVE` | `dev` |
+| `IAM_EXAMPLE_SEED_DEMO` | `true` |
+
+`QuickStartDemoSeeder` 会重置演示 IAM 投影，只能用于专用本地演示数据库。
+
+如果没有现成 MySQL / Redis，也可以选择仓库提供的 Docker Compose。这只是可选工具，详见[手动部署](/getting-started/manual-deployment/)。
+
+## 15. 什么时候算接入成功
+
+普通使用者达到下面几项即可：
+
+- 应用可以正常启动；
+- MySQL、Redis 连接正常；
+- IAM schema 成功迁移或已由你的部署流程管理；
+- 合法用户可以登录；
+- `GET /iam/auth/me` 能读取当前 Principal；
+- 至少一个业务接口能够按配置得到预期的允许或拒绝结果。
+
+不需要为了“证明 IAM 能工作”再运行项目仓库的全量测试。
+
+接下来建议阅读：[手动部署](/getting-started/manual-deployment/)、[基础配置](/getting-started/configuration/)、[@RequirePermission](/authorization/require-permission/) 与[生产检查清单](/operations/production-checklist/)。
