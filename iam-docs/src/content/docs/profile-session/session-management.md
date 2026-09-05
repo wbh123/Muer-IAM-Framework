@@ -1,44 +1,72 @@
 ---
 title: 会话管理
-description: 查询与维护用户的登录会话，理解 AuthSession 的生命周期与心跳机制。
+description: 查询和理解用户登录 Session、生命周期与 MySQL/Redis 存储边界。
 sidebar:
   order: 3
 ---
 
 ## 解决的问题
 
-用户可能从多个设备/客户端登录，需要统一查看、续期与失效这些会话。`AuthSession` 记录每次登录的完整元数据，是审计与强制下线的依据。
+用户可能从多个设备或客户端登录，需要查看当前有哪些 Session、它们何时登录、最近何时活跃，以及何时过期。
 
 ## 关键概念
 
-- `AuthSession` record 组件：`sessionId, userId, clientType, clientInstance, ipAddress, userAgent, loginAt, lastSeenAt, expiresAt, revokedAt, logoutAt, revokeReason`。
-- 方法：`revoked()`、`revoke(at, reason)`、`touch(at)`（更新 `lastSeenAt`）。
-- 心跳：配置 `iam.session.touch-interval`（默认 `10m`），每次访问刷新 `lastSeenAt`。
-- 查询：`GET /iam/sessions` → `{ items: [ SessionResponse ] }`，含 `sessionId, userId, clientType, loginAt, lastSeenAt, expiresAt`。
+`AuthSession` 记录：
 
-## 真实示例
-
-```bash
-curl https://iam.example.com/iam/sessions \
-  -H "Authorization: Bearer <token>"
+```text
+sessionId
+userId
+clientType
+clientInstance
+ipAddress
+userAgent
+loginAt
+lastSeenAt
+expiresAt
+revokedAt
+logoutAt
+revokeReason
 ```
 
-返回示例：
+常用生命周期方法包括 `revoked()`、`revoke(at, reason)` 和 `touch(at)`。
+
+`iam.session.touch-interval` 默认 `10m`，用于控制活跃时间更新频率。
+
+## 查询当前 Session
+
+| 项目 | 内容 |
+| --- | --- |
+| Method | `GET` |
+| Path | `/iam/sessions` |
+| Auth | Bearer Token |
+| 成功 | HTTP `200` |
+
+响应结构：
 
 ```json
 {
   "items": [
-    { "sessionId": "sess-reader", "userId": 101, "clientType": "WEB",
-      "loginAt": "2026-09-04T08:00:00Z", "lastSeenAt": "2026-09-04T09:30:00Z" }
+    {
+      "sessionId": "sess-reader",
+      "userId": 101,
+      "clientType": "WEB",
+      "loginAt": "<timestamp>",
+      "lastSeenAt": "<timestamp>",
+      "expiresAt": "<timestamp>"
+    }
   ]
 }
 ```
 
-会话持久化在 MySQL；Redis 仅存不透明令牌到会话的索引（见 [Redis 架构](/operations/redis/)）。
+## 存储边界
+
+- MySQL 保存持久 Session 状态；
+- Redis 保存不透明 Token 到 `TokenRecord` 的快速索引；
+- Session 是否撤销、Profile 等持久事实不能只依赖 Redis。
+
+详细基础设施说明见 [MySQL](/operations/mysql/) 和 [Redis](/operations/redis/)。
 
 ## 源码
 
-- `AuthSession` / `TokenRecord`：https://github.com/wbh123/iam/blob/main/iam-session/src/main/java/io/github/iamstarter/session/
-- 配置 `IamProperties`：https://github.com/wbh123/iam/blob/main/iam-spring-boot-autoconfigure/src/main/java/io/github/iamstarter/autoconfigure/
-
-当前版本：`0.1.0-SNAPSHOT`（Release Candidate），尚未发布。
+- `AuthSession` / `TokenRecord`：<https://github.com/wbh123/iam/tree/main/iam-session/src/main/java/io/github/iamstarter/session>
+- `IamProperties`：<https://github.com/wbh123/iam/tree/main/iam-spring-boot-autoconfigure/src/main/java/io/github/iamstarter/autoconfigure>
