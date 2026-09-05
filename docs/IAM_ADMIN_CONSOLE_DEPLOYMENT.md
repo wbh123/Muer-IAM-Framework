@@ -114,3 +114,87 @@ registry.addResourceHandler("/admin/**")
 - Starter 正常运行**不依赖** admin 前端；只部署后端时 `/iam/**` Management API 依然可用。
 - 管理控制台自身的每条 `/iam/admin/**` 请求都会再次经过 `AuthorizationEngine` 细粒度
   授权。菜单隐藏只是 UI 优化，不是安全边界。
+
+## 8. 本地开发启动体验（iam-example，Explicit Opt-In）
+
+> ⚠️ `admin-demo / demo-pass` **只**用于本地开发与演示，生产环境不会自动创建该账户。
+
+同时满足下面两个条件才会创建开发管理员：
+
+```text
+spring.profiles.active=dev   (或 SPRING_PROFILES_ACTIVE=dev)
+iam.example.seed-admin=true  (或 IAM_EXAMPLE_SEED_ADMIN=true)
+```
+
+默认均为 `false`：普通 dev 与“只有配置项、没开 dev profile”都不会执行 seed。
+
+后端（iam-example）：
+
+```bash
+SPRING_PROFILES_ACTIVE=dev IAM_EXAMPLE_SEED_ADMIN=true \
+  IAM_EXAMPLE_JDBC_URL=jdbc:mysql://localhost:3306/iam_example ... \
+  mvn -pl iam-example -am spring-boot:run
+```
+
+前端：
+
+```bash
+cd iam-admin-web
+npm ci
+npm run api:generate
+npm run dev
+```
+
+然后用下面的凭据在 Web 页面登录（Client Type 选择 `WEB`）：
+
+```text
+username: admin-demo
+password: demo-pass
+```
+
+Seed 会创建（id 均为 iam-example 专用，不会出现在宿主生产 schema）：
+
+- 用户 `admin-demo` + Identity `identity-admin-demo`（EXAMPLE 域）；
+- `IAM Admin Console` Template 的 PUBLISHED v1，包含全部真实 `iam.admin.*`
+  permission code（以源码为准，共 18 个：overview/user/identity/permission/
+  template/profile/scope/session/audit/diagnostics/authorization-version…）；
+- Profile `admin-console`，Scope `IAM_ADMIN:*` READ + WRITE —— 该 Scope 只对
+  `IAM_*` 管理资源生效，不覆盖宿主业务资源（PROJECT 等仍需各自 scope）。
+
+> `iam-admin-web` 里的菜单按 `/iam/auth/capabilities` 渲染；后端不做任何角色旁路，
+> 每条 `/iam/admin/**` 依旧经 `AuthorizationEngine` 授权。
+
+## 9. 生产第一个管理员（部署期 Bootstrap）
+
+生产环境**没有**默认账户、**没有**万能密码，也**不提供**类似
+`POST /iam/bootstrap/admin` 的公开 HTTP 初始化端点（避免首次启动暴露、初始化竞态与
+安全风险）。第一个管理员应通过受控的部署流程创建，例如：受控 SQL / migration /
+deployment seeder，或宿主系统自己的 initial provisioning。
+
+推荐流程：
+
+```text
+创建业务用户
+    ↓
+创建 Identity
+    ↓
+创建「IAM Admin」Permission Template + PUBLISHED Version（18 个 iam.admin.*）
+    ↓
+创建 Admin Profile 并绑定该 Version
+    ↓
+按宿主 hierarchy 授予管理所需的 Resource Scope（含 READ/WRITE 与资源范围）
+    ↓
+启动 Admin Console，用该账户登录
+    ↓
+后续管理员由 Console 内部管理
+```
+
+要点：
+
+- Permission Code 必须与后端源码一致，不要自己造码（模板权限以真实 `iam.admin.*`
+  为准，见 `docs/PUBLIC_API.md` 与 OpenAPI）。
+- Resource Scope 不是 bypass：必须让 profile 的 scope 覆盖你要管理的目标；示例应用用
+  `IAM_ADMIN:*` 覆盖 `IAM_*` 资源，是**示例宿主**的 hierarchy 规则，生产宿主需按自己的
+  资源模型定义等价规则。
+- 管理账户的初始凭据由你的 provisioning 流程发放与轮换；IAM 侧只认
+  `IdentityAuthenticator` 的验证结果。
