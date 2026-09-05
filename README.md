@@ -25,6 +25,20 @@ The 0.1.0 candidate scope and known limitations are in the
 [release notes](docs/RELEASE_NOTES_0.1.0.md); migration ownership and staged
 adoption are in the [migration guide](docs/IAM_MIGRATION_GUIDE.md).
 
+A browsable Chinese documentation site lives in [`iam-docs/`](iam-docs/)
+(an Astro + Starlight site mirroring the Quick Start and full reference). To
+preview it locally:
+
+```bash
+cd iam-docs
+npm ci
+npm run dev     # http://localhost:4321
+```
+
+Its static build (`npm run build`) is verified in CI; Pages deployment is a
+manual, human-gated step and is not enabled by the repository.
+
+
 ## Five-minute integration
 
 1. Add the single dependency:
