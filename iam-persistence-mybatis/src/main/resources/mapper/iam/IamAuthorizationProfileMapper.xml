@@ -38,6 +38,29 @@
         ORDER BY id
     </select>
 
+    <select id="search" resultMap="profileRow">
+        SELECT id AS profile_id, user_id, display_name AS profile_name, template_version_id,
+               CAST(client_types AS CHAR) AS client_types_json, enabled, revoked_at, valid_from, valid_until
+        FROM iam_authorization_profile
+        WHERE id &gt; #{afterProfileId}
+        <if test="userId != null">
+            AND user_id = #{userId}
+        </if>
+        <if test="templateVersionId != null">
+            AND template_version_id = #{templateVersionId}
+        </if>
+        <if test="enabled != null">
+            AND enabled = #{enabled}
+        </if>
+        <if test="revoked != null">
+            AND (revoked_at IS NOT NULL) = #{revoked}
+        </if>
+        <if test="clientType != null and clientType != ''">
+            AND JSON_CONTAINS(client_types, JSON_QUOTE(#{clientType}))
+        </if>
+        ORDER BY id LIMIT #{limit}
+    </select>
+
     <select id="findScopes" resultMap="scope">
         SELECT resource_type, resource_id, scope_access
         FROM iam_authorization_scope

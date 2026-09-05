@@ -168,13 +168,17 @@ public class IamAdministrationController implements AdministrationApi {
     }
 
     @Override
-    public ResponseEntity<UserListResponse> listUsers(Long afterUserId, Integer limit) {
+    public ResponseEntity<UserListResponse> listUsers(Long afterUserId, Integer limit,
+                                                      String username, String userType, Boolean enabled) {
         var principal = currentPrincipal();
         if (principal == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         if (!isAllowed(principal, "iam.admin.user.read", "IAM_USER_COLLECTION", "users")) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-        var values = accounts.listUsers(afterUserId, limit);
+        boolean filtered = username != null || userType != null || enabled != null;
+        var values = filtered
+                ? accounts.listUsers(afterUserId, limit, username, userType, enabled)
+                : accounts.listUsers(afterUserId, limit);
         var items = values.stream().map(IamAdministrationController::userResponse).toList();
         Long next = values.size() < limit ? null : values.getLast().userId();
         return ResponseEntity.ok(new UserListResponse(items).nextAfterUserId(next));

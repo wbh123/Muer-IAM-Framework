@@ -162,6 +162,21 @@ paths:
         - name: limit
           in: query
           schema: {type: integer, minimum: 1, maximum: 100, default: 50}
+        - name: username
+          in: query
+          required: false
+          schema: {type: string, maxLength: 191}
+          description: Optional case-insensitive substring filter on username.
+        - name: userType
+          in: query
+          required: false
+          schema: {type: string, maxLength: 64}
+          description: Optional exact filter on user type.
+        - name: enabled
+          in: query
+          required: false
+          schema: {type: boolean}
+          description: Optional filter on account enabled state.
       responses:
         '200':
           description: Cursor-paginated users
@@ -171,6 +186,23 @@ paths:
         '401': {description: Authentication required}
         '403': {description: Administration permission denied}
   /iam/admin/users/{userId}:
+    get:
+      tags: [Management Users]
+      operationId: getUser
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema: {type: integer, format: int64}
+      responses:
+        '200':
+          description: User detail
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/UserResponse'}
+        '401': {description: Authentication required}
+        '403': {description: Administration permission denied}
+        '404': {description: User not found}
     put:
       tags: [Administration]
       operationId: saveUser
@@ -208,6 +240,23 @@ paths:
         '401': {description: Authentication required}
         '403': {description: Administration permission denied}
   /iam/admin/identities/{identityId}:
+    get:
+      tags: [Management Identity]
+      operationId: getIdentity
+      parameters:
+        - name: identityId
+          in: path
+          required: true
+          schema: {type: string}
+      responses:
+        '200':
+          description: Identity detail
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/IdentityResponse'}
+        '401': {description: Authentication required}
+        '403': {description: Administration permission denied}
+        '404': {description: Identity not found}
     put:
       tags: [Administration]
       operationId: saveIdentity
@@ -226,6 +275,23 @@ paths:
         '401': {description: Authentication required}
         '403': {description: Administration permission denied}
   /iam/admin/profiles/{profileId}:
+    get:
+      tags: [Management Profiles]
+      operationId: getAuthorizationProfile
+      parameters:
+        - name: profileId
+          in: path
+          required: true
+          schema: {type: integer, format: int64}
+      responses:
+        '200':
+          description: Authorization profile detail including scopes
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/AuthorizationProfileResponse'}
+        '401': {description: Authentication required}
+        '403': {description: Administration permission denied}
+        '404': {description: Authorization profile not found}
     put:
       tags: [Administration]
       operationId: saveAuthorizationProfile
@@ -245,6 +311,25 @@ paths:
         '401': {description: Authentication required}
         '403': {description: Administration permission denied}
   /iam/admin/profiles/{profileId}/scopes:
+    get:
+      tags: [Management Profiles]
+      operationId: getAuthorizationProfileScopes
+      parameters:
+        - name: profileId
+          in: path
+          required: true
+          schema: {type: integer, format: int64}
+      responses:
+        '200':
+          description: Resource scopes attached to an authorization profile
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {$ref: '#/components/schemas/ResourceScope'}
+        '401': {description: Authentication required}
+        '403': {description: Administration permission denied}
+        '404': {description: Authorization profile not found}
     put:
       tags: [Administration]
       operationId: replaceAuthorizationProfileScopes
@@ -320,6 +405,350 @@ paths:
         '204': {description: All active sessions for the user forcibly revoked}
         '401': {description: Authentication required}
         '403': {description: Administration permission denied}
+  /iam/auth/capabilities:
+    get:
+      tags: [Capabilities]
+      operationId: getCurrentCapabilities
+      summary: Capabilities visible to the current principal
+      description: >
+        Returns only what the current principal can see: the principal, its active
+        profile and template version, the permission codes granted by the active
+        template version, and the resource scopes of the active profile. No other
+        subject data is returned and no administration permission is required.
+      responses:
+        '200':
+          description: Current principal capabilities
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/PrincipalCapabilitiesResponse'}
+        '401': {description: Authentication required}
+  /iam/admin/overview:
+    get:
+      tags: [Management Overview]
+      operationId: getAdminOverview
+      summary: Operational summary for the IAM administration console
+      responses:
+        '200':
+          description: Operational counts
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/OverviewResponse'}
+        '401': {description: Authentication required}
+        '403': {description: Administration permission denied}
+  /iam/admin/permissions:
+    get:
+      tags: [Management Permissions]
+      operationId: listPermissions
+      summary: Permission explorer over the permission registry
+      parameters:
+        - name: keyword
+          in: query
+          required: false
+          schema: {type: string, maxLength: 191}
+          description: Case-insensitive substring filter on permission code or display name.
+        - name: domain
+          in: query
+          required: false
+          schema: {type: string, maxLength: 64}
+          description: Optional prefix filter applied to the permission code domain segment.
+        - name: afterId
+          in: query
+          required: false
+          schema: {type: integer, format: int64, minimum: 0, default: 0}
+        - name: limit
+          in: query
+          required: false
+          schema: {type: integer, minimum: 1, maximum: 100, default: 50}
+      responses:
+        '200':
+          description: Cursor-paginated permission registry entries
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/PermissionListResponse'}
+        '401': {description: Authentication required}
+        '403': {description: Administration permission denied}
+  /iam/admin/templates:
+    get:
+      tags: [Management Templates]
+      operationId: listPermissionTemplates
+      parameters:
+        - name: afterTemplateId
+          in: query
+          required: false
+          schema: {type: integer, format: int64, minimum: 0, default: 0}
+        - name: limit
+          in: query
+          required: false
+          schema: {type: integer, minimum: 1, maximum: 100, default: 50}
+      responses:
+        '200':
+          description: Cursor-paginated permission templates with their latest version
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/PermissionTemplateListResponse'}
+        '401': {description: Authentication required}
+        '403': {description: Administration permission denied}
+  /iam/admin/templates/{templateId}:
+    get:
+      tags: [Management Templates]
+      operationId: getPermissionTemplate
+      parameters:
+        - name: templateId
+          in: path
+          required: true
+          schema: {type: integer, format: int64}
+      responses:
+        '200':
+          description: Permission template detail
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/PermissionTemplateSummary'}
+        '401': {description: Authentication required}
+        '403': {description: Administration permission denied}
+        '404': {description: Permission template not found}
+  /iam/admin/templates/{templateId}/versions:
+    get:
+      tags: [Management Templates]
+      operationId: listPermissionTemplateVersions
+      parameters:
+        - name: templateId
+          in: path
+          required: true
+          schema: {type: integer, format: int64}
+      responses:
+        '200':
+          description: Versions of a permission template, newest first
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {$ref: '#/components/schemas/PermissionTemplateVersionResponse'}
+        '401': {description: Authentication required}
+        '403': {description: Administration permission denied}
+        '404': {description: Permission template not found}
+  /iam/admin/template-versions/{versionId}:
+    get:
+      tags: [Management Templates]
+      operationId: getPermissionTemplateVersion
+      parameters:
+        - name: versionId
+          in: path
+          required: true
+          schema: {type: integer, format: int64}
+      responses:
+        '200':
+          description: Permission template version with its permission codes
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/PermissionTemplateVersionResponse'}
+        '401': {description: Authentication required}
+        '403': {description: Administration permission denied}
+        '404': {description: Template version not found}
+  /iam/admin/profiles:
+    get:
+      tags: [Management Profiles]
+      operationId: listAuthorizationProfiles
+      parameters:
+        - name: afterProfileId
+          in: query
+          required: false
+          schema: {type: integer, format: int64, minimum: 0, default: 0}
+        - name: limit
+          in: query
+          required: false
+          schema: {type: integer, minimum: 1, maximum: 100, default: 50}
+        - name: userId
+          in: query
+          required: false
+          schema: {type: integer, format: int64}
+        - name: templateVersionId
+          in: query
+          required: false
+          schema: {type: integer, format: int64}
+        - name: enabled
+          in: query
+          required: false
+          schema: {type: boolean}
+        - name: revoked
+          in: query
+          required: false
+          schema: {type: boolean}
+        - name: clientType
+          in: query
+          required: false
+          schema: {type: string, maxLength: 64}
+      responses:
+        '200':
+          description: Cursor-paginated authorization profiles
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ProfileListResponse'}
+        '401': {description: Authentication required}
+        '403': {description: Administration permission denied}
+  /iam/admin/users/{userId}/profiles:
+    get:
+      tags: [Management Profiles]
+      operationId: listUserAuthorizationProfiles
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema: {type: integer, format: int64}
+      responses:
+        '200':
+          description: Authorization profiles owned by the user
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {$ref: '#/components/schemas/AuthorizationProfileResponse'}
+        '401': {description: Authentication required}
+        '403': {description: Administration permission denied}
+        '404': {description: User not found}
+  /iam/admin/sessions:
+    get:
+      tags: [Management Sessions]
+      operationId: adminListSessions
+      parameters:
+        - name: userId
+          in: query
+          required: false
+          schema: {type: integer, format: int64}
+        - name: clientType
+          in: query
+          required: false
+          schema: {type: string, maxLength: 64}
+        - name: active
+          in: query
+          required: false
+          schema: {type: boolean}
+          description: When true only active sessions are returned; when false only ended sessions.
+        - name: after
+          in: query
+          required: false
+          schema: {type: string}
+          description: Opaque cursor returned by a previous page. It encodes the last seen login time and session id; it never contains token material.
+        - name: limit
+          in: query
+          required: false
+          schema: {type: integer, minimum: 1, maximum: 100, default: 50}
+      responses:
+        '200':
+          description: Cursor-paginated sessions across users
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/AdminSessionListResponse'}
+        '401': {description: Authentication required}
+        '403': {description: Administration permission denied}
+  /iam/admin/sessions/{sessionId}:
+    get:
+      tags: [Management Sessions]
+      operationId: getAdminSession
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema: {type: string}
+      responses:
+        '200':
+          description: Session detail
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/SessionResponse'}
+        '401': {description: Authentication required}
+        '403': {description: Administration permission denied}
+        '404': {description: Session not found}
+  /iam/admin/users/{userId}/sessions:
+    get:
+      tags: [Management Sessions]
+      operationId: listUserSessions
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema: {type: integer, format: int64}
+      responses:
+        '200':
+          description: Sessions owned by the user
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {$ref: '#/components/schemas/SessionResponse'}
+        '401': {description: Authentication required}
+        '403': {description: Administration permission denied}
+        '404': {description: User not found}
+  /iam/admin/audit-events:
+    get:
+      tags: [Management Audit]
+      operationId: listAuditEvents
+      parameters:
+        - name: userId
+          in: query
+          required: false
+          schema: {type: integer, format: int64}
+        - name: identityId
+          in: query
+          required: false
+          schema: {type: string}
+        - name: eventType
+          in: query
+          required: false
+          schema: {type: string, maxLength: 191}
+        - name: resourceType
+          in: query
+          required: false
+          schema: {type: string, maxLength: 128}
+        - name: resourceId
+          in: query
+          required: false
+          schema: {type: string, maxLength: 191}
+        - name: sessionId
+          in: query
+          required: false
+          schema: {type: string}
+        - name: from
+          in: query
+          required: false
+          schema: {type: string, format: date-time}
+        - name: to
+          in: query
+          required: false
+          schema: {type: string, format: date-time}
+        - name: after
+          in: query
+          required: false
+          schema: {type: integer, format: int64, minimum: 0, default: 0}
+        - name: limit
+          in: query
+          required: false
+          schema: {type: integer, minimum: 1, maximum: 100, default: 50}
+      responses:
+        '200':
+          description: Cursor-paginated immutable audit events
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/AuditEventListResponse'}
+        '401': {description: Authentication required}
+        '403': {description: Administration permission denied}
+  /iam/admin/audit-events/{eventId}:
+    get:
+      tags: [Management Audit]
+      operationId: getAuditEvent
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          schema: {type: string}
+      responses:
+        '200':
+          description: Audit event detail
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/AuditEventResponse'}
+        '401': {description: Authentication required}
+        '403': {description: Administration permission denied}
+        '404': {description: Audit event not found}
 components:
   schemas:
     LoginRequest:
@@ -363,6 +792,8 @@ components:
         lastSeenAt: {type: string, format: date-time}
         expiresAt: {type: string, format: date-time}
         logoutAt: {type: string, format: date-time, nullable: true}
+        status: {type: string, enum: [ACTIVE, REVOKED, EXPIRED], nullable: true}
+        revokeReason: {type: string, nullable: true}
     SessionListResponse:
       type: object
       required: [items]
@@ -482,3 +913,126 @@ components:
         allowed: {type: boolean}
         decisionCode: {type: string}
         steps: {type: array, items: {$ref: '#/components/schemas/AuthorizationDecisionStep'}}
+    PrincipalCapabilitiesResponse:
+      type: object
+      required: [principal, activeProfileId, templateVersionId, permissions, scopes]
+      properties:
+        principal: {$ref: '#/components/schemas/PrincipalResponse'}
+        activeProfileId: {type: integer, format: int64}
+        templateVersionId: {type: integer, format: int64}
+        permissions:
+          type: array
+          uniqueItems: true
+          items: {type: string}
+        scopes: {type: array, items: {$ref: '#/components/schemas/ResourceScope'}}
+    OverviewResponse:
+      type: object
+      required: [totalUsers, enabledUsers, activeSessions, activeProfiles, templateVersions, auditEventsToday]
+      properties:
+        totalUsers: {type: integer, format: int64}
+        enabledUsers: {type: integer, format: int64}
+        activeSessions: {type: integer, format: int64}
+        activeProfiles: {type: integer, format: int64}
+        templateVersions: {type: integer, format: int64}
+        auditEventsToday: {type: integer, format: int64}
+    PermissionSummary:
+      type: object
+      required: [permissionCode, displayName, description, enabled, inUseCount]
+      properties:
+        permissionCode: {type: string}
+        displayName: {type: string}
+        description: {type: string, nullable: true}
+        enabled: {type: boolean}
+        inUseCount: {type: integer, format: int64}
+    PermissionListResponse:
+      type: object
+      required: [items]
+      properties:
+        items: {type: array, items: {$ref: '#/components/schemas/PermissionSummary'}}
+        nextAfterPermissionId: {type: integer, format: int64, nullable: true}
+    PermissionTemplateSummary:
+      type: object
+      required: [templateId, templateKey, name, description, enabled]
+      properties:
+        templateId: {type: integer, format: int64}
+        templateKey: {type: string}
+        name: {type: string}
+        description: {type: string, nullable: true}
+        enabled: {type: boolean}
+        latestVersionId: {type: integer, format: int64, nullable: true}
+        latestVersionNumber: {type: integer, nullable: true}
+        latestVersionStatus: {type: string, enum: [DRAFT, PUBLISHED, RETIRED], nullable: true}
+    PermissionTemplateListResponse:
+      type: object
+      required: [items]
+      properties:
+        items: {type: array, items: {$ref: '#/components/schemas/PermissionTemplateSummary'}}
+        nextAfterTemplateId: {type: integer, format: int64, nullable: true}
+    PermissionTemplateVersionResponse:
+      type: object
+      required: [versionId, templateId, versionNumber, status, permissions]
+      properties:
+        versionId: {type: integer, format: int64}
+        templateId: {type: integer, format: int64}
+        versionNumber: {type: integer, minimum: 1}
+        status: {type: string, enum: [DRAFT, PUBLISHED, RETIRED]}
+        permissions: {type: array, uniqueItems: true, items: {type: string}}
+    ProfileListResponse:
+      type: object
+      required: [items]
+      properties:
+        items: {type: array, items: {$ref: '#/components/schemas/AuthorizationProfileResponse'}}
+        nextAfterProfileId: {type: integer, format: int64, nullable: true}
+    AdminSessionListResponse:
+      type: object
+      required: [items]
+      properties:
+        items: {type: array, items: {$ref: '#/components/schemas/SessionResponse'}}
+        nextAfter: {type: string, nullable: true}
+    AuditSubjectResponse:
+      type: object
+      required: [subjectType, subjectId, relation]
+      properties:
+        subjectType: {type: string}
+        subjectId: {type: string}
+        relation: {type: string}
+    AuditEventResponse:
+      type: object
+      required:
+        - eventId
+        - occurredAt
+        - actor
+        - action
+        - resourceType
+        - resourceId
+        - result
+        - requestId
+        - before
+        - after
+        - metadata
+        - subjects
+      properties:
+        eventId: {type: string}
+        occurredAt: {type: string, format: date-time}
+        actor: {type: string}
+        action: {type: string}
+        resourceType: {type: string}
+        resourceId: {type: string}
+        result: {type: string}
+        requestId: {type: string}
+        before:
+          type: object
+          additionalProperties: {type: string}
+        after:
+          type: object
+          additionalProperties: {type: string}
+        metadata:
+          type: object
+          additionalProperties: {type: string}
+        subjects: {type: array, items: {$ref: '#/components/schemas/AuditSubjectResponse'}}
+    AuditEventListResponse:
+      type: object
+      required: [items]
+      properties:
+        items: {type: array, items: {$ref: '#/components/schemas/AuditEventResponse'}}
+        nextAfterAuditLogId: {type: integer, format: int64, nullable: true}

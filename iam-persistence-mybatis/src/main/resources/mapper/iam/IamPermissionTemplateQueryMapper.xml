@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.github.iamstarter.persistence.mapper.IamPermissionTemplateQueryMapper">
+    <resultMap id="templateRow" type="io.github.iamstarter.persistence.PermissionTemplateRow">
+        <constructor>
+            <arg column="template_id" javaType="_long"/>
+            <arg column="template_key" javaType="java.lang.String"/>
+            <arg column="name" javaType="java.lang.String"/>
+            <arg column="description" javaType="java.lang.String"/>
+            <arg column="enabled" javaType="_boolean"/>
+        </constructor>
+    </resultMap>
+
+    <resultMap id="versionRow" type="io.github.iamstarter.persistence.mapper.IamPermissionTemplateQueryMapper$VersionProjection">
+        <constructor>
+            <arg column="version_id" javaType="_long"/>
+            <arg column="template_id" javaType="_long"/>
+            <arg column="version_number" javaType="_int"/>
+            <arg column="status" javaType="io.github.iamstarter.authorization.TemplateVersionStatus"/>
+        </constructor>
+    </resultMap>
+
+    <resultMap id="permissionRow" type="io.github.iamstarter.persistence.PermissionSummaryRow">
+        <constructor>
+            <arg column="permission_id" javaType="_long"/>
+            <arg column="permission_code" javaType="java.lang.String"/>
+            <arg column="display_name" javaType="java.lang.String"/>
+            <arg column="description" javaType="java.lang.String"/>
+            <arg column="enabled" javaType="_boolean"/>
+            <arg column="in_use_count" javaType="_long"/>
+        </constructor>
+    </resultMap>
+
+    <select id="findTemplate" resultMap="templateRow">
+        SELECT id AS template_id, template_key, display_name AS name, description, enabled
+        FROM iam_permission_template
+        WHERE id = #{templateId}
+    </select>
+
+    <select id="listTemplates" resultMap="templateRow">
+        SELECT id AS template_id, template_key, display_name AS name, description, enabled
+        FROM iam_permission_template
+        WHERE id &gt; #{afterTemplateId}
+        ORDER BY id
+        LIMIT #{limit}
+    </select>
+
+    <select id="listVersions" resultMap="versionRow">
+        SELECT id AS version_id, template_id, version_number, status
+        FROM iam_permission_template_version
+        WHERE template_id = #{templateId}
+        ORDER BY version_number DESC
+    </select>
+
+    <select id="findVersion" resultMap="versionRow">
+        SELECT id AS version_id, template_id, version_number, status
+        FROM iam_permission_template_version
+        WHERE id = #{versionId}
+    </select>
+
+    <select id="findPermissions" resultType="java.lang.String">
+        SELECT permission.permission_code
+        FROM iam_template_permission link
+        JOIN iam_permission permission ON permission.id = link.permission_id
+        WHERE link.template_version_id = #{versionId}
+        ORDER BY permission.permission_code
+    </select>
+
+    <select id="listPermissions" resultMap="permissionRow">
+        SELECT permission.id AS permission_id,
+               permission.permission_code,
+               permission.display_name,
+               permission.description,
+               permission.enabled,
+               (SELECT COUNT(*) FROM iam_template_permission link
+                 WHERE link.permission_id = permission.id) AS in_use_count
+        FROM iam_permission permission
+        WHERE permission.id &gt; #{afterPermissionId}
+        <if test="keyword != null and keyword != ''">
+            AND (permission.permission_code LIKE CONCAT('%', #{keyword}, '%')
+                 OR permission.display_name LIKE CONCAT('%', #{keyword}, '%'))
+        </if>
+        <if test="domain != null and domain != ''">
+            AND permission.permission_code LIKE CONCAT(#{domain}, '.%')
+        </if>
+        ORDER BY permission.id
+        LIMIT #{limit}
+    </select>
+</mapper>

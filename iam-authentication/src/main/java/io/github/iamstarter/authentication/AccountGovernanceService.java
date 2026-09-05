@@ -5,6 +5,7 @@ import io.github.iamstarter.core.model.IamUser;
 import io.github.iamstarter.core.model.Identity;
 import io.github.iamstarter.core.port.IamUserRepository;
 import io.github.iamstarter.core.port.IdentityRepository;
+import io.github.iamstarter.core.port.UserQueryRepository;
 
 import java.util.List;
 import java.util.Objects;
@@ -13,18 +14,33 @@ public final class AccountGovernanceService {
     private final IamUserRepository users;
     private final IdentityRepository identities;
     private final AuthorizationVersionService versions;
+    private final UserQueryRepository query;
 
     public AccountGovernanceService(IamUserRepository users, IdentityRepository identities,
                                     AuthorizationVersionService versions) {
+        this(users, identities, versions, null);
+    }
+
+    public AccountGovernanceService(IamUserRepository users, IdentityRepository identities,
+                                    AuthorizationVersionService versions, UserQueryRepository query) {
         this.users = Objects.requireNonNull(users);
         this.identities = Objects.requireNonNull(identities);
         this.versions = Objects.requireNonNull(versions);
+        this.query = query;
     }
 
     public List<IamUser> listUsers(long afterUserId, int limit) {
         if (afterUserId < 0) throw new IllegalArgumentException("afterUserId must not be negative");
         if (limit < 1 || limit > 100) throw new IllegalArgumentException("limit must be between 1 and 100");
         return List.copyOf(users.findPage(afterUserId, limit));
+    }
+
+    public List<IamUser> listUsers(long afterUserId, int limit, String username, String userType,
+                                   Boolean enabled) {
+        if (query == null) {
+            throw new IllegalArgumentException("user filtering is not available on this IAM backend");
+        }
+        return List.copyOf(query.search(afterUserId, limit, username, userType, enabled));
     }
 
     public List<Identity> listIdentities(long userId) {

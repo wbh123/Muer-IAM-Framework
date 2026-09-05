@@ -19,6 +19,21 @@
         FROM iam_user WHERE id &gt; #{afterUserId}
         ORDER BY id LIMIT #{limit}
     </select>
+    <select id="search" resultMap="iamUser">
+        SELECT id, username, user_type, enabled, authorization_version
+        FROM iam_user
+        WHERE id &gt; #{afterUserId}
+        <if test="username != null and username != ''">
+            AND username LIKE CONCAT('%', #{username}, '%')
+        </if>
+        <if test="userType != null and userType != ''">
+            AND user_type = #{userType}
+        </if>
+        <if test="enabled != null">
+            AND enabled = #{enabled}
+        </if>
+        ORDER BY id LIMIT #{limit}
+    </select>
     <insert id="upsert">
         INSERT INTO iam_user (id, username, user_type, enabled, authorization_version)
         VALUES (#{userId}, #{username}, #{userType}, #{enabled}, #{authorizationVersion})

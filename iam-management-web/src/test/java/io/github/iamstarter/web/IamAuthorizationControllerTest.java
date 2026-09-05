@@ -2,6 +2,7 @@ package io.github.iamstarter.web;
 
 import io.github.iamstarter.authorization.AuthorizationDecision;
 import io.github.iamstarter.authorization.AuthorizationDecisionStep;
+import io.github.iamstarter.authorization.AuthorizationEngine;
 import io.github.iamstarter.authorization.AuthorizationRequest;
 import io.github.iamstarter.authorization.AuthorizationProfile;
 import io.github.iamstarter.authorization.AuthorizationProfileRepository;
@@ -159,8 +160,41 @@ class IamAuthorizationControllerTest {
                 .andExpect(status().isNotFound());
     }
 
+    @Test
+    void diagnostics_denies_principals_without_the_admin_diagnostics_permission() throws Exception {
+        var principal = new IamPrincipal(7L, "identity-7", "SECURITY", 31L, 9L, "WEB", 4L);
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(principal, null, List.of()));
+        var diagnostics = new AuthorizationDiagnosticsService((actualPrincipal, request) ->
+                new AuthorizationDecision(true, "ALLOW", List.of()));
+        AuthorizationEngine denied = (actualPrincipal, request) ->
+                new AuthorizationDecision(false, "PERMISSION_DENIED", List.of());
+        var mvc = MockMvcBuilders.standaloneSetup(
+                controller(diagnostics, List.of(), denied)).build();
+
+        mvc.perform(post("/iam/authorization/diagnostics")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "permissionCode":"asset.read",
+                                  "domain":"SECURITY",
+                                  "clientType":"WEB",
+                                  "resourceType":"ASSET",
+                                  "resourceId":"asset-3",
+                                  "scopeAccess":"READ"
+                                }
+                                """))
+                .andExpect(status().isForbidden());
+    }
+
     private static IamAuthorizationController controller(AuthorizationDiagnosticsService diagnostics,
                                                          List<AuthorizationProfile> initial) {
+        return controller(diagnostics, initial, alwaysAllowed());
+    }
+
+    private static IamAuthorizationController controller(AuthorizationDiagnosticsService diagnostics,
+                                                         List<AuthorizationProfile> initial,
+                                                         AuthorizationEngine engine) {
         var profiles = profileService(initial);
         TokenStore tokens = new TokenStore() {
             public Optional<TokenRecord> resolve(String token) { return Optional.empty(); }
@@ -174,7 +208,11 @@ class IamAuthorizationControllerTest {
                 Clock.fixed(Instant.parse("2026-08-27T00:00:00Z"), ZoneOffset.UTC), Duration.ofHours(8),
                 () -> "switched-token", () -> "switched-session");
         return new IamAuthorizationController(diagnostics, profiles,
-                new AuthorizationProfileSwitchService(profiles, authentication));
+                new AuthorizationProfileSwitchService(profiles, authentication), engine);
+    }
+
+    private static AuthorizationEngine alwaysAllowed() {
+        return (principal, request) -> new AuthorizationDecision(true, "ALLOW", List.of());
     }
 
     private static AuthorizationProfileService profileService(List<AuthorizationProfile> initial) {
