@@ -29,7 +29,7 @@ jobs:
             ([char[]](99,111,109,46,119,117,115,116,46,105,97,109) -join ''),
             ([char[]](99,111,109,46,119,117,115,116) -join ''),
             ([char[]](87,117,115,116) -join ''),
-            ([char[]](0x6B66,0x6C49,0x79D1,0x6280,0x5927,0x5B66) -join '')
+            ([char[]](0x6B66,0x6C49,0x79D1,0x6280,0x5927) -join '')
           )
           ./scripts/test-identity-check.ps1 -RepositoryRoot $PWD
           ./scripts/test-rename-project.ps1 -RepositoryRoot $PWD
@@ -87,6 +87,12 @@ jobs:
         run: >-
           mvn -B -pl iam-example -am -Pintegration
           -Dtest=IamStarterConsumptionTest,IamSecurityIntegrationTest
+          -Dsurefire.failIfNoSpecifiedTests=false test
+
+      - name: Verify opt-in admin demo seeder isolation
+        run: >-
+          mvn -B -pl iam-example -am -Pintegration
+          -Dtest=AdminConsoleDemoSeedIntegrationTest
           -Dsurefire.failIfNoSpecifiedTests=false test
 
   consumer-integration:
