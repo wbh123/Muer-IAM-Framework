@@ -22,5 +22,5 @@ IAM 的访问凭据是 Token，背后是 `AuthSession(sessionId, userId, clientT
 
 ## 源码参考
 
-- `AuthSession`：<https://github.com/wbh123/iam/blob/main/iam-session/src/main/java/io/github/iamstarter/session/AuthSession.java>
-- `IamProperties`：<https://github.com/wbh123/iam/blob/main/iam-spring-boot-autoconfigure/src/main/java/io/github/iamstarter/autoconfigure/IamProperties.java>
+- `AuthSession`：<https://github.com/wbh123/iam/blob/main/muer-session/src/main/java/io/github/iamstarter/session/AuthSession.java>
+- `IamProperties`：<https://github.com/wbh123/iam/blob/main/muer-spring-boot-autoconfigure/src/main/java/io/github/iamstarter/autoconfigure/IamProperties.java>

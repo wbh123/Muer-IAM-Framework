@@ -1,6 +1,6 @@
-package io.github.iamstarter.core.port;
+package io.github.muer.core.port;
 
-import io.github.iamstarter.core.model.IamUser;
+import io.github.muer.core.model.IamUser;
 
 import java.util.List;
 import java.util.Optional;

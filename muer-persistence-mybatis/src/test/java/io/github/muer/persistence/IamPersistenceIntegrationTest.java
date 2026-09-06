@@ -1,4 +1,4 @@
-package io.github.iamstarter.persistence;
+package io.github.muer.persistence;
 
 import org.flywaydb.core.Flyway;
 import org.apache.ibatis.builder.xml.XMLMapperBuilder;
@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import io.github.iamstarter.session.AuthSession;
+import io.github.muer.session.AuthSession;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -69,7 +69,7 @@ class IamPersistenceIntegrationTest {
         insertUser(41L);
         var repository = new MyBatisSessionRepository(sessionFactory());
         Instant loginAt = Instant.now().minusSeconds(60).truncatedTo(ChronoUnit.MICROS);
-        var active = new io.github.iamstarter.session.AuthSession("session-41", 41L, "WEB", "browser-41",
+        var active = new io.github.muer.session.AuthSession("session-41", 41L, "WEB", "browser-41",
                 "203.0.113.41", "integration-browser/1.0", loginAt, loginAt,
                 loginAt.plus(Duration.ofDays(1)), null, null, null);
 
@@ -103,9 +103,9 @@ class IamPersistenceIntegrationTest {
     void account_governance_repositories_round_trip_users_and_identities_with_pagination() throws Exception {
         var users = new MyBatisIamUserRepository(sessionFactory());
         var identities = new MyBatisIdentityRepository(sessionFactory());
-        var user = new io.github.iamstarter.core.model.IamUser(45L, "account-45", "MEMBER", true, 1L);
+        var user = new io.github.muer.core.model.IamUser(45L, "account-45", "MEMBER", true, 1L);
         users.save(user);
-        identities.save(new io.github.iamstarter.core.model.Identity(
+        identities.save(new io.github.muer.core.model.Identity(
                 "identity-45", 45L, "account-45@example.test", "ACCOUNT", true));
 
         assertEquals(user, users.findById(45L).orElseThrow());
@@ -117,10 +117,10 @@ class IamPersistenceIntegrationTest {
     void login_event_repository_appends_a_queryable_security_event() throws Exception {
         insertUser(44L);
         var repository = new MyBatisLoginEventRepository(sessionFactory());
-        repository.append(new io.github.iamstarter.session.LoginEvent(
+        repository.append(new io.github.muer.session.LoginEvent(
                 "login-44", 44L, "alex", "ACCOUNT", "WEB", "browser-44",
                 "203.0.113.44", "integration-browser/1.0", "DESKTOP", "Linux", "Firefox", "1.2.0",
-                "session-44", io.github.iamstarter.session.LoginResult.SUCCESS, null, "request-44",
+                "session-44", io.github.muer.session.LoginResult.SUCCESS, null, "request-44",
                 Instant.parse("2026-08-26T02:00:00Z")));
 
         try (var connection = DriverManager.getConnection(
@@ -144,18 +144,18 @@ class IamPersistenceIntegrationTest {
         insertUser(43L);
         insertTemplateVersion(61L, 60L);
         var repository = new MyBatisAuthorizationProfileRepository(sessionFactory());
-        var original = new io.github.iamstarter.authorization.AuthorizationProfile(
+        var original = new io.github.muer.authorization.AuthorizationProfile(
                 51L, 43L, "operations", 61L, Set.of("WEB", "MOBILE"), true, false,
                 Instant.parse("2026-08-01T00:00:00Z"), Instant.parse("2026-09-01T00:00:00Z"),
-                List.of(new io.github.iamstarter.core.model.ResourceScope(
-                        "DEPARTMENT", "7", io.github.iamstarter.core.model.ScopeAccess.READ)));
+                List.of(new io.github.muer.core.model.ResourceScope(
+                        "DEPARTMENT", "7", io.github.muer.core.model.ScopeAccess.READ)));
 
         repository.save(original);
         assertEquals(original, repository.require(51L));
         assertEquals(List.of(original), repository.findByUserId(43L));
 
-        var replacement = original.withScopes(List.of(new io.github.iamstarter.core.model.ResourceScope(
-                "DEPARTMENT", "9", io.github.iamstarter.core.model.ScopeAccess.WRITE)));
+        var replacement = original.withScopes(List.of(new io.github.muer.core.model.ResourceScope(
+                "DEPARTMENT", "9", io.github.muer.core.model.ScopeAccess.WRITE)));
         repository.save(replacement);
 
         assertEquals(replacement, new MyBatisAuthorizationProfileRepository(sessionFactory()).require(51L));
@@ -168,10 +168,10 @@ class IamPersistenceIntegrationTest {
         insertUser(46L);
         insertTemplateVersion(63L, 62L);
         var profiles = new MyBatisAuthorizationProfileRepository(sessionFactory());
-        var original = new io.github.iamstarter.authorization.AuthorizationProfile(
+        var original = new io.github.muer.authorization.AuthorizationProfile(
                 52L, 46L, "security", 63L, Set.of("WEB"), true, false, null, null,
-                List.of(new io.github.iamstarter.core.model.ResourceScope(
-                        "DEPARTMENT", "7", io.github.iamstarter.core.model.ScopeAccess.READ)));
+                List.of(new io.github.muer.core.model.ResourceScope(
+                        "DEPARTMENT", "7", io.github.muer.core.model.ScopeAccess.READ)));
         profiles.save(original);
         executeSql("""
                 CREATE TRIGGER fail_iam_authorization_version
@@ -182,8 +182,8 @@ class IamPersistenceIntegrationTest {
             var mutation = new MyBatisAuthorizationScopeMutation(sessionFactory());
 
             assertThrows(RuntimeException.class, () -> mutation.replaceScopesAndIncrementVersion(
-                    52L, List.of(new io.github.iamstarter.core.model.ResourceScope(
-                            "DEPARTMENT", "9", io.github.iamstarter.core.model.ScopeAccess.WRITE))));
+                    52L, List.of(new io.github.muer.core.model.ResourceScope(
+                            "DEPARTMENT", "9", io.github.muer.core.model.ScopeAccess.WRITE))));
         } finally {
             executeSql("DROP TRIGGER IF EXISTS fail_iam_authorization_version");
         }
@@ -196,15 +196,15 @@ class IamPersistenceIntegrationTest {
     void permission_template_version_round_trips_and_replaces_permission_links_atomically() throws Exception {
         insertTemplate(70L);
         var repository = new MyBatisPermissionTemplateVersionRepository(sessionFactory());
-        var draft = new io.github.iamstarter.authorization.PermissionTemplateVersion(
-                71L, 70L, 1, io.github.iamstarter.authorization.TemplateVersionStatus.DRAFT,
+        var draft = new io.github.muer.authorization.PermissionTemplateVersion(
+                71L, 70L, 1, io.github.muer.authorization.TemplateVersionStatus.DRAFT,
                 Set.of("account.read", "account.write"));
 
         repository.save(draft);
         assertEquals(draft, repository.require(71L));
 
-        var published = new io.github.iamstarter.authorization.PermissionTemplateVersion(
-                71L, 70L, 1, io.github.iamstarter.authorization.TemplateVersionStatus.PUBLISHED,
+        var published = new io.github.muer.authorization.PermissionTemplateVersion(
+                71L, 70L, 1, io.github.muer.authorization.TemplateVersionStatus.PUBLISHED,
                 Set.of("account.read"));
         repository.save(published);
 
@@ -214,20 +214,20 @@ class IamPersistenceIntegrationTest {
     @Test
     void audit_append_persists_json_and_subjects_and_rolls_back_partial_writes() throws Exception {
         var repository = new MyBatisAuditRepository(sessionFactory());
-        var record = new io.github.iamstarter.audit.AuditRecord(
+        var record = new io.github.muer.audit.AuditRecord(
                 "audit-81", "service:operator", "account.update", "ACCOUNT", "81", "SUCCESS", "request-81",
                 Map.of("name", "before"), Map.of("name", "after"),
                 Map.of("source", "management \"api\"\nline"),
                 Instant.parse("2026-08-26T08:30:00Z"));
-        var subject = new io.github.iamstarter.audit.AuditSubjectLink(
-                "ACCOUNT", "81", io.github.iamstarter.audit.AuditSubjectRelation.PRIMARY);
+        var subject = new io.github.muer.audit.AuditSubjectLink(
+                "ACCOUNT", "81", io.github.muer.audit.AuditSubjectRelation.PRIMARY);
 
         repository.append(record, List.of(subject));
 
         assertEquals(new StoredAudit("service:operator", "before", "after", "management \"api\"\nline", 1),
                 storedAudit("audit-81"));
 
-        var duplicate = new io.github.iamstarter.audit.AuditRecord(
+        var duplicate = new io.github.muer.audit.AuditRecord(
                 "audit-82", "service:operator", "account.update", "ACCOUNT", "82", "FAILED", "request-82",
                 Map.of(), Map.of(), Map.of(), Instant.parse("2026-08-26T08:31:00Z"));
         assertThrows(RuntimeException.class, () -> repository.append(duplicate, List.of(subject, subject)));
@@ -439,12 +439,12 @@ class IamPersistenceIntegrationTest {
     @Test
     void management_audit_queries_read_back_immutable_events() throws Exception {
         var append = new MyBatisAuditRepository(sessionFactory());
-        var record = new io.github.iamstarter.audit.AuditRecord(
+        var record = new io.github.muer.audit.AuditRecord(
                 "audit-mgmt-1", "user:301", "user.enable", "USER", "301", "SUCCESS", "request-mgmt",
                 Map.of(), Map.of(), Map.of("reason", "console"),
                 Instant.parse("2026-08-30T06:00:00Z"));
-        append.append(record, List.of(new io.github.iamstarter.audit.AuditSubjectLink(
-                "USER", "301", io.github.iamstarter.audit.AuditSubjectRelation.PRIMARY)));
+        append.append(record, List.of(new io.github.muer.audit.AuditSubjectLink(
+                "USER", "301", io.github.muer.audit.AuditSubjectRelation.PRIMARY)));
 
         var queries = new MyBatisAuditQueryRepository(sessionFactory());
         var detail = queries.findById("audit-mgmt-1").orElseThrow();
@@ -452,7 +452,7 @@ class IamPersistenceIntegrationTest {
         assertEquals("console", detail.metadata().get("reason"));
         assertEquals("301", detail.subjects().getFirst().subjectId());
 
-        var page = queries.findEvents(new io.github.iamstarter.audit.AuditEventFilter(
+        var page = queries.findEvents(new io.github.muer.audit.AuditEventFilter(
                 301L, null, null, "user.enable", "USER", "301", null, null), 0L, 10);
         assertEquals(1, page.events().size());
         assertEquals("audit-mgmt-1", page.events().getFirst().eventId());

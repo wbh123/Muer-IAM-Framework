@@ -23,5 +23,5 @@ sidebar:
 
 ## 源码参考
 
-- `IdentityAuthenticator`：<https://github.com/wbh123/iam/blob/main/iam-authentication/src/main/java/io/github/iamstarter/authentication/IdentityAuthenticator.java>
-- `IamProperties`：<https://github.com/wbh123/iam/blob/main/iam-spring-boot-autoconfigure/src/main/java/io/github/iamstarter/autoconfigure/IamProperties.java>
+- `IdentityAuthenticator`：<https://github.com/wbh123/iam/blob/main/muer-authentication/src/main/java/io/github/iamstarter/authentication/IdentityAuthenticator.java>
+- `IamProperties`：<https://github.com/wbh123/iam/blob/main/muer-spring-boot-autoconfigure/src/main/java/io/github/iamstarter/autoconfigure/IamProperties.java>

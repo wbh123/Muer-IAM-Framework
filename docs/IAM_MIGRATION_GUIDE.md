@@ -103,7 +103,7 @@ rollback. Keep audit and comparison evidence so the mismatch can be diagnosed.
 
 ## Current extraction status
 
-This repository's `iam-example` is the current consumer demonstration. It
+This repository's `muer-example` is the current consumer demonstration. It
 verifies generic login, scoped document access, denied requests, profile switch,
 diagnostics, and session revocation. A real host must still establish its own
 decision-parity evidence before switching enforcement authority for any

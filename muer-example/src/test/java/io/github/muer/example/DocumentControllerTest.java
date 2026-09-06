@@ -1,4 +1,4 @@
-package io.github.iamstarter.example;
+package io.github.muer.example;
 
 import org.junit.jupiter.api.Test;
 
@@ -19,6 +19,6 @@ class DocumentControllerTest {
         assertEquals(404, controller.read("missing").getStatusCode().value());
         assertFalse(Arrays.stream(DocumentController.class.getConstructors())
                 .anyMatch(constructor -> Arrays.asList(constructor.getParameterTypes())
-                        .contains(io.github.iamstarter.authorization.AuthorizationEngine.class)));
+                        .contains(io.github.muer.authorization.AuthorizationEngine.class)));
     }
 }

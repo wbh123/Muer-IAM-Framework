@@ -1,4 +1,4 @@
-package io.github.iamstarter.example;
+package io.github.muer.example;
 
 import org.springframework.stereotype.Component;
 

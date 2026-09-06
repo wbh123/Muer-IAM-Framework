@@ -1,9 +1,9 @@
-package io.github.iamstarter.example;
+package io.github.muer.example;
 
-import io.github.iamstarter.core.model.ResourceDescriptor;
-import io.github.iamstarter.core.model.ResourceScope;
-import io.github.iamstarter.core.model.ScopeAccess;
-import io.github.iamstarter.authentication.LoginRequest;
+import io.github.muer.core.model.ResourceDescriptor;
+import io.github.muer.core.model.ResourceScope;
+import io.github.muer.core.model.ScopeAccess;
+import io.github.muer.authentication.LoginRequest;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

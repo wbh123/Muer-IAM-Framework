@@ -1,11 +1,11 @@
-package io.github.iamstarter.authentication;
+package io.github.muer.authentication;
 
-import io.github.iamstarter.authorization.AuthorizationVersionService;
-import io.github.iamstarter.core.model.IamUser;
-import io.github.iamstarter.core.model.Identity;
-import io.github.iamstarter.core.port.IamUserRepository;
-import io.github.iamstarter.core.port.IdentityRepository;
-import io.github.iamstarter.core.port.UserQueryRepository;
+import io.github.muer.authorization.AuthorizationVersionService;
+import io.github.muer.core.model.IamUser;
+import io.github.muer.core.model.Identity;
+import io.github.muer.core.port.IamUserRepository;
+import io.github.muer.core.port.IdentityRepository;
+import io.github.muer.core.port.UserQueryRepository;
 
 import java.util.List;
 import java.util.Objects;

@@ -1,6 +1,6 @@
-package io.github.iamstarter.persistence.mapper;
+package io.github.muer.persistence.mapper;
 
-import io.github.iamstarter.session.LoginEvent;
+import io.github.muer.session.LoginEvent;
 
 public interface IamLoginEventMapper {
     int insert(LoginEvent event);

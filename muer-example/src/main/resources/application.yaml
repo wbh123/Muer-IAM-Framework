@@ -8,7 +8,7 @@ spring:
       host: ${IAM_EXAMPLE_REDIS_HOST:localhost}
       port: ${IAM_EXAMPLE_REDIS_PORT:6379}
 
-iam:
+muer:
   enabled: true
   token:
     ttl: 8h

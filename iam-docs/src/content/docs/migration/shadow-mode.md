@@ -22,5 +22,5 @@ IAM 的授权核心是 `AuthorizationEngine.decide(principal, request)`，它返
 
 ## 源码参考
 
-- `AuthorizationEngine`：<https://github.com/wbh123/iam/blob/main/iam-authorization/src/main/java/io/github/iamstarter/authorization/AuthorizationEngine.java>
-- 诊断接口 OpenAPI：<https://github.com/wbh123/iam/blob/main/iam-management-web/src/main/resources/openapi/iam.yaml>
+- `AuthorizationEngine`：<https://github.com/wbh123/iam/blob/main/muer-authorization/src/main/java/io/github/iamstarter/authorization/AuthorizationEngine.java>
+- 诊断接口 OpenAPI：<https://github.com/wbh123/iam/blob/main/muer-management-web/src/main/resources/openapi/iam.yaml>

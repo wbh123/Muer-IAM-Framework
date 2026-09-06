@@ -21,7 +21,7 @@ npm run build          # 产出 dist/
 ## 契约
 
 前端不手写 DTO：`src/api/generated/` 全部由
-`../iam-management-web/src/main/resources/openapi/iam.yaml` 生成。若新增/变更后端
+`../muer-management-web/src/main/resources/openapi/iam.yaml` 生成。若新增/变更后端
 端点，先修改 iam.yaml，再 `npm run api:generate`。
 
 ## 安全约定

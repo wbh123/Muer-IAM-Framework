@@ -1,4 +1,4 @@
-package io.github.iamstarter.audit;
+package io.github.muer.audit;
 
 import org.junit.jupiter.api.Test;
 

@@ -1,12 +1,12 @@
-package io.github.iamstarter.web;
+package io.github.muer.web;
 
-import io.github.iamstarter.authorization.AuthorizationEngine;
-import io.github.iamstarter.core.port.UserQueryRepository;
-import io.github.iamstarter.session.AuthSession;
-import io.github.iamstarter.session.SessionQueryRepository;
-import io.github.iamstarter.web.api.ManagementSessionsApi;
-import io.github.iamstarter.web.dto.AdminSessionListResponse;
-import io.github.iamstarter.web.dto.SessionResponse;
+import io.github.muer.authorization.AuthorizationEngine;
+import io.github.muer.core.port.UserQueryRepository;
+import io.github.muer.session.AuthSession;
+import io.github.muer.session.SessionQueryRepository;
+import io.github.muer.web.api.ManagementSessionsApi;
+import io.github.muer.web.dto.AdminSessionListResponse;
+import io.github.muer.web.dto.SessionResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,8 +16,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-import static io.github.iamstarter.web.WebSecurity.allowedRead;
-import static io.github.iamstarter.web.WebSecurity.currentPrincipal;
+import static io.github.muer.web.WebSecurity.allowedRead;
+import static io.github.muer.web.WebSecurity.currentPrincipal;
 
 @RestController
 public class IamManagementSessionsController implements ManagementSessionsApi {

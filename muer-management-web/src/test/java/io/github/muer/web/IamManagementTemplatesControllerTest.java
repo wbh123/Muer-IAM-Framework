@@ -1,14 +1,14 @@
-package io.github.iamstarter.web;
+package io.github.muer.web;
 
-import io.github.iamstarter.authorization.AuthorizationDecision;
-import io.github.iamstarter.authorization.AuthorizationEngine;
-import io.github.iamstarter.authorization.PermissionSummary;
-import io.github.iamstarter.authorization.PermissionSummaryPage;
-import io.github.iamstarter.authorization.PermissionTemplate;
-import io.github.iamstarter.authorization.PermissionTemplateQueryRepository;
-import io.github.iamstarter.authorization.PermissionTemplateVersion;
-import io.github.iamstarter.authorization.TemplateVersionStatus;
-import io.github.iamstarter.core.model.IamPrincipal;
+import io.github.muer.authorization.AuthorizationDecision;
+import io.github.muer.authorization.AuthorizationEngine;
+import io.github.muer.authorization.PermissionSummary;
+import io.github.muer.authorization.PermissionSummaryPage;
+import io.github.muer.authorization.PermissionTemplate;
+import io.github.muer.authorization.PermissionTemplateQueryRepository;
+import io.github.muer.authorization.PermissionTemplateVersion;
+import io.github.muer.authorization.TemplateVersionStatus;
+import io.github.muer.core.model.IamPrincipal;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

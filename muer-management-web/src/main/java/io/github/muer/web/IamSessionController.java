@@ -1,14 +1,14 @@
-package io.github.iamstarter.web;
+package io.github.muer.web;
 
-import io.github.iamstarter.core.model.IamPrincipal;
-import io.github.iamstarter.session.AuthSession;
-import io.github.iamstarter.session.SessionRepository;
-import io.github.iamstarter.session.SessionService;
-import io.github.iamstarter.web.api.SessionsApi;
-import io.github.iamstarter.web.dto.RevokeOthersRequest;
-import io.github.iamstarter.web.dto.RevokeRequest;
-import io.github.iamstarter.web.dto.SessionListResponse;
-import io.github.iamstarter.web.dto.SessionResponse;
+import io.github.muer.core.model.IamPrincipal;
+import io.github.muer.session.AuthSession;
+import io.github.muer.session.SessionRepository;
+import io.github.muer.session.SessionService;
+import io.github.muer.web.api.SessionsApi;
+import io.github.muer.web.dto.RevokeOthersRequest;
+import io.github.muer.web.dto.RevokeRequest;
+import io.github.muer.web.dto.SessionListResponse;
+import io.github.muer.web.dto.SessionResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RestController;

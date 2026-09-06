@@ -1,11 +1,11 @@
-package io.github.iamstarter.web;
+package io.github.muer.web;
 
-import io.github.iamstarter.core.model.IamPrincipal;
-import io.github.iamstarter.session.AuthSession;
-import io.github.iamstarter.session.SessionRepository;
-import io.github.iamstarter.session.SessionService;
-import io.github.iamstarter.session.TokenRecord;
-import io.github.iamstarter.session.TokenStore;
+import io.github.muer.core.model.IamPrincipal;
+import io.github.muer.session.AuthSession;
+import io.github.muer.session.SessionRepository;
+import io.github.muer.session.SessionService;
+import io.github.muer.session.TokenRecord;
+import io.github.muer.session.TokenStore;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

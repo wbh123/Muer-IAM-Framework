@@ -1,4 +1,4 @@
-package io.github.iamstarter.persistence;
+package io.github.muer.persistence;
 
 import java.util.Map;
 import java.util.stream.Collectors;

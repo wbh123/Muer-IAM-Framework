@@ -1,4 +1,4 @@
-package io.github.iamstarter.example;
+package io.github.muer.example;
 
 /** A minimal host-owned payload; IAM only decides whether the operation is allowed. */
 public record DocumentUpdate(String status) {

@@ -1,8 +1,8 @@
-package io.github.iamstarter.persistence.mapper;
+package io.github.muer.persistence.mapper;
 
-import io.github.iamstarter.authorization.AuthorizationProfile;
-import io.github.iamstarter.core.model.ResourceScope;
-import io.github.iamstarter.persistence.AuthorizationProfileRow;
+import io.github.muer.authorization.AuthorizationProfile;
+import io.github.muer.core.model.ResourceScope;
+import io.github.muer.persistence.AuthorizationProfileRow;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;

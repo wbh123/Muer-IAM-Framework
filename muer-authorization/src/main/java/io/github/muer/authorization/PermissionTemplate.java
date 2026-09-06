@@ -1,4 +1,4 @@
-package io.github.iamstarter.authorization;
+package io.github.muer.authorization;
 
 import java.util.Objects;
 

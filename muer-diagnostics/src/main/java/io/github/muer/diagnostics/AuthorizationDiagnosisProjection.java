@@ -1,7 +1,7 @@
-package io.github.iamstarter.diagnostics;
+package io.github.muer.diagnostics;
 
-import io.github.iamstarter.authorization.AuthorizationDecision;
-import io.github.iamstarter.authorization.AuthorizationDecisionStep;
+import io.github.muer.authorization.AuthorizationDecision;
+import io.github.muer.authorization.AuthorizationDecisionStep;
 
 import java.util.List;
 

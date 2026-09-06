@@ -38,7 +38,7 @@ interface ResourceHierarchyProvider {
 }
 ```
 
-源码见 [ResourceHierarchyProvider.java](https://github.com/wbh123/iam/blob/main/iam-core/src/main/java/io/github/iamstarter/core/port/ResourceHierarchyProvider.java) 与 [模型目录](https://github.com/wbh123/iam/blob/main/iam-core/src/main/java/io/github/iamstarter/core/model/)。
+源码见 [ResourceHierarchyProvider.java](https://github.com/wbh123/iam/blob/main/muer-core/src/main/java/io/github/iamstarter/core/port/ResourceHierarchyProvider.java) 与 [模型目录](https://github.com/wbh123/iam/blob/main/muer-core/src/main/java/io/github/iamstarter/core/model/)。
 
 ## 示例：项目内只读
 

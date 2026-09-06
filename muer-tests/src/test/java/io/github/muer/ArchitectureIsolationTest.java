@@ -1,6 +1,6 @@
-package io.github.iamstarter;
+package io.github.muer;
 
-import io.github.iamstarter.core.model.IamUser;
+import io.github.muer.core.model.IamUser;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

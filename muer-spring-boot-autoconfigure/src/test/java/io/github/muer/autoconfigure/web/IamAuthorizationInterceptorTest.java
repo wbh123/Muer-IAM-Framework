@@ -1,11 +1,11 @@
-package io.github.iamstarter.autoconfigure.web;
+package io.github.muer.autoconfigure.web;
 
-import io.github.iamstarter.authorization.AuthorizationDecision;
-import io.github.iamstarter.authorization.AuthorizationEngine;
-import io.github.iamstarter.authorization.AuthorizationRequest;
-import io.github.iamstarter.core.model.IamPrincipal;
-import io.github.iamstarter.core.model.ResourceDescriptor;
-import io.github.iamstarter.core.model.ScopeAccess;
+import io.github.muer.authorization.AuthorizationDecision;
+import io.github.muer.authorization.AuthorizationEngine;
+import io.github.muer.authorization.AuthorizationRequest;
+import io.github.muer.core.model.IamPrincipal;
+import io.github.muer.core.model.ResourceDescriptor;
+import io.github.muer.core.model.ScopeAccess;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;

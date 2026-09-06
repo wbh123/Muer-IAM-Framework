@@ -35,5 +35,5 @@ sidebar:
 
 ## 源码参考
 
-- 入口总览：<https://github.com/wbh123/iam/blob/main/iam-core/src/main/java/io/github/iamstarter/core/model/>
-- `AuthorizationEngine`：<https://github.com/wbh123/iam/blob/main/iam-authorization/src/main/java/io/github/iamstarter/authorization/AuthorizationEngine.java>
+- 入口总览：<https://github.com/wbh123/iam/blob/main/muer-core/src/main/java/io/github/iamstarter/core/model/>
+- `AuthorizationEngine`：<https://github.com/wbh123/iam/blob/main/muer-authorization/src/main/java/io/github/iamstarter/authorization/AuthorizationEngine.java>

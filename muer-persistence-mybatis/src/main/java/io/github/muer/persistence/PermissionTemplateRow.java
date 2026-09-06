@@ -1,6 +1,6 @@
-package io.github.iamstarter.persistence;
+package io.github.muer.persistence;
 
-import io.github.iamstarter.authorization.PermissionTemplate;
+import io.github.muer.authorization.PermissionTemplate;
 
 public record PermissionTemplateRow(long templateId, String templateKey, String name,
                                     String description, boolean enabled) {

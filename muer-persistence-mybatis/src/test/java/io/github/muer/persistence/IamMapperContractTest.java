@@ -1,4 +1,4 @@
-package io.github.iamstarter.persistence;
+package io.github.muer.persistence;
 
 import org.apache.ibatis.builder.xml.XMLMapperBuilder;
 import org.apache.ibatis.io.Resources;
@@ -30,22 +30,22 @@ class IamMapperContractTest {
         }
 
         assertTrue(configuration.hasStatement(
-                "io.github.iamstarter.persistence.mapper.IamLoginEventMapper.insert"));
+                "io.github.muer.persistence.mapper.IamLoginEventMapper.insert"));
         assertTrue(configuration.hasStatement(
-                "io.github.iamstarter.persistence.mapper.IamSessionMapper.touch"));
+                "io.github.muer.persistence.mapper.IamSessionMapper.touch"));
         assertTrue(configuration.hasStatement(
-                "io.github.iamstarter.persistence.mapper.IamUserMapper.findPage"));
+                "io.github.muer.persistence.mapper.IamUserMapper.findPage"));
         assertTrue(configuration.hasStatement(
-                "io.github.iamstarter.persistence.mapper.IamUserMapper.search"));
+                "io.github.muer.persistence.mapper.IamUserMapper.search"));
         assertTrue(configuration.hasStatement(
-                "io.github.iamstarter.persistence.mapper.IamAuthorizationProfileMapper.search"));
+                "io.github.muer.persistence.mapper.IamAuthorizationProfileMapper.search"));
         assertTrue(configuration.hasStatement(
-                "io.github.iamstarter.persistence.mapper.IamSessionMapper.search"));
+                "io.github.muer.persistence.mapper.IamSessionMapper.search"));
         assertTrue(configuration.hasStatement(
-                "io.github.iamstarter.persistence.mapper.IamPermissionTemplateQueryMapper.listPermissions"));
+                "io.github.muer.persistence.mapper.IamPermissionTemplateQueryMapper.listPermissions"));
         assertTrue(configuration.hasStatement(
-                "io.github.iamstarter.persistence.mapper.IamOverviewMapper.load"));
+                "io.github.muer.persistence.mapper.IamOverviewMapper.load"));
         assertTrue(configuration.hasStatement(
-                "io.github.iamstarter.persistence.mapper.IamAuditMapper.findEvents"));
+                "io.github.muer.persistence.mapper.IamAuditMapper.findEvents"));
     }
 }

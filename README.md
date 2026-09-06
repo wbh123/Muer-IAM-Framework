@@ -1,6 +1,11 @@
-# IAM Spring Boot Starter
+# 木耳 Muer
 
-A reusable Identity and Access Management framework for Spring Boot applications, providing authentication, fine-grained authorization, permission templates, authorization profiles, resource scopes, distributed session management, security auditing, explainable authorization decisions, Management APIs and an optional web management console.
+Identity infrastructure that grows naturally with your applications.
+
+让身份能力，在每个系统中自然生长。\
+Grow quietly. Connect steadily.
+
+Muer Identity 是面向现代业务系统的通用身份与访问管理基础框架，提供认证、细粒度授权、权限模板、Profile、资源范围、会话管理、审计与可解释诊断能力。
 
 ## 0.1.0 scope
 
@@ -45,8 +50,8 @@ The documentation includes manual deployment guidance for MySQL, Redis, Spring B
 
    ```xml
    <dependency>
-       <groupId>io.github.iamstarter</groupId>
-       <artifactId>iam-spring-boot-starter</artifactId>
+       <groupId>io.github.muer</groupId>
+       <artifactId>muer-spring-boot-starter</artifactId>
        <version>0.1.0-SNAPSHOT</version>
    </dependency>
    ```
@@ -64,7 +69,7 @@ The documentation includes manual deployment guidance for MySQL, Redis, Spring B
          host: localhost
          port: 6379
 
-   iam:
+   muer:
      enabled: true
      token:
        ttl: 8h
@@ -80,11 +85,11 @@ The documentation includes manual deployment guidance for MySQL, Redis, Spring B
 
 Using Docker, Testcontainers, or the repository's complete verification suite is **not** required for application deployment. Those tools are used by IAM maintainers and CI. If a developer has no local MySQL / Redis, `examples/quickstart/docker-compose.yml` remains available as an optional convenience.
 
-See [IAM_INTEGRATION_GUIDE.md](docs/IAM_INTEGRATION_GUIDE.md) for infrastructure and SPI configuration and [iam-example](iam-example/README.md) for a maintainer-facing consumer showcase.
+See [IAM_INTEGRATION_GUIDE.md](docs/IAM_INTEGRATION_GUIDE.md) for infrastructure and SPI configuration and [muer-example](muer-example/README.md) for a maintainer-facing consumer showcase.
 
 ## IAM Admin Console
 
-`iam-admin-web/` is the **optional management console shipped with 0.1.0**. It is a Vue 3 + TypeScript + Element Plus SPA whose API client is generated from the same [`iam.yaml`](iam-management-web/src/main/resources/openapi/iam.yaml) contract implemented by the Java Management API.
+`iam-admin-web/` is the **optional management console shipped with 0.1.0**. It is a Vue 3 + TypeScript + Element Plus SPA whose API client is generated from the same [`iam.yaml`](muer-management-web/src/main/resources/openapi/iam.yaml) contract implemented by the Java Management API.
 
 The console covers Dashboard, Users and Identities, Permission Explorer, Permission Templates, Authorization Profiles and Scopes, Sessions, Audit, Diagnostics and current-user account/profile operations.
 
@@ -120,7 +125,7 @@ Use the Vite address shown in the terminal (normally `http://localhost:5173`). A
 
 ### Production boundary
 
-- The Starter works **without** the admin frontend: depending on `iam-spring-boot-starter` never requires serving `iam-admin-web`.
+- The Starter works **without** the admin frontend: depending on `muer-spring-boot-starter` never requires serving `iam-admin-web`.
 - Every `/iam/admin/**` request is re-authorized by `AuthorizationEngine` with fine-grained `iam.admin.*` permissions and resource scopes. Menu or route hiding is only a frontend usability guard.
 - Production has no default administrator and no public bootstrap endpoint. The first administrator must be provisioned through controlled SQL/migration/deployment seeding or the host application's own initial provisioning flow.
 - `POST /iam/authorization/diagnostics` remains authenticated self-diagnostics for the current principal and does not require an admin permission.
@@ -135,7 +140,7 @@ See [IAM Admin Console Deployment](docs/IAM_ADMIN_CONSOLE_DEPLOYMENT.md) for Ngi
 
 ## Modules
 
-Applications normally depend only on `iam-spring-boot-starter`. Internal modules separate the dependency-free domain, authentication, authorization, session, audit, diagnostics, MyBatis persistence, OpenAPI web contract and Spring Boot automatic configuration. `iam-admin-web` and `iam-docs` are repository-level companion applications, not Maven runtime modules.
+Applications normally depend only on `muer-spring-boot-starter`. Internal modules separate the dependency-free domain, authentication, authorization, session, audit, diagnostics, MyBatis persistence, OpenAPI web contract and Spring Boot automatic configuration. `iam-admin-web` and `iam-docs` are repository-level companion applications, not Maven runtime modules.
 
 ## Security defaults
 

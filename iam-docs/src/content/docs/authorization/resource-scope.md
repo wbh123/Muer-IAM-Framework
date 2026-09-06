@@ -21,5 +21,5 @@ alice 默认 Profile 401 持有作用域 `(PROJECT,101,READ)`；其文档 1001 �
 
 ## 源码
 
-- ResourceScope：<https://github.com/wbh123/iam/blob/main/iam-core/src/main/java/io/github/iamstarter/core/model/>
-- ResourceHierarchyProvider：<https://github.com/wbh123/iam/blob/main/iam-core/src/main/java/io/github/iamstarter/core/port/ResourceHierarchyProvider.java>
+- ResourceScope：<https://github.com/wbh123/iam/blob/main/muer-core/src/main/java/io/github/iamstarter/core/model/>
+- ResourceHierarchyProvider：<https://github.com/wbh123/iam/blob/main/muer-core/src/main/java/io/github/iamstarter/core/port/ResourceHierarchyProvider.java>

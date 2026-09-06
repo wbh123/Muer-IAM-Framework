@@ -50,10 +50,10 @@ sidebar:
 Authorization: Bearer <accessToken>
 ```
 
-`alice / demo-pass` 只是 `iam-example` 的演示身份。生产系统继续使用自己的用户表、密码校验或企业身份源。
+`alice / demo-pass` 只是 `muer-example` 的演示身份。生产系统继续使用自己的用户表、密码校验或企业身份源。
 
 ## 源码
 
-- `LoginRequest`：<https://github.com/wbh123/iam/blob/main/iam-authentication/src/main/java/io/github/iamstarter/authentication/LoginRequest.java>
-- `IdentityAuthenticator`：<https://github.com/wbh123/iam/blob/main/iam-authentication/src/main/java/io/github/iamstarter/authentication/IdentityAuthenticator.java>
-- OpenAPI：<https://github.com/wbh123/iam/blob/main/iam-management-web/src/main/resources/openapi/iam.yaml>
+- `LoginRequest`：<https://github.com/wbh123/iam/blob/main/muer-authentication/src/main/java/io/github/iamstarter/authentication/LoginRequest.java>
+- `IdentityAuthenticator`：<https://github.com/wbh123/iam/blob/main/muer-authentication/src/main/java/io/github/iamstarter/authentication/IdentityAuthenticator.java>
+- OpenAPI：<https://github.com/wbh123/iam/blob/main/muer-management-web/src/main/resources/openapi/iam.yaml>

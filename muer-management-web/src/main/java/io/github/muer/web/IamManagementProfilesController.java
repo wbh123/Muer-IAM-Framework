@@ -1,15 +1,15 @@
-package io.github.iamstarter.web;
+package io.github.muer.web;
 
-import io.github.iamstarter.authorization.AuthorizationEngine;
-import io.github.iamstarter.authorization.AuthorizationProfile;
-import io.github.iamstarter.authorization.AuthorizationProfileQueryRepository;
-import io.github.iamstarter.authorization.AuthorizationProfileRepository;
-import io.github.iamstarter.authorization.AuthorizationProfileService;
-import io.github.iamstarter.core.port.UserQueryRepository;
-import io.github.iamstarter.web.api.ManagementProfilesApi;
-import io.github.iamstarter.web.dto.AuthorizationProfileResponse;
-import io.github.iamstarter.web.dto.ProfileListResponse;
-import io.github.iamstarter.web.dto.ResourceScope;
+import io.github.muer.authorization.AuthorizationEngine;
+import io.github.muer.authorization.AuthorizationProfile;
+import io.github.muer.authorization.AuthorizationProfileQueryRepository;
+import io.github.muer.authorization.AuthorizationProfileRepository;
+import io.github.muer.authorization.AuthorizationProfileService;
+import io.github.muer.core.port.UserQueryRepository;
+import io.github.muer.web.api.ManagementProfilesApi;
+import io.github.muer.web.dto.AuthorizationProfileResponse;
+import io.github.muer.web.dto.ProfileListResponse;
+import io.github.muer.web.dto.ResourceScope;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,8 +19,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.NoSuchElementException;
 
-import static io.github.iamstarter.web.WebSecurity.allowedRead;
-import static io.github.iamstarter.web.WebSecurity.currentPrincipal;
+import static io.github.muer.web.WebSecurity.allowedRead;
+import static io.github.muer.web.WebSecurity.currentPrincipal;
 
 @RestController
 public class IamManagementProfilesController implements ManagementProfilesApi {
@@ -118,7 +118,7 @@ public class IamManagementProfilesController implements ManagementProfilesApi {
         return response;
     }
 
-    private static ResourceScope toScope(io.github.iamstarter.core.model.ResourceScope scope) {
+    private static ResourceScope toScope(io.github.muer.core.model.ResourceScope scope) {
         return new ResourceScope(scope.scopeType(), scope.scopeRefId(),
                 ResourceScope.AccessModeEnum.fromValue(scope.accessMode().name()));
     }

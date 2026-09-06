@@ -1,6 +1,6 @@
-package io.github.iamstarter.persistence.mapper;
+package io.github.muer.persistence.mapper;
 
-import io.github.iamstarter.persistence.OverviewRow;
+import io.github.muer.persistence.OverviewRow;
 
 /**
  * Read-only operational overview counters.

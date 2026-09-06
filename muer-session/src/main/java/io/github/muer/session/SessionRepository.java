@@ -1,4 +1,4 @@
-package io.github.iamstarter.session;
+package io.github.muer.session;
 
 import java.util.List;
 import java.util.Optional;

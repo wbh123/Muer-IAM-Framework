@@ -1,7 +1,7 @@
-package io.github.iamstarter.persistence;
+package io.github.muer.persistence;
 
-import io.github.iamstarter.core.model.IamPrincipal;
-import io.github.iamstarter.session.TokenRecord;
+import io.github.muer.core.model.IamPrincipal;
+import io.github.muer.session.TokenRecord;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

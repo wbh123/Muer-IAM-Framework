@@ -36,7 +36,7 @@ iam:
 
 ## 源码
 
-- 配置 `IamProperties`：https://github.com/wbh123/iam/blob/main/iam-spring-boot-autoconfigure/src/main/java/io/github/iamstarter/autoconfigure/
-- Session 模型：https://github.com/wbh123/iam/blob/main/iam-session/src/main/java/io/github/iamstarter/session/
+- 配置 `IamProperties`：https://github.com/wbh123/iam/blob/main/muer-spring-boot-autoconfigure/src/main/java/io/github/iamstarter/autoconfigure/
+- Session 模型：https://github.com/wbh123/iam/blob/main/muer-session/src/main/java/io/github/iamstarter/session/
 
 当前版本：`0.1.0-SNAPSHOT`（Release Candidate），尚未发布。

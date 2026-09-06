@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="io.github.iamstarter.persistence.mapper.IamLoginEventMapper">
+<mapper namespace="io.github.muer.persistence.mapper.IamLoginEventMapper">
     <insert id="insert">
         INSERT INTO iam_login_event
             (event_id, user_id, identity_key, identity_domain, client_type, client_instance,

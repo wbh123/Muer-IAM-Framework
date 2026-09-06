@@ -1,7 +1,7 @@
-package io.github.iamstarter.example;
+package io.github.muer.example;
 
-import io.github.iamstarter.autoconfigure.web.MvcResourceDescriptorResolver;
-import io.github.iamstarter.core.model.ResourceDescriptor;
+import io.github.muer.autoconfigure.web.MvcResourceDescriptorResolver;
+import io.github.muer.core.model.ResourceDescriptor;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;

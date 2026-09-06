@@ -1,7 +1,7 @@
 # IAM Starter Consumer Showcase
 
-`iam-example` is a consuming Spring Boot application, not another IAM
-deployment layer. Its only production dependency is `iam-spring-boot-starter`.
+`muer-example` is a consuming Spring Boot application, not another IAM
+deployment layer. Its only production dependency is `muer-spring-boot-starter`.
 The host application supplies its small `IdentityAuthenticator` and order-to-
 department hierarchy adapter; the starter supplies schema migration, MyBatis
 repositories, opaque tokens, persisted sessions, IAM controllers, permission
@@ -93,7 +93,7 @@ Run the document and session acceptance suite against temporary MySQL and
 Redis containers:
 
 ```bash
-mvn -pl iam-example -am -Pintegration \
+mvn -pl muer-example -am -Pintegration \
   -Dtest=IamConsumerIntegrationTest \
   -Dsurefire.failIfNoSpecifiedTests=false test
 ```
@@ -112,7 +112,7 @@ export IAM_EXAMPLE_DB_PASSWORD='replace-with-local-password'
 export IAM_EXAMPLE_REDIS_HOST='127.0.0.1'
 export IAM_EXAMPLE_REDIS_PORT='6379'
 
-mvn -pl iam-example -am spring-boot:run
+mvn -pl muer-example -am spring-boot:run
 ```
 
 Keep the application running, then set its address in a second shell:
@@ -254,7 +254,7 @@ The fast smoke check is container-free and proves a consuming Spring Boot
 application discovers the starter:
 
 ```bash
-mvn -pl iam-example -am -Dtest=IamStarterAutoConfigurationSmokeTest -Dsurefire.failIfNoSpecifiedTests=false test
+mvn -pl muer-example -am -Dtest=IamStarterAutoConfigurationSmokeTest -Dsurefire.failIfNoSpecifiedTests=false test
 ```
 
 The real-infrastructure suite requires Docker. It starts isolated MySQL and
@@ -262,5 +262,5 @@ Redis Testcontainers, seeds the generic projection, and proves this HTTP
 walkthrough including profile switching and revocation:
 
 ```bash
-mvn -pl iam-example -am -Pintegration -Dtest=IamStarterConsumptionTest,IamSecurityIntegrationTest -Dsurefire.failIfNoSpecifiedTests=false test
+mvn -pl muer-example -am -Pintegration -Dtest=IamStarterConsumptionTest,IamSecurityIntegrationTest -Dsurefire.failIfNoSpecifiedTests=false test
 ```

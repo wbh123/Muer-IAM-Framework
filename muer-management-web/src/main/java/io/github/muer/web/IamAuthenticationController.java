@@ -1,12 +1,12 @@
-package io.github.iamstarter.web;
+package io.github.muer.web;
 
-import io.github.iamstarter.authentication.AuthenticationService;
-import io.github.iamstarter.core.model.IamPrincipal;
-import io.github.iamstarter.session.TokenStore;
-import io.github.iamstarter.session.SessionService;
-import io.github.iamstarter.web.api.AuthenticationApi;
-import io.github.iamstarter.web.dto.LoginResponse;
-import io.github.iamstarter.web.dto.PrincipalResponse;
+import io.github.muer.authentication.AuthenticationService;
+import io.github.muer.core.model.IamPrincipal;
+import io.github.muer.session.TokenStore;
+import io.github.muer.session.SessionService;
+import io.github.muer.web.api.AuthenticationApi;
+import io.github.muer.web.dto.LoginResponse;
+import io.github.muer.web.dto.PrincipalResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,9 +31,9 @@ public class IamAuthenticationController implements AuthenticationApi {
     }
 
     @Override
-    public ResponseEntity<LoginResponse> login(io.github.iamstarter.web.dto.LoginRequest request) {
+    public ResponseEntity<LoginResponse> login(io.github.muer.web.dto.LoginRequest request) {
         var servletRequest = currentServletRequest();
-        var result = authentication.login(new io.github.iamstarter.authentication.LoginRequest(
+        var result = authentication.login(new io.github.muer.authentication.LoginRequest(
                 request.getUsername(), request.getPassword(), request.getClientType(), request.getClientInstance(),
                 bounded(servletRequest == null ? null : servletRequest.getRemoteAddr(), 64),
                 header(servletRequest, HttpHeaders.USER_AGENT, 1024),

@@ -1,6 +1,6 @@
-package io.github.iamstarter.autoconfigure;
+package io.github.muer.autoconfigure;
 
-import io.github.iamstarter.authentication.AuthenticationService;
+import io.github.muer.authentication.AuthenticationService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

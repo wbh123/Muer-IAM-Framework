@@ -1,15 +1,15 @@
-package io.github.iamstarter.web;
+package io.github.muer.web;
 
-import io.github.iamstarter.authorization.AuthorizationDecision;
-import io.github.iamstarter.authorization.AuthorizationEngine;
-import io.github.iamstarter.authorization.AuthorizationProfile;
-import io.github.iamstarter.authorization.AuthorizationProfileQueryRepository;
-import io.github.iamstarter.authorization.AuthorizationProfileRepository;
-import io.github.iamstarter.core.model.IamPrincipal;
-import io.github.iamstarter.core.model.IamUser;
-import io.github.iamstarter.core.model.ResourceScope;
-import io.github.iamstarter.core.model.ScopeAccess;
-import io.github.iamstarter.core.port.UserQueryRepository;
+import io.github.muer.authorization.AuthorizationDecision;
+import io.github.muer.authorization.AuthorizationEngine;
+import io.github.muer.authorization.AuthorizationProfile;
+import io.github.muer.authorization.AuthorizationProfileQueryRepository;
+import io.github.muer.authorization.AuthorizationProfileRepository;
+import io.github.muer.core.model.IamPrincipal;
+import io.github.muer.core.model.IamUser;
+import io.github.muer.core.model.ResourceScope;
+import io.github.muer.core.model.ScopeAccess;
+import io.github.muer.core.port.UserQueryRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

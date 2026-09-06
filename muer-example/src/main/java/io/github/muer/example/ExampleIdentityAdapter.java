@@ -1,7 +1,7 @@
-package io.github.iamstarter.example;
+package io.github.muer.example;
 
-import io.github.iamstarter.authentication.IdentityAuthenticator;
-import io.github.iamstarter.core.model.IamPrincipal;
+import io.github.muer.authentication.IdentityAuthenticator;
+import io.github.muer.core.model.IamPrincipal;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

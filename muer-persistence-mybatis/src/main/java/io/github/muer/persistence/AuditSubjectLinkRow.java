@@ -1,7 +1,7 @@
-package io.github.iamstarter.persistence;
+package io.github.muer.persistence;
 
-import io.github.iamstarter.audit.AuditSubjectLink;
-import io.github.iamstarter.audit.AuditSubjectRelation;
+import io.github.muer.audit.AuditSubjectLink;
+import io.github.muer.audit.AuditSubjectRelation;
 
 /**
  * Flat projection of one audit subject link including its parent audit log id.

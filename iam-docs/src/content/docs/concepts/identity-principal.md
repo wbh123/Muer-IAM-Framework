@@ -11,7 +11,7 @@ sidebar:
 
 ## IamPrincipal 是什么
 
-`IamPrincipal` 是一个 Java `record`，组件顺序固定如下（源码 [IamPrincipal.java](https://github.com/wbh123/iam/blob/main/iam-core/src/main/java/io/github/iamstarter/core/model/IamPrincipal.java)）：
+`IamPrincipal` 是一个 Java `record`，组件顺序固定如下（源码 [IamPrincipal.java](https://github.com/wbh123/iam/blob/main/muer-core/src/main/java/io/github/iamstarter/core/model/IamPrincipal.java)）：
 
 ```
 userId, identityId, identityDomain, activeProfileId(Long),

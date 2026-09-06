@@ -1,9 +1,9 @@
-package io.github.iamstarter.persistence;
+package io.github.muer.persistence;
 
-import io.github.iamstarter.audit.AuditRecord;
-import io.github.iamstarter.audit.AuditRepository;
-import io.github.iamstarter.audit.AuditSubjectLink;
-import io.github.iamstarter.persistence.mapper.IamAuditMapper;
+import io.github.muer.audit.AuditRecord;
+import io.github.muer.audit.AuditRepository;
+import io.github.muer.audit.AuditSubjectLink;
+import io.github.muer.persistence.mapper.IamAuditMapper;
 import org.apache.ibatis.session.SqlSessionFactory;
 
 import java.util.List;

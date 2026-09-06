@@ -1,36 +1,36 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>io.github.iamstarter</groupId>
-        <artifactId>iam-parent</artifactId>
+        <groupId>io.github.muer</groupId>
+        <artifactId>muer-parent</artifactId>
         <version>0.1.0-SNAPSHOT</version>
     </parent>
-    <artifactId>iam-spring-boot-autoconfigure</artifactId>
+    <artifactId>muer-spring-boot-autoconfigure</artifactId>
 
     <dependencies>
         <dependency>
-            <groupId>io.github.iamstarter</groupId>
-            <artifactId>iam-authentication</artifactId>
+            <groupId>io.github.muer</groupId>
+            <artifactId>muer-authentication</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.github.iamstarter</groupId>
-            <artifactId>iam-authorization</artifactId>
+            <groupId>io.github.muer</groupId>
+            <artifactId>muer-authorization</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.github.iamstarter</groupId>
-            <artifactId>iam-diagnostics</artifactId>
+            <groupId>io.github.muer</groupId>
+            <artifactId>muer-diagnostics</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.github.iamstarter</groupId>
-            <artifactId>iam-management-web</artifactId>
+            <groupId>io.github.muer</groupId>
+            <artifactId>muer-management-web</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.github.iamstarter</groupId>
-            <artifactId>iam-persistence-mybatis</artifactId>
+            <groupId>io.github.muer</groupId>
+            <artifactId>muer-persistence-mybatis</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

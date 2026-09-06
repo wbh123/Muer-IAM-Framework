@@ -1,6 +1,6 @@
-package io.github.iamstarter.authentication;
+package io.github.muer.authentication;
 
-import io.github.iamstarter.core.model.IamPrincipal;
+import io.github.muer.core.model.IamPrincipal;
 
 import java.util.Optional;
 

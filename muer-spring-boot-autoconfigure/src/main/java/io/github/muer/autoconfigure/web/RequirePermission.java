@@ -1,6 +1,6 @@
-package io.github.iamstarter.autoconfigure.web;
+package io.github.muer.autoconfigure.web;
 
-import io.github.iamstarter.core.model.ScopeAccess;
+import io.github.muer.core.model.ScopeAccess;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

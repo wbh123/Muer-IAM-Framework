@@ -1,28 +1,28 @@
-package io.github.iamstarter.autoconfigure;
+package io.github.muer.autoconfigure;
 
-import io.github.iamstarter.authorization.AuthorizationEngine;
-import io.github.iamstarter.authorization.AuthorizationProfileRepository;
-import io.github.iamstarter.authorization.AuthorizationVersionRepository;
-import io.github.iamstarter.authorization.PermissionTemplateVersionRepository;
-import io.github.iamstarter.authentication.AuthenticationService;
-import io.github.iamstarter.authentication.IdentityAuthenticator;
-import io.github.iamstarter.authentication.LoginRequest;
-import io.github.iamstarter.core.model.IamPrincipal;
-import io.github.iamstarter.core.port.ResourceHierarchyProvider;
-import io.github.iamstarter.session.TokenStore;
-import io.github.iamstarter.session.SessionRepository;
-import io.github.iamstarter.web.IamAdministrationController;
-import io.github.iamstarter.web.IamAuthenticationController;
-import io.github.iamstarter.web.IamAuthorizationController;
-import io.github.iamstarter.web.IamSessionController;
-import io.github.iamstarter.persistence.MyBatisAuthorizationProfileRepository;
-import io.github.iamstarter.persistence.MyBatisAuthorizationVersionRepository;
-import io.github.iamstarter.persistence.MyBatisPermissionTemplateVersionRepository;
-import io.github.iamstarter.persistence.MyBatisSessionRepository;
-import io.github.iamstarter.persistence.RedisTokenStore;
-import io.github.iamstarter.autoconfigure.web.IamAuthorizationInterceptor;
-import io.github.iamstarter.autoconfigure.web.IamAuthorizationFailureHandler;
-import io.github.iamstarter.autoconfigure.web.ProblemDetailIamAuthorizationFailureHandler;
+import io.github.muer.authorization.AuthorizationEngine;
+import io.github.muer.authorization.AuthorizationProfileRepository;
+import io.github.muer.authorization.AuthorizationVersionRepository;
+import io.github.muer.authorization.PermissionTemplateVersionRepository;
+import io.github.muer.authentication.AuthenticationService;
+import io.github.muer.authentication.IdentityAuthenticator;
+import io.github.muer.authentication.LoginRequest;
+import io.github.muer.core.model.IamPrincipal;
+import io.github.muer.core.port.ResourceHierarchyProvider;
+import io.github.muer.session.TokenStore;
+import io.github.muer.session.SessionRepository;
+import io.github.muer.web.IamAdministrationController;
+import io.github.muer.web.IamAuthenticationController;
+import io.github.muer.web.IamAuthorizationController;
+import io.github.muer.web.IamSessionController;
+import io.github.muer.persistence.MyBatisAuthorizationProfileRepository;
+import io.github.muer.persistence.MyBatisAuthorizationVersionRepository;
+import io.github.muer.persistence.MyBatisPermissionTemplateVersionRepository;
+import io.github.muer.persistence.MyBatisSessionRepository;
+import io.github.muer.persistence.RedisTokenStore;
+import io.github.muer.autoconfigure.web.IamAuthorizationInterceptor;
+import io.github.muer.autoconfigure.web.IamAuthorizationFailureHandler;
+import io.github.muer.autoconfigure.web.ProblemDetailIamAuthorizationFailureHandler;
 import org.apache.ibatis.session.SqlSessionFactory;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.AfterEach;
@@ -53,10 +53,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class IamAutoConfigurationTest {
+class MuerAutoConfigurationTest {
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
             .withUserConfiguration(AdapterConfiguration.class)
-            .withConfiguration(org.springframework.boot.autoconfigure.AutoConfigurations.of(IamAutoConfiguration.class));
+            .withConfiguration(org.springframework.boot.autoconfigure.AutoConfigurations.of(MuerAutoConfiguration.class));
 
     @AfterEach
     void clearSecurityContext() {
@@ -66,11 +66,11 @@ class IamAutoConfigurationTest {
     @Test
     void enabled_configuration_registers_engine_authentication_and_bearer_filter() {
         contextRunner.withPropertyValues(
-                        "iam.enabled=true",
-                        "iam.token.ttl=4h",
-                        "iam.token.redis-prefix=custom-iam",
-                        "iam.session.touch-interval=3m",
-                        "iam.client-types=WEB,MOBILE")
+                        "muer.enabled=true",
+                        "muer.token.ttl=4h",
+                        "muer.token.redis-prefix=custom-iam",
+                        "muer.session.touch-interval=3m",
+                        "muer.client-types=WEB,MOBILE")
                 .run(context -> {
                     assertNotNull(context.getBean(AuthorizationEngine.class));
                     assertNotNull(context.getBean(IamBearerTokenFilter.class));
@@ -80,7 +80,7 @@ class IamAutoConfigurationTest {
                     assertNotNull(context.getBean(IamAuthorizationController.class));
                     assertNotNull(context.getBean(IamAdministrationController.class));
                     assertNotNull(context.getBean(IamSessionController.class));
-                    var properties = context.getBean(IamProperties.class);
+                    var properties = context.getBean(MuerProperties.class);
                     assertEquals(Duration.ofHours(4), properties.getToken().getTtl());
                     assertEquals("custom-iam", properties.getToken().getRedisPrefix());
                     assertEquals(Duration.ofMinutes(3), properties.getSession().getTouchInterval());
@@ -90,7 +90,7 @@ class IamAutoConfigurationTest {
 
     @Test
     void disabled_configuration_registers_no_runtime_components() {
-        contextRunner.withPropertyValues("iam.enabled=false")
+        contextRunner.withPropertyValues("muer.enabled=false")
                 .run(context -> {
                     assertFalse(context.containsBean("iamAuthorizationEngine"));
                     assertFalse(context.containsBean("iamBearerTokenFilter"));
@@ -99,32 +99,32 @@ class IamAutoConfigurationTest {
 
     @Test
     void rejects_a_non_positive_token_ttl_during_startup() {
-        contextRunner.withPropertyValues("iam.token.ttl=0s")
+        contextRunner.withPropertyValues("muer.token.ttl=0s")
                 .run(context -> assertNotNull(context.getStartupFailure()));
     }
 
     @Test
     void rejects_an_empty_login_client_type_allow_list_during_startup() {
-        contextRunner.withPropertyValues("iam.client-types=")
+        contextRunner.withPropertyValues("muer.client-types=")
                 .run(context -> assertNotNull(context.getStartupFailure()));
     }
 
     @Test
     void rejects_an_empty_redis_token_prefix_during_startup() {
-        contextRunner.withPropertyValues("iam.token.redis-prefix=")
+        contextRunner.withPropertyValues("muer.token.redis-prefix=")
                 .run(context -> assertNotNull(context.getStartupFailure()));
     }
 
     @Test
     void rejects_an_empty_schema_history_table_during_startup() {
-        contextRunner.withPropertyValues("iam.schema.history-table=")
+        contextRunner.withPropertyValues("muer.schema.history-table=")
                 .run(context -> assertNotNull(context.getStartupFailure()));
     }
 
     @Test
     void configured_client_types_reject_a_login_before_the_host_authenticator_runs() {
         contextRunner.withUserConfiguration(PermissiveIdentityConfiguration.class)
-                .withPropertyValues("iam.client-types=WEB")
+                .withPropertyValues("muer.client-types=WEB")
                 .run(context -> {
                     var authentication = context.getBean(AuthenticationService.class);
 
@@ -138,8 +138,8 @@ class IamAutoConfigurationTest {
     void schema_migration_can_be_disabled_for_a_host_managed_database() {
         new ApplicationContextRunner()
                 .withUserConfiguration(InfrastructureConfiguration.class)
-                .withConfiguration(org.springframework.boot.autoconfigure.AutoConfigurations.of(IamAutoConfiguration.class))
-                .withPropertyValues("iam.schema.enabled=false")
+                .withConfiguration(org.springframework.boot.autoconfigure.AutoConfigurations.of(MuerAutoConfiguration.class))
+                .withPropertyValues("muer.schema.enabled=false")
                 .run(context -> assertFalse(context.containsBean("iamSchemaMigrator")));
     }
 
@@ -147,8 +147,8 @@ class IamAutoConfigurationTest {
     void infrastructure_beans_activate_default_persistence_adapters() {
         new ApplicationContextRunner()
                 .withUserConfiguration(InfrastructureConfiguration.class)
-                .withConfiguration(org.springframework.boot.autoconfigure.AutoConfigurations.of(IamAutoConfiguration.class))
-                .withPropertyValues("iam.schema.enabled=false")
+                .withConfiguration(org.springframework.boot.autoconfigure.AutoConfigurations.of(MuerAutoConfiguration.class))
+                .withPropertyValues("muer.schema.enabled=false")
                 .run(context -> {
                     assertEquals(MyBatisAuthorizationProfileRepository.class,
                             context.getBean(AuthorizationProfileRepository.class).getClass());
@@ -169,7 +169,7 @@ class IamAutoConfigurationTest {
                 .withUserConfiguration(AdapterConfiguration.class)
                 .withConfiguration(org.springframework.boot.autoconfigure.AutoConfigurations.of(
                         SecurityAutoConfiguration.class, ServletWebSecurityAutoConfiguration.class,
-                        IamAutoConfiguration.class))
+                        MuerAutoConfiguration.class))
                 .run(context -> {
                     assertNotNull(context.getBean("iamSecurityFilterChain", SecurityFilterChain.class));
                     assertNotNull(context.getBean(IamAuthorizationInterceptor.class));
@@ -183,7 +183,7 @@ class IamAutoConfigurationTest {
                 .withUserConfiguration(AdapterConfiguration.class)
                 .withConfiguration(org.springframework.boot.autoconfigure.AutoConfigurations.of(
                         SecurityAutoConfiguration.class, ServletWebSecurityAutoConfiguration.class,
-                        IamAutoConfiguration.class))
+                        MuerAutoConfiguration.class))
                 .run(context -> assertEquals(ProblemDetailIamAuthorizationFailureHandler.class,
                         context.getBean(IamAuthorizationFailureHandler.class).getClass()));
     }
@@ -194,7 +194,7 @@ class IamAutoConfigurationTest {
                 .withUserConfiguration(AdapterConfiguration.class, CustomFailureHandlerConfiguration.class)
                 .withConfiguration(org.springframework.boot.autoconfigure.AutoConfigurations.of(
                         SecurityAutoConfiguration.class, ServletWebSecurityAutoConfiguration.class,
-                        IamAutoConfiguration.class))
+                        MuerAutoConfiguration.class))
                 .run(context -> {
                     assertTrue(context.containsBean("customFailureHandler"));
                     assertFalse(context.containsBean("iamAuthorizationFailureHandler"));

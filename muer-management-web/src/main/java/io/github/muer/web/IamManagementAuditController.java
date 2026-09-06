@@ -1,15 +1,15 @@
-package io.github.iamstarter.web;
+package io.github.muer.web;
 
-import io.github.iamstarter.audit.AuditEvent;
-import io.github.iamstarter.audit.AuditEventFilter;
-import io.github.iamstarter.audit.AuditEventPage;
-import io.github.iamstarter.audit.AuditQueryRepository;
-import io.github.iamstarter.audit.AuditSubjectLink;
-import io.github.iamstarter.authorization.AuthorizationEngine;
-import io.github.iamstarter.web.api.ManagementAuditApi;
-import io.github.iamstarter.web.dto.AuditEventListResponse;
-import io.github.iamstarter.web.dto.AuditEventResponse;
-import io.github.iamstarter.web.dto.AuditSubjectResponse;
+import io.github.muer.audit.AuditEvent;
+import io.github.muer.audit.AuditEventFilter;
+import io.github.muer.audit.AuditEventPage;
+import io.github.muer.audit.AuditQueryRepository;
+import io.github.muer.audit.AuditSubjectLink;
+import io.github.muer.authorization.AuthorizationEngine;
+import io.github.muer.web.api.ManagementAuditApi;
+import io.github.muer.web.dto.AuditEventListResponse;
+import io.github.muer.web.dto.AuditEventResponse;
+import io.github.muer.web.dto.AuditSubjectResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,8 +20,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-import static io.github.iamstarter.web.WebSecurity.allowedRead;
-import static io.github.iamstarter.web.WebSecurity.currentPrincipal;
+import static io.github.muer.web.WebSecurity.allowedRead;
+import static io.github.muer.web.WebSecurity.currentPrincipal;
 
 @RestController
 public class IamManagementAuditController implements ManagementAuditApi {

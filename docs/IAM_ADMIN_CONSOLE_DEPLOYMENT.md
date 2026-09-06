@@ -30,7 +30,7 @@ npm run build
 
 ## 2. 后端要求
 
-- Spring Boot 宿主应用引入 `iam-spring-boot-starter`，提供 MySQL（IAM schema 迁移）与 Redis。
+- Spring Boot 宿主应用引入 `muer-spring-boot-starter`，提供 MySQL（IAM schema 迁移）与 Redis。
 - 宿主提供 `IdentityAuthenticator` 与 `ResourceHierarchyProvider` 适配器；IAM 自己不做用户名/密码验证。
 - 管理端能访问 `/iam/**`，并拿到具有 `iam.admin.*` 权限的 Profile。
 - 每条 `/iam/admin/**` 请求仍由 `AuthorizationEngine` 按 Permission + Scope + Policy 重新授权。
@@ -97,7 +97,7 @@ server {
 
 可以由宿主应用或外部 Web Server 托管 `dist/`。生产环境更推荐独立静态服务器/CDN + 反向代理，而不是把前端构建工具带入后端运行环境。
 
-## 7. 本地手工启动（iam-example）
+## 7. 本地手工启动（muer-example）
 
 先准备：
 

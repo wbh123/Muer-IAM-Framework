@@ -1,14 +1,14 @@
-package io.github.iamstarter.example;
+package io.github.muer.example;
 
-import io.github.iamstarter.authentication.AuthenticationService;
-import io.github.iamstarter.authentication.LoginRequest;
-import io.github.iamstarter.authorization.AuthorizationEngine;
-import io.github.iamstarter.authorization.AuthorizationProfileRepository;
-import io.github.iamstarter.authorization.AuthorizationVersionRepository;
-import io.github.iamstarter.authorization.PermissionTemplateVersionRepository;
-import io.github.iamstarter.core.port.ResourceHierarchyProvider;
-import io.github.iamstarter.session.SessionRepository;
-import io.github.iamstarter.session.TokenStore;
+import io.github.muer.authentication.AuthenticationService;
+import io.github.muer.authentication.LoginRequest;
+import io.github.muer.authorization.AuthorizationEngine;
+import io.github.muer.authorization.AuthorizationProfileRepository;
+import io.github.muer.authorization.AuthorizationVersionRepository;
+import io.github.muer.authorization.PermissionTemplateVersionRepository;
+import io.github.muer.core.port.ResourceHierarchyProvider;
+import io.github.muer.session.SessionRepository;
+import io.github.muer.session.TokenStore;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -26,7 +26,7 @@ import static org.mockito.Mockito.mock;
 @SpringBootTest(
         classes = IamStarterAutoConfigurationSmokeTest.ConsumerApplication.class,
         webEnvironment = SpringBootTest.WebEnvironment.NONE,
-        properties = "iam.schema.enabled=false")
+        properties = "muer.schema.enabled=false")
 class IamStarterAutoConfigurationSmokeTest {
     @Test
     void operator_a_demo_credentials_resolve_to_the_reader_501_principal() {

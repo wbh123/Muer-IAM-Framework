@@ -1,13 +1,13 @@
-package io.github.iamstarter.authentication;
+package io.github.muer.authentication;
 
-import io.github.iamstarter.core.model.IamPrincipal;
-import io.github.iamstarter.session.TokenRecord;
-import io.github.iamstarter.session.TokenStore;
-import io.github.iamstarter.session.AuthSession;
-import io.github.iamstarter.session.SessionRepository;
-import io.github.iamstarter.session.LoginEvent;
-import io.github.iamstarter.session.LoginEventRepository;
-import io.github.iamstarter.session.LoginResult;
+import io.github.muer.core.model.IamPrincipal;
+import io.github.muer.session.TokenRecord;
+import io.github.muer.session.TokenStore;
+import io.github.muer.session.AuthSession;
+import io.github.muer.session.SessionRepository;
+import io.github.muer.session.LoginEvent;
+import io.github.muer.session.LoginEventRepository;
+import io.github.muer.session.LoginResult;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;

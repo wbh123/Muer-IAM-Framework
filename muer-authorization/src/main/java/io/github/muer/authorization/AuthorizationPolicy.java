@@ -1,6 +1,6 @@
-package io.github.iamstarter.authorization;
+package io.github.muer.authorization;
 
-import io.github.iamstarter.core.model.IamPrincipal;
+import io.github.muer.core.model.IamPrincipal;
 
 @FunctionalInterface
 public interface AuthorizationPolicy {

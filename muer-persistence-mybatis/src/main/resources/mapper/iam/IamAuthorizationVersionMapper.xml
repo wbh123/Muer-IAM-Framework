@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="io.github.iamstarter.persistence.mapper.IamAuthorizationVersionMapper">
+<mapper namespace="io.github.muer.persistence.mapper.IamAuthorizationVersionMapper">
     <select id="findVersion" resultType="java.lang.Long">
         SELECT authorization_version
         FROM iam_user

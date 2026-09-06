@@ -1,4 +1,4 @@
-package io.github.iamstarter.persistence.mapper;
+package io.github.muer.persistence.mapper;
 
 import org.apache.ibatis.annotations.Param;
 

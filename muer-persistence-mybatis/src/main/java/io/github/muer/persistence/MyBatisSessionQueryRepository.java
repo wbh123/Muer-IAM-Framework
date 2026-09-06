@@ -1,8 +1,8 @@
-package io.github.iamstarter.persistence;
+package io.github.muer.persistence;
 
-import io.github.iamstarter.persistence.mapper.IamSessionMapper;
-import io.github.iamstarter.session.AuthSession;
-import io.github.iamstarter.session.SessionQueryRepository;
+import io.github.muer.persistence.mapper.IamSessionMapper;
+import io.github.muer.session.AuthSession;
+import io.github.muer.session.SessionQueryRepository;
 import org.apache.ibatis.session.SqlSessionFactory;
 
 import java.time.Instant;

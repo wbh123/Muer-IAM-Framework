@@ -29,8 +29,8 @@ Alice 默认登录得到 `IamPrincipal(userId=101, activeProfileId=401, template
 
 ## 源码
 
-- `AuthorizationProfile`：https://github.com/wbh123/iam/blob/main/iam-authorization/src/main/java/io/github/iamstarter/authorization/
-- `IamPrincipal`：https://github.com/wbh123/iam/blob/main/iam-core/src/main/java/io/github/iamstarter/core/model/IamPrincipal.java
-- 演示种子：`iam-example/src/main/java/io/github/iamstarter/example/`
+- `AuthorizationProfile`：https://github.com/wbh123/iam/blob/main/muer-authorization/src/main/java/io/github/iamstarter/authorization/
+- `IamPrincipal`：https://github.com/wbh123/iam/blob/main/muer-core/src/main/java/io/github/iamstarter/core/model/IamPrincipal.java
+- 演示种子：`muer-example/src/main/java/io/github/iamstarter/example/`
 
 当前版本：`0.1.0-SNAPSHOT`（Release Candidate），尚未发布。

@@ -1,12 +1,12 @@
-package io.github.iamstarter.persistence;
+package io.github.muer.persistence;
 
-import io.github.iamstarter.authorization.PermissionSummary;
-import io.github.iamstarter.authorization.PermissionSummaryPage;
-import io.github.iamstarter.authorization.PermissionTemplate;
-import io.github.iamstarter.authorization.PermissionTemplateQueryRepository;
-import io.github.iamstarter.authorization.PermissionTemplateVersion;
-import io.github.iamstarter.authorization.TemplateVersionStatus;
-import io.github.iamstarter.persistence.mapper.IamPermissionTemplateQueryMapper;
+import io.github.muer.authorization.PermissionSummary;
+import io.github.muer.authorization.PermissionSummaryPage;
+import io.github.muer.authorization.PermissionTemplate;
+import io.github.muer.authorization.PermissionTemplateQueryRepository;
+import io.github.muer.authorization.PermissionTemplateVersion;
+import io.github.muer.authorization.TemplateVersionStatus;
+import io.github.muer.persistence.mapper.IamPermissionTemplateQueryMapper;
 import org.apache.ibatis.session.SqlSessionFactory;
 
 import java.util.ArrayList;

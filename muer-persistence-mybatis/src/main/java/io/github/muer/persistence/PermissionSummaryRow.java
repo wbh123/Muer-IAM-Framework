@@ -1,6 +1,6 @@
-package io.github.iamstarter.persistence;
+package io.github.muer.persistence;
 
-import io.github.iamstarter.authorization.PermissionSummary;
+import io.github.muer.authorization.PermissionSummary;
 
 public record PermissionSummaryRow(long permissionId, String permissionCode, String displayName,
                                    String description, boolean enabled, long inUseCount) {

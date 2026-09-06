@@ -1,7 +1,7 @@
-package io.github.iamstarter.example;
+package io.github.muer.example;
 
-import io.github.iamstarter.autoconfigure.web.RequirePermission;
-import io.github.iamstarter.core.model.ScopeAccess;
+import io.github.muer.autoconfigure.web.RequirePermission;
+import io.github.muer.core.model.ScopeAccess;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

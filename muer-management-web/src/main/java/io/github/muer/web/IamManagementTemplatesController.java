@@ -1,17 +1,17 @@
-package io.github.iamstarter.web;
+package io.github.muer.web;
 
-import io.github.iamstarter.authorization.AuthorizationEngine;
-import io.github.iamstarter.authorization.PermissionSummaryPage;
-import io.github.iamstarter.authorization.PermissionTemplate;
-import io.github.iamstarter.authorization.PermissionTemplateQueryRepository;
-import io.github.iamstarter.authorization.PermissionTemplateVersion;
-import io.github.iamstarter.authorization.TemplateVersionStatus;
-import io.github.iamstarter.web.api.ManagementPermissionsApi;
-import io.github.iamstarter.web.api.ManagementTemplatesApi;
-import io.github.iamstarter.web.dto.PermissionListResponse;
-import io.github.iamstarter.web.dto.PermissionTemplateListResponse;
-import io.github.iamstarter.web.dto.PermissionTemplateSummary;
-import io.github.iamstarter.web.dto.PermissionTemplateVersionResponse;
+import io.github.muer.authorization.AuthorizationEngine;
+import io.github.muer.authorization.PermissionSummaryPage;
+import io.github.muer.authorization.PermissionTemplate;
+import io.github.muer.authorization.PermissionTemplateQueryRepository;
+import io.github.muer.authorization.PermissionTemplateVersion;
+import io.github.muer.authorization.TemplateVersionStatus;
+import io.github.muer.web.api.ManagementPermissionsApi;
+import io.github.muer.web.api.ManagementTemplatesApi;
+import io.github.muer.web.dto.PermissionListResponse;
+import io.github.muer.web.dto.PermissionTemplateListResponse;
+import io.github.muer.web.dto.PermissionTemplateSummary;
+import io.github.muer.web.dto.PermissionTemplateVersionResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,8 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static io.github.iamstarter.web.WebSecurity.allowedRead;
-import static io.github.iamstarter.web.WebSecurity.currentPrincipal;
+import static io.github.muer.web.WebSecurity.allowedRead;
+import static io.github.muer.web.WebSecurity.currentPrincipal;
 
 @RestController
 public class IamManagementTemplatesController implements ManagementTemplatesApi, ManagementPermissionsApi {
@@ -107,9 +107,9 @@ public class IamManagementTemplatesController implements ManagementTemplatesApi,
         int pageSize = limit == null ? 50 : limit;
         PermissionSummaryPage page = templates.listPermissions(keyword, domain,
                 afterId == null ? 0L : afterId, pageSize);
-        var items = new ArrayList<io.github.iamstarter.web.dto.PermissionSummary>(page.items().size());
+        var items = new ArrayList<io.github.muer.web.dto.PermissionSummary>(page.items().size());
         for (var summary : page.items()) {
-            items.add(new io.github.iamstarter.web.dto.PermissionSummary(
+            items.add(new io.github.muer.web.dto.PermissionSummary(
                     summary.permissionCode(), summary.displayName(), summary.description(),
                     summary.enabled(), summary.inUseCount()));
         }

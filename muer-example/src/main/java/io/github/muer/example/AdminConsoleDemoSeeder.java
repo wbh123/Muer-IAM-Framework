@@ -1,4 +1,4 @@
-package io.github.iamstarter.example;
+package io.github.muer.example;
 
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -11,8 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringJoiner;
 
-import static io.github.iamstarter.example.AdminDemoSeedConstants.ADMIN_PERMISSIONS;
-import static io.github.iamstarter.example.AdminDemoSeedConstants.PERMISSION_ID_BASE;
+import static io.github.muer.example.AdminDemoSeedConstants.ADMIN_PERMISSIONS;
+import static io.github.muer.example.AdminDemoSeedConstants.PERMISSION_ID_BASE;
 
 /**
  * Creates the explicit opt-in IAM Admin Console demo administrator for the
@@ -23,7 +23,7 @@ import static io.github.iamstarter.example.AdminDemoSeedConstants.PERMISSION_ID_
  */
 @Component
 @Profile("dev")
-@ConditionalOnProperty(prefix = "iam.example", name = "seed-admin", havingValue = "true")
+@ConditionalOnProperty(prefix = "muer.example", name = "seed-admin", havingValue = "true")
 final class AdminConsoleDemoSeeder implements ApplicationRunner {
     private final JdbcTemplate jdbc;
 

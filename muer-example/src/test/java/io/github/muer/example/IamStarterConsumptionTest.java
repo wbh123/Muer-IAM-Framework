@@ -1,10 +1,10 @@
-package io.github.iamstarter.example;
+package io.github.muer.example;
 
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
-import io.github.iamstarter.authentication.AuthenticationService;
-import io.github.iamstarter.session.SessionRepository;
-import io.github.iamstarter.web.dto.AuthorizationEvaluationRequest;
+import io.github.muer.authentication.AuthenticationService;
+import io.github.muer.session.SessionRepository;
+import io.github.muer.web.dto.AuthorizationEvaluationRequest;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

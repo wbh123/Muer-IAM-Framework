@@ -1,18 +1,18 @@
-package io.github.iamstarter.web;
+package io.github.muer.web;
 
-import io.github.iamstarter.authorization.AuthorizationRequest;
-import io.github.iamstarter.authorization.AuthorizationProfile;
-import io.github.iamstarter.authorization.AuthorizationProfileService;
-import io.github.iamstarter.authentication.AuthorizationProfileSwitchService;
-import io.github.iamstarter.core.model.IamPrincipal;
-import io.github.iamstarter.core.model.ResourceDescriptor;
-import io.github.iamstarter.core.model.ScopeAccess;
-import io.github.iamstarter.diagnostics.AuthorizationDiagnosticsService;
-import io.github.iamstarter.web.api.AuthorizationApi;
-import io.github.iamstarter.web.dto.AuthorizationDecisionResponse;
-import io.github.iamstarter.web.dto.AuthorizationEvaluationRequest;
-import io.github.iamstarter.web.dto.AuthorizationProfileResponse;
-import io.github.iamstarter.web.dto.LoginResponse;
+import io.github.muer.authorization.AuthorizationRequest;
+import io.github.muer.authorization.AuthorizationProfile;
+import io.github.muer.authorization.AuthorizationProfileService;
+import io.github.muer.authentication.AuthorizationProfileSwitchService;
+import io.github.muer.core.model.IamPrincipal;
+import io.github.muer.core.model.ResourceDescriptor;
+import io.github.muer.core.model.ScopeAccess;
+import io.github.muer.diagnostics.AuthorizationDiagnosticsService;
+import io.github.muer.web.api.AuthorizationApi;
+import io.github.muer.web.dto.AuthorizationDecisionResponse;
+import io.github.muer.web.dto.AuthorizationEvaluationRequest;
+import io.github.muer.web.dto.AuthorizationProfileResponse;
+import io.github.muer.web.dto.LoginResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -56,7 +56,7 @@ public class IamAuthorizationController implements AuthorizationApi {
                 ScopeAccess.valueOf(request.getScopeAccess().getValue()));
         var decision = diagnostics.evaluate(principal, authorizationRequest);
         var steps = decision.steps().stream()
-                .map(step -> new io.github.iamstarter.web.dto.AuthorizationDecisionStep(
+                .map(step -> new io.github.muer.web.dto.AuthorizationDecisionStep(
                         step.code(), step.passed(), step.reason()))
                 .toList();
         return ResponseEntity.ok(new AuthorizationDecisionResponse(
@@ -99,9 +99,9 @@ public class IamAuthorizationController implements AuthorizationApi {
     private static AuthorizationProfileResponse toResponse(AuthorizationProfile profile) {
         var clientTypes = profile.clientTypes().stream().sorted().toList();
         var scopes = profile.scopes().stream()
-                .map(scope -> new io.github.iamstarter.web.dto.ResourceScope(
+                .map(scope -> new io.github.muer.web.dto.ResourceScope(
                         scope.scopeType(), scope.scopeRefId(),
-                        io.github.iamstarter.web.dto.ResourceScope.AccessModeEnum.fromValue(scope.accessMode().name())))
+                        io.github.muer.web.dto.ResourceScope.AccessModeEnum.fromValue(scope.accessMode().name())))
                 .toList();
         var response = new AuthorizationProfileResponse(
                 profile.profileId(), profile.userId(), profile.profileName(), profile.templateVersionId(),
@@ -111,8 +111,8 @@ public class IamAuthorizationController implements AuthorizationApi {
         return response;
     }
 
-    private static io.github.iamstarter.web.dto.PrincipalResponse toResponse(IamPrincipal principal) {
-        return new io.github.iamstarter.web.dto.PrincipalResponse(
+    private static io.github.muer.web.dto.PrincipalResponse toResponse(IamPrincipal principal) {
+        return new io.github.muer.web.dto.PrincipalResponse(
                 principal.userId(), principal.identityId(), principal.identityDomain(),
                 principal.clientType(), principal.authorizationVersion())
                 .activeProfileId(principal.activeProfileId())

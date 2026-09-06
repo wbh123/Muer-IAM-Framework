@@ -1,8 +1,8 @@
-package io.github.iamstarter.example;
+package io.github.muer.example;
 
-import io.github.iamstarter.core.model.ResourceDescriptor;
-import io.github.iamstarter.core.model.ResourceScope;
-import io.github.iamstarter.core.port.ResourceHierarchyProvider;
+import io.github.muer.core.model.ResourceDescriptor;
+import io.github.muer.core.model.ResourceScope;
+import io.github.muer.core.port.ResourceHierarchyProvider;
 import org.springframework.stereotype.Component;
 
 @Component

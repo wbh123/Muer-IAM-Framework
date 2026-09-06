@@ -11,14 +11,14 @@ sidebar:
 
 ## 字段定义（真实）
 
-`authorizationVersion` 是 `IamPrincipal` 的最后一个组件，类型为整数，校验约束为 **`>= 0`**（源码 [IamPrincipal.java](https://github.com/wbh123/iam/blob/main/iam-core/src/main/java/io/github/iamstarter/core/model/IamPrincipal.java)）：
+`authorizationVersion` 是 `IamPrincipal` 的最后一个组件，类型为整数，校验约束为 **`>= 0`**（源码 [IamPrincipal.java](https://github.com/wbh123/iam/blob/main/muer-core/src/main/java/io/github/iamstarter/core/model/IamPrincipal.java)）：
 
 ```
 userId, identityId, identityDomain, activeProfileId(Long),
 templateVersionId(Long), clientType, authorizationVersion
 ```
 
-演示账号 alice 登录后该值为 `0`（源码 [ExampleIdentityAdapter](https://github.com/wbh123/iam/blob/main/iam-example/src/main/java/io/github/iamstarter/example/ExampleIdentityAdapter.java)）。
+演示账号 alice 登录后该值为 `0`（源码 [ExampleIdentityAdapter](https://github.com/wbh123/iam/blob/main/muer-example/src/main/java/io/github/iamstarter/example/ExampleIdentityAdapter.java)）。
 
 ## 管理端点
 
@@ -28,7 +28,7 @@ templateVersionId(Long), clientType, authorizationVersion
 POST /iam/admin/users/{userId}/authorization-version
 ```
 
-该管理接口受对应的 `iam.admin.*` permission 授权检查（见 [OpenAPI](https://github.com/wbh123/iam/blob/main/iam-management-web/src/main/resources/openapi/iam.yaml)）。
+该管理接口受对应的 `iam.admin.*` permission 授权检查（见 [OpenAPI](https://github.com/wbh123/iam/blob/main/muer-management-web/src/main/resources/openapi/iam.yaml)）。
 
 ## 与缓存的关系
 

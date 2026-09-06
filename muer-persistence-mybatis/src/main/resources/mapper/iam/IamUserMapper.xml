@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="io.github.iamstarter.persistence.mapper.IamUserMapper">
-    <resultMap id="iamUser" type="io.github.iamstarter.core.model.IamUser">
+<mapper namespace="io.github.muer.persistence.mapper.IamUserMapper">
+    <resultMap id="iamUser" type="io.github.muer.core.model.IamUser">
         <constructor>
             <arg column="id" javaType="_long"/>
             <arg column="username" javaType="java.lang.String"/>

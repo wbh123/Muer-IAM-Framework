@@ -1,8 +1,8 @@
-package io.github.iamstarter.persistence;
+package io.github.muer.persistence;
 
-import io.github.iamstarter.persistence.mapper.IamLoginEventMapper;
-import io.github.iamstarter.session.LoginEvent;
-import io.github.iamstarter.session.LoginEventRepository;
+import io.github.muer.persistence.mapper.IamLoginEventMapper;
+import io.github.muer.session.LoginEvent;
+import io.github.muer.session.LoginEventRepository;
 import org.apache.ibatis.session.SqlSessionFactory;
 
 import java.util.Objects;

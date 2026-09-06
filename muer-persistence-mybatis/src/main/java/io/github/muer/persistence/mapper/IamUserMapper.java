@@ -1,6 +1,6 @@
-package io.github.iamstarter.persistence.mapper;
+package io.github.muer.persistence.mapper;
 
-import io.github.iamstarter.core.model.IamUser;
+import io.github.muer.core.model.IamUser;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;

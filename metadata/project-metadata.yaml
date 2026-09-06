@@ -3,7 +3,7 @@ project:
   repositoryName: IAM-Spring-Boot-Starter
   description: Reusable identity and access management starter for Spring Boot.
 coordinates:
-  groupId: io.github.iamstarter
+  groupId: io.github.muer
   version: 0.1.0-SNAPSHOT
 java:
-  basePackage: io.github.iamstarter
+  basePackage: io.github.muer

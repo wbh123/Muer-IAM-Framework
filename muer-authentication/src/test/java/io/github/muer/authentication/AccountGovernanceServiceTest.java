@@ -1,11 +1,11 @@
-package io.github.iamstarter.authentication;
+package io.github.muer.authentication;
 
-import io.github.iamstarter.authorization.AuthorizationVersionRepository;
-import io.github.iamstarter.authorization.AuthorizationVersionService;
-import io.github.iamstarter.core.model.IamUser;
-import io.github.iamstarter.core.model.Identity;
-import io.github.iamstarter.core.port.IamUserRepository;
-import io.github.iamstarter.core.port.IdentityRepository;
+import io.github.muer.authorization.AuthorizationVersionRepository;
+import io.github.muer.authorization.AuthorizationVersionService;
+import io.github.muer.core.model.IamUser;
+import io.github.muer.core.model.Identity;
+import io.github.muer.core.port.IamUserRepository;
+import io.github.muer.core.port.IdentityRepository;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;

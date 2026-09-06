@@ -1,6 +1,6 @@
-package io.github.iamstarter.session;
+package io.github.muer.session;
 
-import io.github.iamstarter.core.model.IamPrincipal;
+import io.github.muer.core.model.IamPrincipal;
 
 import java.time.Instant;
 import java.util.Objects;

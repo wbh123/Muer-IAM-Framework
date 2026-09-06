@@ -1,9 +1,9 @@
-package io.github.iamstarter.persistence.mapper;
+package io.github.muer.persistence.mapper;
 
-import io.github.iamstarter.authorization.PermissionTemplateVersion;
-import io.github.iamstarter.authorization.TemplateVersionStatus;
-import io.github.iamstarter.persistence.PermissionSummaryRow;
-import io.github.iamstarter.persistence.PermissionTemplateRow;
+import io.github.muer.authorization.PermissionTemplateVersion;
+import io.github.muer.authorization.TemplateVersionStatus;
+import io.github.muer.persistence.PermissionSummaryRow;
+import io.github.muer.persistence.PermissionTemplateRow;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;

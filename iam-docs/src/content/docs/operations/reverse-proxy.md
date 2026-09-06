@@ -32,7 +32,7 @@ location /iam/ {
 
 ## 源码
 
-- `LoginRequest`：https://github.com/wbh123/iam/blob/main/iam-authentication/src/main/java/io/github/iamstarter/authentication/
-- OpenAPI：https://github.com/wbh123/iam/blob/main/iam-management-web/src/main/resources/openapi/iam.yaml
+- `LoginRequest`：https://github.com/wbh123/iam/blob/main/muer-authentication/src/main/java/io/github/iamstarter/authentication/
+- OpenAPI：https://github.com/wbh123/iam/blob/main/muer-management-web/src/main/resources/openapi/iam.yaml
 
 当前版本：`0.1.0-SNAPSHOT`（Release Candidate），尚未发布。

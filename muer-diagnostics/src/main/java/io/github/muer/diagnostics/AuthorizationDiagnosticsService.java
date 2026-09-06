@@ -1,8 +1,8 @@
-package io.github.iamstarter.diagnostics;
+package io.github.muer.diagnostics;
 
-import io.github.iamstarter.authorization.AuthorizationEngine;
-import io.github.iamstarter.authorization.AuthorizationRequest;
-import io.github.iamstarter.core.model.IamPrincipal;
+import io.github.muer.authorization.AuthorizationEngine;
+import io.github.muer.authorization.AuthorizationRequest;
+import io.github.muer.core.model.IamPrincipal;
 
 import java.util.Objects;
 

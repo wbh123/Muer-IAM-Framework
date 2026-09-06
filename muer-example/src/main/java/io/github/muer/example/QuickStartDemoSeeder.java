@@ -1,4 +1,4 @@
-package io.github.iamstarter.example;
+package io.github.muer.example;
 
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Profile("dev")
-@ConditionalOnProperty(prefix = "iam.example", name = "seed-demo", havingValue = "true")
+@ConditionalOnProperty(prefix = "muer.example", name = "seed-demo", havingValue = "true")
 final class QuickStartDemoSeeder implements ApplicationRunner {
     private final JdbcTemplate jdbc;
     private final DocumentCatalog documents;

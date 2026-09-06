@@ -6,8 +6,8 @@ A consuming Spring Boot application declares one IAM production dependency:
 
 ```xml
 <dependency>
-    <groupId>io.github.iamstarter</groupId>
-    <artifactId>iam-spring-boot-starter</artifactId>
+    <groupId>io.github.muer</groupId>
+    <artifactId>muer-spring-boot-starter</artifactId>
     <version>0.1.0-SNAPSHOT</version>
 </dependency>
 ```
@@ -125,7 +125,7 @@ The starter contributes a stateless security chain only for `/iam/**`:
 - the IAM filter is disabled as a global servlet filter;
 - the host remains responsible for security rules outside `/iam/**`.
 
-The complete contract is in `iam-management-web/src/main/resources/openapi/iam.yaml`.
+The complete contract is in `muer-management-web/src/main/resources/openapi/iam.yaml`.
 
 For deployment verification, users normally only need to confirm:
 

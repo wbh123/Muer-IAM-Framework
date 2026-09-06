@@ -1,7 +1,7 @@
-package io.github.iamstarter.authorization;
+package io.github.muer.authorization;
 
-import io.github.iamstarter.core.model.ResourceScope;
-import io.github.iamstarter.core.model.IamPrincipal;
+import io.github.muer.core.model.ResourceScope;
+import io.github.muer.core.model.IamPrincipal;
 
 import java.time.Clock;
 import java.util.List;

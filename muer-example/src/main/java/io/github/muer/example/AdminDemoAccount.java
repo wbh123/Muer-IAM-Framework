@@ -1,6 +1,6 @@
-package io.github.iamstarter.example;
+package io.github.muer.example;
 
-import io.github.iamstarter.core.model.IamPrincipal;
+import io.github.muer.core.model.IamPrincipal;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Profile("dev")
-@ConditionalOnProperty(prefix = "iam.example", name = "seed-admin", havingValue = "true")
+@ConditionalOnProperty(prefix = "muer.example", name = "seed-admin", havingValue = "true")
 final class AdminDemoAccount {
     AppUser user() {
         return new AppUser(AdminDemoSeedConstants.USER_ID, AdminDemoSeedConstants.USERNAME,

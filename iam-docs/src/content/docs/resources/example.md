@@ -7,7 +7,7 @@ sidebar:
 
 ## 演示用户
 
-`iam-example` 的 `ExampleIdentityAdapter` 提供：
+`muer-example` 的 `ExampleIdentityAdapter` 提供：
 
 - `alice` / 密码 `demo-pass` / `clientType=WEB` → 登录默认得到 `IamPrincipal(userId=101, activeProfileId=401, templateVersionId=301)`。
 - `author-a` → 独立消费身份 `app-user-101`，editor 模板 302。
@@ -34,4 +34,4 @@ alice 默认（401）只能读 project 101 内文档；`POST`（需 WRITE）被�
 
 ## 源码参考
 
-- 演示：<https://github.com/wbh123/iam/blob/main/iam-example/src/main/java/io/github/iamstarter/example/>
+- 演示：<https://github.com/wbh123/iam/blob/main/muer-example/src/main/java/io/github/iamstarter/example/>

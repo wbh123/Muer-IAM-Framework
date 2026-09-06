@@ -11,14 +11,14 @@ IAM 源码位于 GitHub：<https://github.com/wbh123/iam>（分支 `main`）。
 
 ## 模块约定
 
-- 核心模型放 `iam-core`，端口（如 `ResourceHierarchyProvider`）以接口形式暴露，由宿主或装配层实现。
-- 认证/授权/会话逻辑分别在 `iam-authentication`/`iam-authorization`/`iam-session`。
-- Spring 装配与 Web 契约放 `iam-spring-boot-autoconfigure`；HTTP 端点与 `openapi/iam.yaml` 放 `iam-management-web`。
+- 核心模型放 `muer-core`，端口（如 `ResourceHierarchyProvider`）以接口形式暴露，由宿主或装配层实现。
+- 认证/授权/会话逻辑分别在 `muer-authentication`/`muer-authorization`/`muer-session`。
+- Spring 装配与 Web 契约放 `muer-spring-boot-autoconfigure`；HTTP 端点与 `openapi/iam.yaml` 放 `muer-management-web`。
 
 ## 开发流程
 
 1. Fork 并在 `main` 切出特性分支。
-2. 本地以 `dev`  profile + `iam.example.seed-demo=true` 启动 `iam-example`，用 alice/demo-pass 验证。
+2. 本地以 `dev`  profile + `iam.example.seed-demo=true` 启动 `muer-example`，用 alice/demo-pass 验证。
 3. 保持 API 与本文档站一致：新增/修改端点须同步更新 `iam.yaml` 与 `src/content/docs/`。
 4. 提交信息清晰说明动机与影响范围。
 

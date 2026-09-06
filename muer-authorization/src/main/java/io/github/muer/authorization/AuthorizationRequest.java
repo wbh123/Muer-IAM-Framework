@@ -1,7 +1,7 @@
-package io.github.iamstarter.authorization;
+package io.github.muer.authorization;
 
-import io.github.iamstarter.core.model.ResourceDescriptor;
-import io.github.iamstarter.core.model.ScopeAccess;
+import io.github.muer.core.model.ResourceDescriptor;
+import io.github.muer.core.model.ScopeAccess;
 
 import java.util.Objects;
 

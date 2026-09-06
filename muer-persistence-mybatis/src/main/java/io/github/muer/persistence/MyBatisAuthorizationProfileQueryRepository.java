@@ -1,8 +1,8 @@
-package io.github.iamstarter.persistence;
+package io.github.muer.persistence;
 
-import io.github.iamstarter.authorization.AuthorizationProfile;
-import io.github.iamstarter.authorization.AuthorizationProfileQueryRepository;
-import io.github.iamstarter.persistence.mapper.IamAuthorizationProfileMapper;
+import io.github.muer.authorization.AuthorizationProfile;
+import io.github.muer.authorization.AuthorizationProfileQueryRepository;
+import io.github.muer.persistence.mapper.IamAuthorizationProfileMapper;
 import org.apache.ibatis.session.SqlSessionFactory;
 
 import java.util.List;

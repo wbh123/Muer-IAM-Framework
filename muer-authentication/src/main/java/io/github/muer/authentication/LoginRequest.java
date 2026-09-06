@@ -1,4 +1,4 @@
-package io.github.iamstarter.authentication;
+package io.github.muer.authentication;
 
 public record LoginRequest(String username, String password, String clientType, String clientInstance,
                            String ipAddress, String userAgent, String deviceType, String osName,

@@ -1,4 +1,4 @@
-package io.github.iamstarter.autoconfigure;
+package io.github.muer.autoconfigure;
 
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.configuration.FluentConfiguration;
@@ -11,7 +11,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class IamSchemaMigratorTest {
+class MuerSchemaMigratorTest {
     @Test
     void migrates_only_the_namespaced_iam_location_with_its_own_history_table() {
         var dataSource = mock(DataSource.class);
@@ -22,7 +22,7 @@ class IamSchemaMigratorTest {
         when(configuration.table("iam_flyway_schema_history")).thenReturn(configuration);
         when(configuration.load()).thenReturn(flyway);
 
-        new IamSchemaMigrator(dataSource, "iam_flyway_schema_history", () -> configuration).migrate();
+        new MuerSchemaMigrator(dataSource, "iam_flyway_schema_history", () -> configuration).migrate();
 
         verify(configuration).dataSource(dataSource);
         verify(configuration).locations("classpath:db/iam/migration");
@@ -33,6 +33,6 @@ class IamSchemaMigratorTest {
     @Test
     void rejects_an_unsafe_history_table_identifier() {
         assertThrows(IllegalArgumentException.class,
-                () -> new IamSchemaMigrator(mock(DataSource.class), "history; DROP TABLE account"));
+                () -> new MuerSchemaMigrator(mock(DataSource.class), "history; DROP TABLE account"));
     }
 }

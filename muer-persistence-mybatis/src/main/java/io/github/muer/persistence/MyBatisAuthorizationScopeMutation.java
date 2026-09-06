@@ -1,9 +1,9 @@
-package io.github.iamstarter.persistence;
+package io.github.muer.persistence;
 
-import io.github.iamstarter.authorization.AuthorizationScopeMutation;
-import io.github.iamstarter.core.model.ResourceScope;
-import io.github.iamstarter.persistence.mapper.IamAuthorizationProfileMapper;
-import io.github.iamstarter.persistence.mapper.IamAuthorizationVersionMapper;
+import io.github.muer.authorization.AuthorizationScopeMutation;
+import io.github.muer.core.model.ResourceScope;
+import io.github.muer.persistence.mapper.IamAuthorizationProfileMapper;
+import io.github.muer.persistence.mapper.IamAuthorizationVersionMapper;
 import org.apache.ibatis.session.SqlSessionFactory;
 
 import java.util.List;

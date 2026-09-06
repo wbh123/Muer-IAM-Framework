@@ -1,11 +1,11 @@
-package io.github.iamstarter.persistence;
+package io.github.muer.persistence;
 
-import io.github.iamstarter.audit.AuditEvent;
-import io.github.iamstarter.audit.AuditEventFilter;
-import io.github.iamstarter.audit.AuditEventPage;
-import io.github.iamstarter.audit.AuditQueryRepository;
-import io.github.iamstarter.audit.AuditSubjectLink;
-import io.github.iamstarter.persistence.mapper.IamAuditMapper;
+import io.github.muer.audit.AuditEvent;
+import io.github.muer.audit.AuditEventFilter;
+import io.github.muer.audit.AuditEventPage;
+import io.github.muer.audit.AuditQueryRepository;
+import io.github.muer.audit.AuditSubjectLink;
+import io.github.muer.persistence.mapper.IamAuditMapper;
 import org.apache.ibatis.session.SqlSessionFactory;
 
 import java.util.ArrayList;

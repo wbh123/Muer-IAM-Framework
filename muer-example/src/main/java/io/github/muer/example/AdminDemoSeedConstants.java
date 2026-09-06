@@ -1,4 +1,4 @@
-package io.github.iamstarter.example;
+package io.github.muer.example;
 
 import java.util.LinkedHashMap;
 import java.util.List;

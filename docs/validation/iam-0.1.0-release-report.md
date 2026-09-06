@@ -19,7 +19,7 @@ This report is a documentation-only follow-up and does not change product runtim
 
 0.1.0 is defined as the first complete product baseline and contains:
 
-- `iam-spring-boot-starter` and Spring Boot auto-configuration;
+- `muer-spring-boot-starter` and Spring Boot auto-configuration;
 - host-owned credential authentication through `IdentityAuthenticator`;
 - opaque token issuance, durable MySQL Session state and Redis token index;
 - Permission, immutable Permission Template Version, Profile and Resource Scope authorization;
@@ -93,7 +93,7 @@ Security and compatibility boundaries reviewed before merge:
 
 ## Administrator bootstrap
 
-`iam-example` provides an explicit development-only administrator for manual Console acceptance only when **both** conditions hold:
+`muer-example` provides an explicit development-only administrator for manual Console acceptance only when **both** conditions hold:
 
 ```text
 SPRING_PROFILES_ACTIVE=dev

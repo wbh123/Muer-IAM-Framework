@@ -115,8 +115,8 @@ iam:
 
 ```xml
 <dependency>
-    <groupId>io.github.iamstarter</groupId>
-    <artifactId>iam-spring-boot-starter</artifactId>
+    <groupId>io.github.muer</groupId>
+    <artifactId>muer-spring-boot-starter</artifactId>
     <version>0.1.0-SNAPSHOT</version>
 </dependency>
 ```
@@ -211,7 +211,7 @@ IAM 负责“这个 Principal 是否有权访问这个 Resource”，宿主系�
 
 ### 9.3 声明式权限示例
 
-以 `iam-example` 的 Document 场景为例：
+以 `muer-example` 的 Document 场景为例：
 
 | 请求 | Reader Profile | Editor Profile | 说明 |
 | --- | --- | --- | --- |
@@ -268,7 +268,7 @@ Profile Switch **不会提升或覆盖原 Token**。原 Reader Token 仍然保�
 
 ## 10. 如果想直接运行仓库示例
 
-`iam-example` 已经提供 Alice / Reader / Editor 的演示数据。你可以：
+`muer-example` 已经提供 Alice / Reader / Editor 的演示数据。你可以：
 
 1. 手动准备一个空 MySQL 数据库和一个可用 Redis；
 2. 配置以下环境变量或在 IDE Run Configuration 中填写同等配置；
@@ -297,7 +297,7 @@ Profile Switch **不会提升或覆盖原 Token**。原 Reader Token 仍然保�
 
 ### 11.1 准备本地管理员
 
-若使用 `iam-example` 验收控制台，可在**专用开发数据库**中显式开启管理员种子：
+若使用 `muer-example` 验收控制台，可在**专用开发数据库**中显式开启管理员种子：
 
 ```text
 SPRING_PROFILES_ACTIVE=dev

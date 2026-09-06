@@ -2,7 +2,7 @@
 set -euo pipefail
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source_root="${1:-$script_dir/../iam-example/src/main/java}"
+source_root="${1:-$script_dir/../muer-example/src/main/java}"
 
 if [[ ! -d "$source_root" ]]; then
     echo "consumer source directory does not exist: $source_root" >&2

@@ -89,7 +89,7 @@ iam:
     - WEB
 ```
 
-`iam.example.seed-demo` 属于 `iam-example` 的演示配置，不是通用 Starter 的 `IamProperties`。只有运行仓库演示时才需要它。
+`iam.example.seed-demo` 属于 `muer-example` 的演示配置，不是通用 Starter 的 `IamProperties`。只有运行仓库演示时才需要它。
 
 ## 推荐生产配置示例
 
@@ -149,5 +149,5 @@ iam:
 
 ## 源码参考
 
-- `IamProperties`：<https://github.com/wbh123/iam/blob/main/iam-spring-boot-autoconfigure/src/main/java/io/github/iamstarter/autoconfigure/IamProperties.java>
+- `IamProperties`：<https://github.com/wbh123/iam/blob/main/muer-spring-boot-autoconfigure/src/main/java/io/github/iamstarter/autoconfigure/IamProperties.java>
 - 手动部署教程：[手动部署](/getting-started/manual-deployment/)

@@ -1,4 +1,4 @@
-package io.github.iamstarter.core.model;
+package io.github.muer.core.model;
 
 import org.junit.jupiter.api.Test;
 

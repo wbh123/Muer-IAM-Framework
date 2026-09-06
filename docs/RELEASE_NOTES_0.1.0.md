@@ -21,7 +21,7 @@
 - **`iam-docs` 文档站**，覆盖接入、配置、授权模型、管理控制台、部署与运维说明。
 
 管理控制台是 0.1.0 的正式能力，但仍然是**可选客户端**：宿主只依赖
-`iam-spring-boot-starter` 即可使用 IAM，Starter 启动和 Management API 均不依赖
+`muer-spring-boot-starter` 即可使用 IAM，Starter 启动和 Management API 均不依赖
 `iam-admin-web` 静态资源。
 
 使用从 [Quick Start](QUICK_START.md) 开始；Admin Console 的开发、部署、首个管理员初始化与
@@ -33,7 +33,7 @@
 - `/iam/admin/**` 不存在管理员角色旁路，每个请求都重新经过 `AuthorizationEngine`；
 - 前端菜单与路由 Capability Guard 只改善用户体验，后端授权才是安全边界；
 - `POST /iam/authorization/diagnostics` 保持“当前已认证 Principal 自诊断”语义，不要求 `iam.admin.*`，也不能指定其他用户/Profile；
-- `iam-example` 的 `admin-demo / demo-pass` 仅在 `dev` Profile 且显式
+- `muer-example` 的 `admin-demo / demo-pass` 仅在 `dev` Profile 且显式
   `iam.example.seed-admin=true` 时创建，生产环境不会自动创建默认管理员；
 - 生产第一个管理员必须由受控 SQL / migration / deployment seeder 或宿主 initial provisioning 完成，不提供公开 bootstrap HTTP 后门。
 
@@ -45,7 +45,7 @@
   资源适配器。
 - `/iam/**` 的 security chain 是 stateless；宿主业务路由仍由宿主 security chain
   负责，并须显式复用 IAM filter 或 principal resolver。
-- `iam-example` 是当前主要消费者示例。其完整 MySQL/Redis HTTP 集成验证依赖 Docker/
+- `muer-example` 是当前主要消费者示例。其完整 MySQL/Redis HTTP 集成验证依赖 Docker/
   Testcontainers 环境；普通使用者部署 IAM 不要求 Docker。
 - Admin Console 当前通过 Vue 单元/组件测试、OpenAPI Client 生成、TypeScript 类型检查与
   production build 验证；浏览器级 Playwright E2E 可在后续补充，但不作为 0.1.0 阻塞项。

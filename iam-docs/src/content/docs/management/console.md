@@ -6,14 +6,14 @@ sidebar:
 ---
 
 `iam-admin-web` 是 **IAM 0.1.0 首发范围内的可选管理控制台**。它通过
-`iam-management-web` 暴露的 Management API 完成 IAM 运维与权限治理，而不是直接读取数据库或 Redis。
+`muer-management-web` 暴露的 Management API 完成 IAM 运维与权限治理，而不是直接读取数据库或 Redis。
 
-它属于 0.1.0 产品能力，但不是 Starter 的运行依赖：只使用 `iam-spring-boot-starter` 的宿主应用不需要部署前端。
+它属于 0.1.0 产品能力，但不是 Starter 的运行依赖：只使用 `muer-spring-boot-starter` 的宿主应用不需要部署前端。
 
 ```
 IAM Spring Boot Starter
         │
-        └── iam-management-web
+        └── muer-management-web
                   │
                   ▼
              OpenAPI iam.yaml
@@ -42,7 +42,7 @@ IAM Spring Boot Starter
 
 ## 本地启动
 
-先按[快速开始](/getting-started/quick-start/)或[手动部署](/getting-started/manual-deployment/)准备 MySQL、Redis 并启动 `iam-example`。
+先按[快速开始](/getting-started/quick-start/)或[手动部署](/getting-started/manual-deployment/)准备 MySQL、Redis 并启动 `muer-example`。
 
 开发演示管理员只有在下面两个条件同时满足时才会创建：
 

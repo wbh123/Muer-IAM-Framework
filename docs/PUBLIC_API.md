@@ -3,26 +3,26 @@
 本页只列出当前源码中供消费应用使用的稳定候选 API/SPI。版本为
 `0.1.0-SNAPSHOT`，因此“稳定”表示本次开发候选的消费边界，而不是已经发布的二进制
 兼容承诺。所有路径和状态以
-[`iam.yaml`](../iam-management-web/src/main/resources/openapi/iam.yaml) 为准。
+[`iam.yaml`](../muer-management-web/src/main/resources/openapi/iam.yaml) 为准。
 
 ## 消费者 API 与 SPI
 
 | 用途 | 类型 | 源码位置 |
 | --- | --- | --- |
-| 登录凭据校验 | `IdentityAuthenticator` | `iam-authentication/src/main/java/io/github/iamstarter/authentication/IdentityAuthenticator.java` |
-| 已认证主体 | `IamPrincipal` | `iam-core/src/main/java/io/github/iamstarter/core/model/IamPrincipal.java` |
-| 资源范围关系 | `ResourceHierarchyProvider`、`ResourceDescriptor`、`ResourceScope` | `iam-core/src/main/java/io/github/iamstarter/core/port/ResourceHierarchyProvider.java` |
-| 授权请求与决定 | `AuthorizationEngine`、`AuthorizationRequest`、`AuthorizationDecision` | `iam-authorization/src/main/java/io/github/iamstarter/authorization/AuthorizationEngine.java` |
-| 额外策略 | `AuthorizationPolicy`、`AuthorizationPolicyResult` | `iam-authorization/src/main/java/io/github/iamstarter/authorization/AuthorizationPolicy.java` |
-| MVC 声明式检查 | `@RequirePermission`、`MvcResourceDescriptorResolver` | `iam-spring-boot-autoconfigure/src/main/java/io/github/iamstarter/autoconfigure/web/RequirePermission.java` |
-| MVC 失败信封替换 | `IamAuthorizationFailureHandler` | `iam-spring-boot-autoconfigure/src/main/java/io/github/iamstarter/autoconfigure/web/IamAuthorizationFailureHandler.java` |
-| 认证与会话模型 | `AuthenticationResult`、`AuthSession`、`TokenRecord` | `iam-authentication/src/main/java/io/github/iamstarter/authentication/AuthenticationResult.java` |
-| profile 与模板模型 | `AuthorizationProfile`、`PermissionTemplateVersion`、`TemplateVersionStatus` | `iam-authorization/src/main/java/io/github/iamstarter/authorization/AuthorizationProfile.java` |
-| 审计模型 | `AuditRecord`、`AuditSubjectLink`、`AuditSubjectRelation` | `iam-audit/src/main/java/io/github/iamstarter/audit/AuditRecord.java` |
-| 管理读侧 SPI（Admin Console） | `UserQueryRepository`、`OverviewRepository` | `iam-core/src/main/java/io/github/iamstarter/core/port/UserQueryRepository.java` |
-| 管理读侧 SPI（Admin Console） | `AuthorizationProfileQueryRepository`、`PermissionTemplateQueryRepository`、`PermissionTemplate`、`PermissionSummary` | `iam-authorization/src/main/java/io/github/iamstarter/authorization/` |
-| 管理读侧 SPI（Admin Console） | `SessionQueryRepository` | `iam-session/src/main/java/io/github/iamstarter/session/SessionQueryRepository.java` |
-| 管理读侧 SPI（Admin Console） | `AuditQueryRepository`、`AuditEvent`、`AuditEventFilter`、`AuditEventPage` | `iam-audit/src/main/java/io/github/iamstarter/audit/` |
+| 登录凭据校验 | `IdentityAuthenticator` | `muer-authentication/src/main/java/io/github/iamstarter/authentication/IdentityAuthenticator.java` |
+| 已认证主体 | `IamPrincipal` | `muer-core/src/main/java/io/github/iamstarter/core/model/IamPrincipal.java` |
+| 资源范围关系 | `ResourceHierarchyProvider`、`ResourceDescriptor`、`ResourceScope` | `muer-core/src/main/java/io/github/iamstarter/core/port/ResourceHierarchyProvider.java` |
+| 授权请求与决定 | `AuthorizationEngine`、`AuthorizationRequest`、`AuthorizationDecision` | `muer-authorization/src/main/java/io/github/iamstarter/authorization/AuthorizationEngine.java` |
+| 额外策略 | `AuthorizationPolicy`、`AuthorizationPolicyResult` | `muer-authorization/src/main/java/io/github/iamstarter/authorization/AuthorizationPolicy.java` |
+| MVC 声明式检查 | `@RequirePermission`、`MvcResourceDescriptorResolver` | `muer-spring-boot-autoconfigure/src/main/java/io/github/iamstarter/autoconfigure/web/RequirePermission.java` |
+| MVC 失败信封替换 | `IamAuthorizationFailureHandler` | `muer-spring-boot-autoconfigure/src/main/java/io/github/iamstarter/autoconfigure/web/IamAuthorizationFailureHandler.java` |
+| 认证与会话模型 | `AuthenticationResult`、`AuthSession`、`TokenRecord` | `muer-authentication/src/main/java/io/github/iamstarter/authentication/AuthenticationResult.java` |
+| profile 与模板模型 | `AuthorizationProfile`、`PermissionTemplateVersion`、`TemplateVersionStatus` | `muer-authorization/src/main/java/io/github/iamstarter/authorization/AuthorizationProfile.java` |
+| 审计模型 | `AuditRecord`、`AuditSubjectLink`、`AuditSubjectRelation` | `muer-audit/src/main/java/io/github/iamstarter/audit/AuditRecord.java` |
+| 管理读侧 SPI（Admin Console） | `UserQueryRepository`、`OverviewRepository` | `muer-core/src/main/java/io/github/iamstarter/core/port/UserQueryRepository.java` |
+| 管理读侧 SPI（Admin Console） | `AuthorizationProfileQueryRepository`、`PermissionTemplateQueryRepository`、`PermissionTemplate`、`PermissionSummary` | `muer-authorization/src/main/java/io/github/iamstarter/authorization/` |
+| 管理读侧 SPI（Admin Console） | `SessionQueryRepository` | `muer-session/src/main/java/io/github/iamstarter/session/SessionQueryRepository.java` |
+| 管理读侧 SPI（Admin Console） | `AuditQueryRepository`、`AuditEvent`、`AuditEventFilter`、`AuditEventPage` | `muer-audit/src/main/java/io/github/iamstarter/audit/` |
 
 管理查询 SPI 与既有可写 port 相互独立：自行实现持久化的宿主无需修改既有 port 实现，
 只需在需要管理读能力时提供上述新 SPI 的 bean（默认 MyBatis 实现使用同一个
@@ -50,7 +50,7 @@
 ## 配置
 
 配置前缀是 `iam`，源码为
-`iam-spring-boot-autoconfigure/src/main/java/io/github/iamstarter/autoconfigure/IamProperties.java`。
+`muer-spring-boot-autoconfigure/src/main/java/io/github/iamstarter/autoconfigure/IamProperties.java`。
 
 | 属性 | 默认值 | 说明与约束 |
 | --- | --- | --- |
@@ -100,7 +100,7 @@
 
 `GET /iam/sessions` 的 `userId` query 参数已经 deprecated 且被忽略；当前 principal
 始终决定所列 session 的归属。请求与响应 schema、参数限制和完整描述见
-[`iam.yaml`](../iam-management-web/src/main/resources/openapi/iam.yaml)。
+[`iam.yaml`](../muer-management-web/src/main/resources/openapi/iam.yaml)。
 
 ### 管理查询端点（Admin Console 支撑）
 
@@ -133,7 +133,7 @@ Redis key；Audit 事件只读。`SessionResponse` 追加只读字段 `status` �
 
 下列内容不是消费应用的稳定 API：
 
-- `iam-persistence-mybatis` 中的 MyBatis repositories、rows、mappers 及 XML mapper；
+- `muer-persistence-mybatis` 中的 MyBatis repositories、rows、mappers 及 XML mapper；
 - 任何 `internal` package；
 - `IamSchemaMigrator`、迁移 SQL、Flyway history 细节和持久化表结构；
 - 自动配置内部 bean 的实现类与 Spring MVC controller 构造器。

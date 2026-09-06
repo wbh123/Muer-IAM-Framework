@@ -25,8 +25,8 @@ MySQL 和 Redis 可以来自本机安装、局域网服务器、云服务或容�
 
 ```xml
 <dependency>
-    <groupId>io.github.iamstarter</groupId>
-    <artifactId>iam-spring-boot-starter</artifactId>
+    <groupId>io.github.muer</groupId>
+    <artifactId>muer-spring-boot-starter</artifactId>
     <version>0.1.0-SNAPSHOT</version>
 </dependency>
 ```
@@ -192,7 +192,7 @@ IAM 不查询你的 Document / Project 表。宿主告诉 IAM “这个资源是
 - 响应包含 `accessToken`、`sessionId`、`expiresAt`、`principal`；
 - 后续受保护接口使用 `Authorization: Bearer <accessToken>`。
 
-> `alice / demo-pass` 是 `iam-example` 的本地演示账号。自己的业务系统应使用自己的身份源。
+> `alice / demo-pass` 是 `muer-example` 的本地演示账号。自己的业务系统应使用自己的身份源。
 
 ## 9. 读取当前 Principal
 
@@ -206,7 +206,7 @@ IAM 不查询你的 Document / Project 表。宿主告诉 IAM “这个资源是
 
 ## 10. 验证声明式权限
 
-`iam-example` 提供一个简单 Document 场景：
+`muer-example` 提供一个简单 Document 场景：
 
 - Document `1001` 属于 Project `101`；
 - Document `2001` 属于 Project `202`；
@@ -233,7 +233,7 @@ IAM 不查询你的 Document / Project 表。宿主告诉 IAM “这个资源是
 
 **接口**：`POST /iam/authorization/profiles/{profileId}/switch`
 
-`iam-example` 的 Editor Profile ID 为 `402`。
+`muer-example` 的 Editor Profile ID 为 `402`。
 
 **预期结果**：HTTP `200`，返回新的 Token 和新的 Session。
 
@@ -267,7 +267,7 @@ Profile Switch 不会修改原 Reader Token，因此：
 
 **预期结果**：成功返回 HTTP `204`。该 Session 对应的 Token 之后访问受保护接口返回 `401`，同一用户的其他独立 Session 不受影响。
 
-## 14. 直接运行 iam-example
+## 14. 直接运行 muer-example
 
 如果想体验上述 Alice 场景，可以手动准备 MySQL / Redis，然后在 IDE Run Configuration 或服务环境中配置：
 

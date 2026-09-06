@@ -1,4 +1,4 @@
-package io.github.iamstarter.autoconfigure.web;
+package io.github.muer.autoconfigure.web;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

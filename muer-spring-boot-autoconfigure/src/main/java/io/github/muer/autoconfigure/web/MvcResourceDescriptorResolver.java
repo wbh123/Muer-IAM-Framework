@@ -1,6 +1,6 @@
-package io.github.iamstarter.autoconfigure.web;
+package io.github.muer.autoconfigure.web;
 
-import io.github.iamstarter.core.model.ResourceDescriptor;
+import io.github.muer.core.model.ResourceDescriptor;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.method.HandlerMethod;
 

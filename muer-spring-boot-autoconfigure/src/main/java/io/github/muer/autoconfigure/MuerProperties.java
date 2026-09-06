@@ -1,4 +1,4 @@
-package io.github.iamstarter.autoconfigure;
+package io.github.muer.autoconfigure;
 
 import jakarta.annotation.PostConstruct;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -7,8 +7,13 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
-@ConfigurationProperties("iam")
-public class IamProperties {
+/**
+ * Muer 对外暴露的 Spring Boot 配置属性。
+ *
+ * <p>该类只负责绑定框架配置，不改变会话、令牌或数据表的既有默认行为。</p>
+ */
+@ConfigurationProperties("muer")
+public class MuerProperties {
     private boolean enabled = true;
     private final Token token = new Token();
     private final Session session = new Session();
@@ -53,19 +58,22 @@ public class IamProperties {
         this.clientTypes = new ArrayList<>(clientTypes == null ? List.of() : clientTypes);
     }
 
+    /**
+     * 校验外部配置，避免不安全或不可用的令牌与客户端类型设置进入运行时。
+     */
     @PostConstruct
     void validate() {
         if (token.ttl == null || token.ttl.isZero() || token.ttl.isNegative()) {
-            throw new IllegalStateException("iam.token.ttl must be positive");
+            throw new IllegalStateException("muer.token.ttl must be positive");
         }
         if (clientTypes.isEmpty() || clientTypes.stream().anyMatch(type -> type == null || type.isBlank())) {
-            throw new IllegalStateException("iam.client-types must contain at least one non-blank value");
+            throw new IllegalStateException("muer.client-types must contain at least one non-blank value");
         }
         if (token.redisPrefix == null || token.redisPrefix.isBlank()) {
-            throw new IllegalStateException("iam.token.redis-prefix must not be blank");
+            throw new IllegalStateException("muer.token.redis-prefix must not be blank");
         }
         if (schema.historyTable == null || schema.historyTable.isBlank()) {
-            throw new IllegalStateException("iam.schema.history-table must not be blank");
+            throw new IllegalStateException("muer.schema.history-table must not be blank");
         }
     }
 

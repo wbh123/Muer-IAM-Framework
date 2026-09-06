@@ -99,7 +99,7 @@ sidebar（`astro.config.mjs`）引用的 slug 必须存在，否则构建会失�
 
 ### IamPrincipal
 
-`iam-core/.../core/model/IamPrincipal.java`，record 组件顺序：
+`muer-core/.../core/model/IamPrincipal.java`，record 组件顺序：
 
 `userId, identityId, identityDomain, activeProfileId(Long), templateVersionId(Long), clientType, authorizationVersion`。
 
@@ -107,7 +107,7 @@ sidebar（`astro.config.mjs`）引用的 slug 必须存在，否则构建会失�
 
 ### LoginRequest
 
-`iam-authentication/.../LoginRequest.java`，组件：
+`muer-authentication/.../LoginRequest.java`，组件：
 
 `username, password, clientType, clientInstance, ipAddress, userAgent, deviceType, osName, browserName, appVersion, requestId`。
 
@@ -237,7 +237,7 @@ Optional<ResourceDescriptor> resolve(HttpServletRequest request, HandlerMethod h
 - POST /iam/authorization/profiles/{profileId}/switch → 200/401/404
 - POST /iam/authorization/diagnostics → 200
 
-管理端点以 `iam-management-web` OpenAPI 为准。
+管理端点以 `muer-management-web` OpenAPI 为准。
 
 ### 登录 / 切换响应体
 
@@ -247,7 +247,7 @@ Principal 必填：`userId,identityId,identityDomain,clientType,authorizationVer
 
 ### 演示用户
 
-`iam-example` 中：
+`muer-example` 中：
 
 - alice 默认 → userId=101, activeProfileId=401, templateVersionId=301；
 - 另有 author-a、reader-b、disabled-c、operator-a/b 等 Consumer Showcase 身份。
@@ -277,17 +277,17 @@ Resolver 把文档映射成 `ResourceDescriptor("DOCUMENT", id, parentPath=["PRO
 
 GitHub blob 基址：`https://github.com/wbh123/iam/blob/main/`
 
-- IamPrincipal: `iam-core/src/main/java/io/github/iamstarter/core/model/IamPrincipal.java`
-- ScopeAccess: `iam-core/src/main/java/io/github/iamstarter/core/model/ScopeAccess.java`
-- ResourceDescriptor/ResourceScope: `iam-core/src/main/java/io/github/iamstarter/core/model/`
-- ResourceHierarchyProvider: `iam-core/src/main/java/io/github/iamstarter/core/port/ResourceHierarchyProvider.java`
-- IdentityAuthenticator: `iam-authentication/src/main/java/io/github/iamstarter/authentication/IdentityAuthenticator.java`
-- AuthorizationEngine 等：`iam-authorization/src/main/java/io/github/iamstarter/authorization/`
-- AuthSession/TokenRecord: `iam-session/src/main/java/io/github/iamstarter/session/`
-- MVC 授权集成：`iam-spring-boot-autoconfigure/src/main/java/io/github/iamstarter/autoconfigure/web/`
-- IamProperties / Bearer Filter: `iam-spring-boot-autoconfigure/src/main/java/io/github/iamstarter/autoconfigure/`
-- Example: `iam-example/src/main/java/io/github/iamstarter/example/`
-- OpenAPI: `iam-management-web/src/main/resources/openapi/iam.yaml`
+- IamPrincipal: `muer-core/src/main/java/io/github/iamstarter/core/model/IamPrincipal.java`
+- ScopeAccess: `muer-core/src/main/java/io/github/iamstarter/core/model/ScopeAccess.java`
+- ResourceDescriptor/ResourceScope: `muer-core/src/main/java/io/github/iamstarter/core/model/`
+- ResourceHierarchyProvider: `muer-core/src/main/java/io/github/iamstarter/core/port/ResourceHierarchyProvider.java`
+- IdentityAuthenticator: `muer-authentication/src/main/java/io/github/iamstarter/authentication/IdentityAuthenticator.java`
+- AuthorizationEngine 等：`muer-authorization/src/main/java/io/github/iamstarter/authorization/`
+- AuthSession/TokenRecord: `muer-session/src/main/java/io/github/iamstarter/session/`
+- MVC 授权集成：`muer-spring-boot-autoconfigure/src/main/java/io/github/iamstarter/autoconfigure/web/`
+- IamProperties / Bearer Filter: `muer-spring-boot-autoconfigure/src/main/java/io/github/iamstarter/autoconfigure/`
+- Example: `muer-example/src/main/java/io/github/iamstarter/example/`
+- OpenAPI: `muer-management-web/src/main/resources/openapi/iam.yaml`
 
 ## 写作语言与风格
 

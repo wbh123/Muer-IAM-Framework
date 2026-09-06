@@ -1,6 +1,6 @@
 ---
 title: HTTP API
-description: 基于 iam-management-web OpenAPI 的真实 HTTP 端点，按请求方式、认证要求和预期结果组织。
+description: 基于 muer-management-web OpenAPI 的真实 HTTP 端点，按请求方式、认证要求和预期结果组织。
 sidebar:
   order: 3
 ---
@@ -185,4 +185,4 @@ Profile Switch、Session Revoke 与 Diagnostics 可以在业务确实需要时�
 
 ## 源码参考
 
-- OpenAPI：<https://github.com/wbh123/iam/blob/main/iam-management-web/src/main/resources/openapi/iam.yaml>
+- OpenAPI：<https://github.com/wbh123/iam/blob/main/muer-management-web/src/main/resources/openapi/iam.yaml>
