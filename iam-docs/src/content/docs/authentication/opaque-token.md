@@ -26,5 +26,5 @@ IAM 发行的 `accessToken` 是**不透明令牌（opaque token）**：它本身
 
 ## 源码
 
-- TokenRecord / AuthSession / LoginResult：<https://github.com/wbh123/iam/blob/main/iam-session/src/main/java/io/github/iamstarter/session/>
-- IamBearerTokenFilter：<https://github.com/wbh123/iam/blob/main/iam-spring-boot-autoconfigure/src/main/java/io/github/iamstarter/autoconfigure/IamBearerTokenFilter.java>
+- TokenRecord / AuthSession / LoginResult：<https://github.com/wbh123/iam/blob/main/muer-session/src/main/java/io/github/muer/session/>
+- IamBearerTokenFilter：<https://github.com/wbh123/iam/blob/main/muer-spring-boot-autoconfigure/src/main/java/io/github/muer/autoconfigure/IamBearerTokenFilter.java>

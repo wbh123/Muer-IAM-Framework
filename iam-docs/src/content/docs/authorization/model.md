@@ -24,5 +24,5 @@ IAM 需要回答「这个用户，对这笔业务资源，能否以某种方式�
 
 ## 源码
 
-- ResourceDescriptor / ResourceScope：<https://github.com/wbh123/iam/blob/main/iam-core/src/main/java/io/github/iamstarter/core/model/>
-- IamPrincipal：<https://github.com/wbh123/iam/blob/main/iam-core/src/main/java/io/github/iamstarter/core/model/IamPrincipal.java>
+- ResourceDescriptor / ResourceScope：<https://github.com/wbh123/iam/blob/main/muer-core/src/main/java/io/github/muer/core/model/>
+- IamPrincipal：<https://github.com/wbh123/iam/blob/main/muer-core/src/main/java/io/github/muer/core/model/IamPrincipal.java>

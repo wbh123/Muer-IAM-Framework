@@ -32,6 +32,6 @@ default void require(IamPrincipal principal, AuthorizationRequest request) // �
 
 ## 源码
 
-<https://github.com/wbh123/iam/blob/main/iam-authorization/src/main/java/io/github/iamstarter/authorization/>
+<https://github.com/wbh123/iam/blob/main/muer-authorization/src/main/java/io/github/muer/authorization/>
 
 相关：见 [authorization-policy](/authorization/authorization-policy/) 与 [resource-scope](/authorization/resource-scope/)。

@@ -1,14 +1,14 @@
 ---
-title: IAM Spring Boot Starter
-description: 为 Spring Boot 应用提供可嵌入的认证、细粒度授权、资源范围与会话治理能力。
+title: 木耳 Muer
+description: Muer 为现代业务系统提供统一身份、认证、授权、会话、审计与诊断能力。
 hero:
-  tagline: 为 Spring Boot 应用提供可嵌入的认证、细粒度授权、资源范围与会话治理能力。宿主保留自己的用户源与业务数据，IAM 只做权威的授权判断。
+  tagline: 让身份能力，在每个系统中自然生长。Muer 为现代业务系统提供统一身份、认证、授权、会话、审计与诊断能力，同时保持清晰、可组合的接入边界。
   actions:
     - text: 快速开始
       link: /getting-started/quick-start/
       icon: right-arrow
       variant: primary
-    - text: 核心概念
+    - text: 查看文档
       link: /concepts/identity-principal/
     - text: GitHub
       link: https://github.com/wbh123/iam
@@ -16,9 +16,9 @@ hero:
 template: splash
 ---
 
-IAM Spring Boot Starter（IAM）为基于 Spring Boot 的宿主应用提供一套**可嵌入**的认证、细粒度授权、资源范围与 Session 治理能力。
+Muer Identity 是面向现代业务系统的轻量 IAM 框架，让统一身份、认证、授权、会话、审计与诊断能力自然融入已有应用。
 
-- IAM **不拥有**宿主的账号、密码或业务数据，它只回答三件事：谁是当前用户、能执行哪些权限、能访问哪些资源范围。
+- Muer **不拥有**宿主的账号、密码或业务数据，它只回答三件事：谁是当前用户、能执行哪些权限、能访问哪些资源范围。
 - 宿主通过少量 SPI（`IdentityAuthenticator`、`ResourceHierarchyProvider`、`MvcResourceDescriptorResolver`）把自己的用户源与业务资源映射进来。
 - 版本为 `0.1.0-SNAPSHOT`（Release Candidate），**尚未发布到 Maven Central**。
 
@@ -34,6 +34,8 @@ IAM Spring Boot Starter（IAM）为基于 Spring Boot 的宿主应用提供一�
 | **Session** | MySQL 持久化权威 Session；Redis 仅作为 opaque token 索引。支持按需撤销单个 Session。 |
 | **授权诊断** | 诊断接口复用同一引擎，返回每一步命中/拒绝的轨迹，便于排查 403。 |
 | **审计** | 登录事件、会话与授权主体变更可审计落库。 |
+
+Identity · Authentication · Authorization · Session · Audit · Diagnostics · Spring Boot
 
 ## 最小示例
 

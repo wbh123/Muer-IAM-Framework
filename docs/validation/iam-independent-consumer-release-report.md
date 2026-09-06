@@ -4,13 +4,13 @@
 
 - Branch: `codex/release-readiness`
 - Candidate commit: `32cdef46632c4e1441c4a9c81020e77fbbc7b696`
-- Intended artifact: `io.github.iamstarter:iam-spring-boot-starter`
+- Intended artifact: `io.github.muer:muer-spring-boot-starter`
 - Recommendation: ready for release review; retain the branch until an
   explicit merge or release decision.
 
 ## Independence boundary
 
-`iam-example` is a host application. Its production code uses public IAM
+`muer-example` is a host application. Its production code uses public IAM
 contracts only: `IdentityAuthenticator`, `IamPrincipal`,
 `ResourceHierarchyProvider`, `ResourceDescriptor`, `ResourceScope`,
 `AuthorizationEngine`, and `AuthorizationRequest`. It does not import IAM
@@ -48,9 +48,9 @@ required GitHub Actions run.
 | --- | --- |
 | `bash scripts/test-consumer-public-api.sh` | Pass; rejects a synthetic internal import and accepts a public SPI import. |
 | `bash scripts/test-showcase-readme.sh` | Pass. |
-| `mvn -pl iam-example -am -Dtest=IamStarterAutoConfigurationSmokeTest -Dsurefire.failIfNoSpecifiedTests=false test` | Pass: 3 tests. |
-| `mvn -pl iam-example -am -Pintegration -Dtest=IamConsumerIntegrationTest -Dsurefire.failIfNoSpecifiedTests=false test` | Pass: 5 tests for RBAC, project scope, invalid token, Profile switch, and revocation. |
-| `mvn -pl iam-example -am -Pintegration -Dtest=IamStarterConsumptionTest,IamSecurityIntegrationTest,IamConsumerIntegrationTest -Dsurefire.failIfNoSpecifiedTests=false test` | Pass at the time of execution: 6 + 4 + 3 tests; the Consumer suite has since grown to 5 focused tests. |
+| `mvn -pl muer-example -am -Dtest=IamStarterAutoConfigurationSmokeTest -Dsurefire.failIfNoSpecifiedTests=false test` | Pass: 3 tests. |
+| `mvn -pl muer-example -am -Pintegration -Dtest=IamConsumerIntegrationTest -Dsurefire.failIfNoSpecifiedTests=false test` | Pass: 5 tests for RBAC, project scope, invalid token, Profile switch, and revocation. |
+| `mvn -pl muer-example -am -Pintegration -Dtest=IamStarterConsumptionTest,IamSecurityIntegrationTest,IamConsumerIntegrationTest -Dsurefire.failIfNoSpecifiedTests=false test` | Pass at the time of execution: 6 + 4 + 3 tests; the Consumer suite has since grown to 5 focused tests. |
 
 Record the GitHub Actions run URL, commit SHA, job conclusion, and any output
 needed to reproduce a failed check. Do not include opaque tokens, passwords,

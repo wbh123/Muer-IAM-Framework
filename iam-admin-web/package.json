@@ -11,7 +11,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "type-check": "vue-tsc --noEmit -p tsconfig.json",
-    "api:generate": "openapi-generator-cli generate -i ../iam-management-web/src/main/resources/openapi/iam.yaml -g typescript-axios -o src/api/generated --additional-properties=supportsES6=true,withInterfaces=true,useSingleRequestParameter=true --skip-validate-spec",
+    "api:generate": "openapi-generator-cli generate -i ../muer-management-web/src/main/resources/openapi/iam.yaml -g typescript-axios -o src/api/generated --additional-properties=supportsES6=true,withInterfaces=true,useSingleRequestParameter=true --skip-validate-spec",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "echo 'lint: no linter configured for iam-admin-web 0.1.0'"

@@ -10,7 +10,7 @@ sidebar:
 ```bash
 cd iam-admin-web
 npm ci
-npm run api:generate   # 契约单一来源：iam-management-web/.../openapi/iam.yaml
+npm run api:generate   # 契约单一来源：muer-management-web/.../openapi/iam.yaml
 npm run type-check
 npm run test
 npm run build          # 产出 dist/
@@ -20,7 +20,7 @@ npm run build          # 产出 dist/
 
 ## 后端要求
 
-宿主应用只需要启动 `iam-spring-boot-starter`，并满足：
+宿主应用只需要启动 `muer-spring-boot-starter`，并满足：
 
 - MySQL（IAM schema 由迁移脚本管理）与 Redis；
 - 宿主实现 `IdentityAuthenticator` 与 `ResourceHierarchyProvider`；

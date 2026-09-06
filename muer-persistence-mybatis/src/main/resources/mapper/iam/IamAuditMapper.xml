@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.github.muer.persistence.mapper.IamAuditMapper">
+    <resultMap id="eventRow" type="io.github.muer.persistence.AuditEventRow">
+        <constructor>
+            <idArg column="log_id" javaType="_long"/>
+            <arg column="event_id" javaType="java.lang.String"/>
+            <arg column="occurred_at" javaType="java.time.Instant"/>
+            <arg column="actor" javaType="java.lang.String"/>
+            <arg column="action_code" javaType="java.lang.String"/>
+            <arg column="resource_type" javaType="java.lang.String"/>
+            <arg column="resource_id" javaType="java.lang.String"/>
+            <arg column="result_code" javaType="java.lang.String"/>
+            <arg column="request_id" javaType="java.lang.String"/>
+            <arg column="before_json" javaType="java.lang.String"/>
+            <arg column="after_json" javaType="java.lang.String"/>
+            <arg column="metadata_json" javaType="java.lang.String"/>
+        </constructor>
+    </resultMap>
+
+    <resultMap id="subject" type="io.github.muer.persistence.AuditSubjectLinkRow">
+        <constructor>
+            <arg column="audit_log_id" javaType="_long"/>
+            <arg column="subject_type" javaType="java.lang.String"/>
+            <arg column="subject_id" javaType="java.lang.String"/>
+            <arg column="relation_code" javaType="io.github.muer.audit.AuditSubjectRelation"/>
+        </constructor>
+    </resultMap>
+
+    <sql id="auditColumns">
+        log.id AS log_id, log.event_id, log.occurred_at, log.operator_ref AS actor,
+        log.action_code, log.resource_type, log.resource_id, log.result_code, log.request_id,
+        CAST(log.before_state AS CHAR) AS before_json,
+        CAST(log.after_state AS CHAR) AS after_json,
+        CAST(log.metadata AS CHAR) AS metadata_json
+    </sql>
+
+    <select id="findEventByEventId" resultMap="eventRow">
+        SELECT <include refid="auditColumns"/>
+        FROM iam_audit_log log
+        WHERE log.event_id = #{eventId}
+    </select>
+
+    <select id="findEvents" resultMap="eventRow">
+        SELECT <include refid="auditColumns"/>
+        FROM iam_audit_log log
+        WHERE 1 = 1
+        <if test="maxLogId != null and maxLogId > 0">
+            AND log.id &lt; #{maxLogId}
+        </if>
+        <if test="actionCode != null and actionCode != ''">
+            AND log.action_code = #{actionCode}
+        </if>
+        <if test="resourceType != null and resourceType != ''">
+            AND log.resource_type = #{resourceType}
+        </if>
+        <if test="resourceId != null and resourceId != ''">
+            AND log.resource_id = #{resourceId}
+        </if>
+        <if test="occurredFrom != null">
+            AND log.occurred_at &gt;= #{occurredFrom}
+        </if>
+        <if test="occurredTo != null">
+            AND log.occurred_at &lt;= #{occurredTo}
+        </if>
+        <if test="subjectUserId != null and subjectUserId != ''">
+            AND EXISTS (SELECT 1 FROM iam_audit_subject_link link
+                         WHERE link.audit_log_id = log.id
+                           AND link.subject_type = 'USER'
+                           AND link.subject_id = #{subjectUserId})
+        </if>
+        <if test="subjectIdentityId != null and subjectIdentityId != ''">
+            AND EXISTS (SELECT 1 FROM iam_audit_subject_link link
+                         WHERE link.audit_log_id = log.id
+                           AND link.subject_type = 'IDENTITY'
+                           AND link.subject_id = #{subjectIdentityId})
+        </if>
+        <if test="subjectSessionId != null and subjectSessionId != ''">
+            AND EXISTS (SELECT 1 FROM iam_audit_subject_link link
+                         WHERE link.audit_log_id = log.id
+                           AND link.subject_type = 'SESSION'
+                           AND link.subject_id = #{subjectSessionId})
+        </if>
+        ORDER BY log.id DESC
+        LIMIT #{limit}
+    </select>
+
+    <select id="findSubjects" resultMap="subject">
+        SELECT audit_log_id, subject_type, subject_id, relation_code
+        FROM iam_audit_subject_link
+        WHERE audit_log_id IN
+        <foreach collection="logIds" item="logId" open="(" separator="," close=")">
+            #{logId}
+        </foreach>
+        ORDER BY id
+    </select>
+
+    <insert id="insertAudit">
+        INSERT INTO iam_audit_log
+            (event_id, operator_ref, action_code, resource_type, resource_id, result_code, request_id,
+             before_state, after_state, metadata, occurred_at)
+        VALUES
+            (#{record.auditId}, #{record.operator}, #{record.action}, #{record.resourceType}, #{record.resourceId},
+             #{record.result}, #{record.requestId}, #{beforeJson}, #{afterJson}, #{metadataJson}, #{record.occurredAt})
+    </insert>
+
+    <select id="findDatabaseId" resultType="java.lang.Long">
+        SELECT id FROM iam_audit_log WHERE event_id = #{auditId}
+    </select>
+
+    <insert id="insertSubject">
+        INSERT INTO iam_audit_subject_link (audit_log_id, subject_type, subject_id, relation_code)
+        VALUES (#{auditLogId}, #{subject.subjectType}, #{subject.subjectId}, #{subject.relation})
+    </insert>
+</mapper>

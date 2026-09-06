@@ -27,7 +27,7 @@ record AuthSession(
 record TokenRecord(sessionId, principal, expiresAt)
 ```
 
-源码见 [iam-session](https://github.com/wbh123/iam/blob/main/iam-session/src/main/java/io/github/iamstarter/session/)。`touch` 受 `iam.session.touch-interval`（默认 10m）节流。
+源码见 [muer-session](https://github.com/wbh123/iam/blob/main/muer-session/src/main/java/io/github/muer/session/)。`touch` 受 `iam.session.touch-interval`（默认 10m）节流。
 
 ## 相关 HTTP 端点（真实）
 

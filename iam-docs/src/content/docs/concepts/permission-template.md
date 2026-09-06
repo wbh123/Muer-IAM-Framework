@@ -25,7 +25,7 @@ record PermissionTemplateVersion(
 
 ## 演示数据（真实）
 
-来自 [`QuickStartDemoSeeder`](https://github.com/wbh123/iam/blob/main/iam-example/src/main/java/io/github/iamstarter/example/QuickStartDemoSeeder.java)：
+来自 [`QuickStartDemoSeeder`](https://github.com/wbh123/iam/blob/main/muer-example/src/main/java/io/github/muer/example/QuickStartDemoSeeder.java)：
 
 | 版本 | 模板 | 状态 | 权限 |
 | --- | --- | --- | --- |
@@ -34,7 +34,7 @@ record PermissionTemplateVersion(
 
 ## 与 Profile 的关系
 
-Profile 通过 `templateVersionId` 引用某个版本（源码 [AuthorizationProfile](https://github.com/wbh123/iam/blob/main/iam-authorization/src/main/java/io/github/iamstarter/authorization/AuthorizationProfile.java)）。切换 Profile 即切换所引用的模板版本，从而改变可用 permission 与 scope。
+Profile 通过 `templateVersionId` 引用某个版本（源码 [AuthorizationProfile](https://github.com/wbh123/iam/blob/main/muer-authorization/src/main/java/io/github/muer/authorization/AuthorizationProfile.java)）。切换 Profile 即切换所引用的模板版本，从而改变可用 permission 与 scope。
 
 ## 下一步
 

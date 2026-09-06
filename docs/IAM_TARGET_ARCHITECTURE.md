@@ -3,7 +3,7 @@
 ## Purpose and delivery form
 
 The deliverable is a reusable Spring Boot library, consumed through one direct
-dependency: `iam-spring-boot-starter`. It is not a separately operated IAM
+dependency: `muer-spring-boot-starter`. It is not a separately operated IAM
 application and does not use the source application's `server/model/client`
 layout. Its own Maven reactor is rooted at `iam/`; consuming applications add
 the starter and implement narrowly scoped adapters for their users, credentials,
@@ -11,22 +11,22 @@ resources and business policies.
 
 ```text
 iam/
-  iam-core/
-  iam-authentication/
-  iam-authorization/
-  iam-session/
-  iam-audit/
-  iam-diagnostics/
-  iam-persistence-mybatis/
-  iam-management-web/
-  iam-spring-boot-autoconfigure/
-  iam-spring-boot-starter/
-  iam-example/
-  iam-tests/
+  muer-core/
+  muer-authentication/
+  muer-authorization/
+  muer-session/
+  muer-audit/
+  muer-diagnostics/
+  muer-persistence-mybatis/
+  muer-management-web/
+  muer-spring-boot-autoconfigure/
+  muer-spring-boot-starter/
+  muer-example/
+  muer-tests/
 ```
 
-`iam-core` has no Spring, MyBatis, Redis, MVC or application dependency.
-`iam-spring-boot-starter` is the only artifact an application normally declares;
+`muer-core` has no Spring, MyBatis, Redis, MVC or application dependency.
+`muer-spring-boot-starter` is the only artifact an application normally declares;
 it brings the autoconfiguration and selected default implementations.
 
 ## Domain model
@@ -120,7 +120,7 @@ and administrator-forced revocation.
 
 ## Persistence and API
 
-`iam-persistence-mybatis` owns MyBatis interfaces and XML plus independent
+`muer-persistence-mybatis` owns MyBatis interfaces and XML plus independent
 Flyway migrations:
 
 ```text
@@ -142,7 +142,7 @@ The initial schema contains `iam_user`, `iam_identity`, `iam_permission`,
 `iam_authorization_scope`, `iam_login_event`, `iam_session`, `iam_audit_log`
 and `iam_audit_subject_link`. Mappers contain SQL; growth queries paginate.
 
-`iam-management-web` is OpenAPI-first and contributes `/iam/auth`, `/iam/sessions`,
+`muer-management-web` is OpenAPI-first and contributes `/iam/auth`, `/iam/sessions`,
 `/iam/authorization`, `/iam/admin` and authorization-diagnostics endpoints.
 It is registered by Starter conditionally, rather than deployed as a separate
 server. Diagnostics call the runtime engine and project its exact decision.

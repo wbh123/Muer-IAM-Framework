@@ -3,19 +3,21 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>io.github.iamstarter</groupId>
-    <artifactId>iam-parent</artifactId>
+    <groupId>io.github.muer</groupId>
+    <artifactId>muer-parent</artifactId>
     <version>0.1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>IAM Spring Boot Starter</name>
-    <description>
-        A Spring Boot starter that provides embeddable authentication, fine-grained
-        permission/scope authorization, and session governance for Spring Boot
-        applications. Built with a permission-and-scope model backed by reusable
-        identity (Profile), resource-scoped permissions, and session lifecycle
-        management. No external identity provider or SSO is required.
-    </description>
-    <url>https://github.com/wbh123/iam</url>
+    <name>Muer IAM Framework</name>
+    <description>Identity infrastructure that grows naturally with your applications.</description>
+    <url>https://muer.github.io</url>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
     <scm>
         <connection>scm:git:https://github.com/wbh123/iam.git</connection>
@@ -35,18 +37,18 @@
     </developers>
 
     <modules>
-        <module>iam-core</module>
-        <module>iam-authentication</module>
-        <module>iam-authorization</module>
-        <module>iam-session</module>
-        <module>iam-audit</module>
-        <module>iam-diagnostics</module>
-        <module>iam-persistence-mybatis</module>
-        <module>iam-management-web</module>
-        <module>iam-spring-boot-autoconfigure</module>
-        <module>iam-spring-boot-starter</module>
-        <module>iam-example</module>
-        <module>iam-tests</module>
+        <module>muer-core</module>
+        <module>muer-authentication</module>
+        <module>muer-authorization</module>
+        <module>muer-session</module>
+        <module>muer-audit</module>
+        <module>muer-diagnostics</module>
+        <module>muer-persistence-mybatis</module>
+        <module>muer-management-web</module>
+        <module>muer-spring-boot-autoconfigure</module>
+        <module>muer-spring-boot-starter</module>
+        <module>muer-example</module>
+        <module>muer-tests</module>
     </modules>
 
     <properties>

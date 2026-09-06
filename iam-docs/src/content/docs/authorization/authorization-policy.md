@@ -31,6 +31,6 @@ sidebar:
 
 ## 源码
 
-<https://github.com/wbh123/iam/blob/main/iam-spring-boot-autoconfigure/src/main/java/io/github/iamstarter/autoconfigure/web/IamAuthorizationInterceptor.java>
+<https://github.com/wbh123/iam/blob/main/muer-spring-boot-autoconfigure/src/main/java/io/github/muer/autoconfigure/web/IamAuthorizationInterceptor.java>
 
 相关：见 [authorization-engine](/authorization/authorization-engine/) 与 [require-permission](/authorization/require-permission/)。

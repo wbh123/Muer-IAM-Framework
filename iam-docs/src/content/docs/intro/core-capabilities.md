@@ -70,8 +70,8 @@ IAM 不查询宿主的业务表，也不理解「文档属于哪个项目」。�
 
 | 能力 | 关键源码 |
 | --- | --- |
-| 认证 | `iam-authentication/.../IdentityAuthenticator.java` |
-| 授权引擎 | `iam-authorization/.../AuthorizationEngine.java` |
-| 声明式权限 | `iam-spring-boot-autoconfigure/.../web/RequirePermission.java` |
-| MVC 资源解析 | `iam-spring-boot-autoconfigure/.../web/MvcResourceDescriptorResolver.java` |
-| 核心模型 | `iam-core/.../core/model/IamPrincipal.java` |
+| 认证 | `muer-authentication/.../IdentityAuthenticator.java` |
+| 授权引擎 | `muer-authorization/.../AuthorizationEngine.java` |
+| 声明式权限 | `muer-spring-boot-autoconfigure/.../web/RequirePermission.java` |
+| MVC 资源解析 | `muer-spring-boot-autoconfigure/.../web/MvcResourceDescriptorResolver.java` |
+| 核心模型 | `muer-core/.../core/model/IamPrincipal.java` |

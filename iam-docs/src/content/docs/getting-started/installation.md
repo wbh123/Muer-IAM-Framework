@@ -15,8 +15,8 @@ IAM 以「一个 Starter 依赖 + 宿主提供少量 SPI」的方式嵌入现有
 
 ```xml
 <dependency>
-    <groupId>io.github.iamstarter</groupId>
-    <artifactId>iam-spring-boot-starter</artifactId>
+    <groupId>io.github.muer</groupId>
+    <artifactId>muer-spring-boot-starter</artifactId>
     <version>0.1.0-SNAPSHOT</version>
 </dependency>
 ```
@@ -41,7 +41,7 @@ MySQL 和 Redis 可以是：
 
 ## 推荐接入顺序
 
-1. 在现有 Spring Boot 工程添加 `iam-spring-boot-starter`；
+1. 在现有 Spring Boot 工程添加 `muer-spring-boot-starter`；
 2. 准备一个可读写的 MySQL 数据库账号；
 3. 准备一个可连接的 Redis 7 服务；
 4. 配置 `spring.datasource`、`spring.data.redis` 与 `iam.*`；
@@ -61,9 +61,9 @@ Starter 不会替你持有用户与业务资源。根据使用能力注册 Sprin
 
 示例实现：
 
-- [ExampleIdentityAdapter.java](https://github.com/wbh123/iam/blob/main/iam-example/src/main/java/io/github/iamstarter/example/ExampleIdentityAdapter.java)
-- [ExampleResourceHierarchyAdapter.java](https://github.com/wbh123/iam/blob/main/iam-example/src/main/java/io/github/iamstarter/example/ExampleResourceHierarchyAdapter.java)
-- [ExampleDocumentResourceResolver.java](https://github.com/wbh123/iam/blob/main/iam-example/src/main/java/io/github/iamstarter/example/ExampleDocumentResourceResolver.java)
+- [ExampleIdentityAdapter.java](https://github.com/wbh123/iam/blob/main/muer-example/src/main/java/io/github/muer/example/ExampleIdentityAdapter.java)
+- [ExampleResourceHierarchyAdapter.java](https://github.com/wbh123/iam/blob/main/muer-example/src/main/java/io/github/muer/example/ExampleResourceHierarchyAdapter.java)
+- [ExampleDocumentResourceResolver.java](https://github.com/wbh123/iam/blob/main/muer-example/src/main/java/io/github/muer/example/ExampleDocumentResourceResolver.java)
 
 ## 不需要做什么
 

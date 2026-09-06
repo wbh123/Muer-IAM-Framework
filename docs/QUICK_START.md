@@ -1,35 +1,54 @@
-# IAM 0.1.0 Quick Start
+# Muer 0.1.0 Quick Start
 
-本文面向第一次接入 `IAM Spring Boot Starter` 的 Spring Boot 开发者，目标是完成一条最短使用路径：
+本文面向第一次接入 Muer 的 Spring Boot 开发者。目标不是复现仓库的完整测试，而是在一个真实业务应用里完成最短闭环：
 
-1. 准备可连接的 MySQL 与 Redis；
-2. 配置 Spring Boot 应用；
-3. 接入宿主身份与资源范围 SPI；
-4. 启动应用；
-5. 通过几个 HTTP 接口确认认证与授权行为符合预期；
-6. 如需可视化管理，再启动 0.1.0 随附的可选 IAM Admin Console。
+```text
+Starter
+→ MySQL / Redis
+→ IdentityAuthenticator
+→ PermissionDefinitionProvider
+→ Resource Resolver
+→ @RequirePermission
+→ 登录 / 授权
+→ 权限管理（可选 Console）
+→ 运行状态（可选 Actuator / Micrometer）
+```
 
-当前版本仍是 `0.1.0-SNAPSHOT`（Release Candidate），尚未作为正式 Maven 发行版发布。
+当前版本仍为 `0.1.0-SNAPSHOT` Release Candidate，尚未创建正式 Maven Release。
 
-> Docker **不是**使用 IAM 的前置条件。你可以使用本机安装的 MySQL / Redis、局域网服务、云数据库或容器。`examples/quickstart/docker-compose.yml` 只是为没有现成基础设施的开发者提供的可选便利方案。
+> **Docker 不是前置条件。** MySQL 与 Redis 可以来自本机、局域网、云服务或容器。仓库中的 Docker Compose 只是一种可选的本地便利方式。
 
 ## 1. 前置条件
 
 - Java 21；
 - Spring Boot 4；
 - Maven；
-- MySQL 8.x（项目发布基线验证使用 MySQL 8.4）；
+- MySQL 8.x（发布基线验证使用 MySQL 8.4）；
 - Redis 7。
 
-使用 IAM 不要求安装 Docker，也不要求运行框架仓库中的 Testcontainers 或完整集成测试。
+如果还要使用 IAM Admin Console，需要 Node.js 22+ 与 npm。
 
-如果还要使用 Admin Console，需要额外准备 Node.js 22+ 与 npm。
+普通使用者不需要运行仓库中的 Testcontainers、Independent Consumer 或完整 Maven Reactor 验证。
 
-## 2. 准备 MySQL
+## 2. 引入 Starter
 
-IAM 默认使用宿主应用的 `DataSource` 持久化 Session、Profile、Permission Template、Scope 与审计数据。
+业务应用通常只需要一个依赖：
 
-如果你已经有 MySQL，可以直接创建一个供当前应用使用的数据库和账号。例如：
+```xml
+<dependency>
+    <groupId>io.github.muer</groupId>
+    <artifactId>muer-spring-boot-starter</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+</dependency>
+```
+
+不要为了接入 Muer 直接依赖 MyBatis Mapper、内部自动配置实现或 `internal` 包。
+
+## 3. 准备 MySQL
+
+Muer 默认复用宿主应用的 `DataSource` 保存 Permission、Template、Profile、Scope、Session 与 Audit 数据。
+
+可以手工准备数据库，例如：
 
 ```sql
 CREATE DATABASE iam_host
@@ -40,45 +59,43 @@ CREATE USER 'iam_app'@'localhost' IDENTIFIED BY 'change-me';
 GRANT ALL PRIVILEGES ON iam_host.* TO 'iam_app'@'localhost';
 ```
 
-如果应用与 MySQL 不在同一台机器，请把 `localhost` 换成实际应用主机或受控网段，并通过防火墙限制访问范围；生产环境不要直接使用示例密码。
+生产环境请使用真实的密码管理与最小权限策略，不要直接照搬示例凭据。
 
-默认情况下：
+默认：
 
 ```yaml
-iam:
+muer:
   schema:
     enabled: true
 ```
 
-Starter 会从 `classpath:db/iam/migration` 自动执行 IAM 的 Flyway migration，并使用独立的历史表 `iam_flyway_schema_history`。因此首次接入通常**不需要手工建 IAM 表**。
+Muer 会执行 `classpath:db/iam/migration` 中的 Flyway Migration，并使用独立的 `iam_flyway_schema_history`。因此首次接入通常不需要手工创建 `iam_*` 表。
 
-只有当你的团队已经通过 DBA、Liquibase、统一 Flyway 流程等方式显式管理同一套 IAM schema 时，才设置：
+如果组织已经由 DBA、Liquibase 或统一迁移平台管理同一套 Schema，再设置：
 
 ```yaml
-iam:
+muer:
   schema:
     enabled: false
 ```
 
-## 3. 准备 Redis
+## 4. 准备 Redis
 
-Redis 用于保存不透明 Token 的快速索引。使用现有 Redis 7 服务即可，不需要预先创建 Key 或数据结构。
-
-最小连接信息包括：
+Redis 用作 Opaque Token 的快速索引。已有 Redis 7 服务可以直接使用，不需要预创建 Key。
 
 | 配置 | 示例 | 说明 |
 | --- | --- | --- |
 | Host | `127.0.0.1` | Redis 地址 |
 | Port | `6379` | Redis 端口 |
-| Password | 按环境设置 | Redis 开启认证时配置 |
+| Password | 按环境设置 | 开启认证时配置 |
 | Database | `0` | 可使用 Spring Boot 默认值 |
-| IAM Key Prefix | `iam` | 多应用共享 Redis 时建议使用应用独立前缀 |
+| Redis Prefix | `my-app:iam` | 多应用共享 Redis 时建议应用隔离 |
 
-生产环境不要把 Redis 直接暴露到公网。应用与 Redis 跨主机部署时，建议使用私网、访问控制和认证。
+生产 Redis 不应直接暴露公网。
 
-## 4. 配置 Spring Boot
+## 5. 配置 Spring Boot
 
-最小的 MySQL、Redis 与 IAM 配置如下：
+最小配置示例：
 
 ```yaml
 spring:
@@ -92,14 +109,14 @@ spring:
       port: 6379
       password: ${IAM_REDIS_PASSWORD:}
 
-iam:
+muer:
   enabled: true
   schema:
     enabled: true
     history-table: iam_flyway_schema_history
   token:
     ttl: 8h
-    redis-prefix: iam
+    redis-prefix: my-app:iam
   session:
     enabled: true
     touch-interval: 10m
@@ -107,23 +124,13 @@ iam:
     - WEB
 ```
 
-如果 MySQL 或 Redis 在其他服务器，只需要替换对应的地址、端口和凭据。IAM 本身不要求基础设施以容器方式运行。
-
-## 5. 引入 Starter
-
-生产应用通常只需要依赖聚合 Starter：
-
-```xml
-<dependency>
-    <groupId>io.github.iamstarter</groupId>
-    <artifactId>iam-spring-boot-starter</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
-</dependency>
-```
+Muer 是品牌与 Spring 配置身份；HTTP `/iam/**`、数据库 `iam_*` 和管理 Permission `iam.admin.*` 继续保留为 IAM 领域协议。
 
 ## 6. 接入宿主身份
 
-IAM 不要求迁移你现有的用户表。宿主系统继续负责用户名、密码、员工账号、学生账号或其他身份源，只需要实现 `IdentityAuthenticator` 并返回 `IamPrincipal`。
+Muer 不要求迁移你的用户表，也不保存宿主密码。业务系统继续负责验证自己的用户名、密码、员工账号、学生账号或其他身份源。
+
+只需提供 `IdentityAuthenticator`：
 
 ```java
 @Bean
@@ -140,11 +147,35 @@ IdentityAuthenticator identityAuthenticator(AccountGateway accounts) {
 }
 ```
 
-`iam.client-types` 是 IAM 层的客户端类型白名单。宿主 `IdentityAuthenticator` 只负责凭据认证，不需要复制这段白名单判断。
+`muer.client-types` 由 Muer 统一校验；宿主 `IdentityAuthenticator` 不应再复制一份 Client Type 白名单。
 
-## 7. 接入资源范围
+## 7. 声明业务 Permission
 
-如果业务需要 Department、Project、Order、Document 等资源范围授权，宿主提供：
+业务权限的正式来源是代码中的 `PermissionDefinitionProvider`，而不是初始化 SQL 或后台随意创建的字符串。
+
+```java
+@Bean
+PermissionDefinitionProvider documentPermissions() {
+    return () -> List.of(
+            new PermissionDefinition("document:read", "查看文档", "读取文档内容"),
+            new PermissionDefinition("document:update", "编辑文档", "修改文档内容"));
+}
+```
+
+应用就绪后，Muer 会：
+
+- 创建缺失 Permission；
+- 更新已存在 Permission 的显示元数据；
+- 对相同 Code + 相同定义去重；
+- 对相同 Code + 冲突定义 Fail Fast；
+- 保留当前 Provider 没有声明的历史 Permission，不自动删除；
+- 对 `@RequirePermission` 引用了未注册 Permission 的情况给出一致性警告。
+
+开发者负责声明“系统有哪些能力”；管理员负责决定“谁拥有这些能力”。
+
+## 8. 接入业务资源范围
+
+如果需要 Department、Project、Order、Document 等资源范围授权，宿主提供 `ResourceHierarchyProvider`：
 
 ```java
 @Bean
@@ -153,39 +184,54 @@ ResourceHierarchyProvider resourceHierarchyProvider(ResourceGateway resources) {
 }
 ```
 
-使用声明式 MVC 授权时，再实现 `MvcResourceDescriptorResolver`，把业务请求映射为 `ResourceDescriptor`。
+使用声明式 MVC 授权时，再提供 `MvcResourceDescriptorResolver`，把业务 URL / 参数映射为 `ResourceDescriptor`。
 
 例如：
 
+```text
+Document 1001
+→ belongs to
+Project 101
+```
+
+Muer 不读取你的业务 Document / Project 表。宿主解释资源归属，Muer 只负责授权判断。
+
+## 9. 保护业务接口
+
 ```java
-@GetMapping("/api/documents/{id}")
-@RequirePermission("document:read")
-public Document get(@PathVariable String id) {
-    return documentService.get(id);
+@PostMapping("/api/documents/{id}")
+@RequirePermission("document:update")
+public Document update(@PathVariable String id, @RequestBody DocumentUpdate request) {
+    return documentService.update(id, request);
 }
 ```
 
-IAM 负责“这个 Principal 是否有权访问这个 Resource”，宿主系统负责“这个 Document 是什么、属于哪个 Project”。
+最终 Allow / Deny 始终由 `AuthorizationEngine` 决定，不应该重新在 Controller 中写 Role 判断。
 
-## 8. 启动应用
+## 10. 启动应用
 
-你可以直接在 IDE 中运行 Spring Boot 主类，也可以按项目自己的标准方式构建并启动 JAR。
+可以直接通过 IDE 或业务项目自己的 JAR / 服务方式启动。
 
-首次启动时，若 `iam.schema.enabled=true`，应能看到 IAM schema migration 正常完成，随后应用成功启动。
+首次启动建议确认：
 
-使用者不需要为了接入 IAM 再执行仓库中的完整自动化测试；这些测试由 IAM 项目的 CI 负责。
+- MySQL 可以连接；
+- Redis 可以连接；
+- `muer.schema.enabled=true` 时 IAM Schema Migration 成功；
+- Permission Definition 注册完成；
+- Spring Boot 应用正常启动。
 
-## 9. 用接口确认接入结果
+到这里无需执行 Muer 仓库的完整自动测试。
 
-可以使用 Postman、Apifox、IDE HTTP Client、浏览器插件或任何 HTTP 客户端。无需依赖 `curl` / `jq`。
+## 11. 用 HTTP 接口确认认证链路
 
-### 9.1 登录
+可以使用 Postman、Apifox、IDE HTTP Client、前端应用等工具，不要求 `curl` / `jq`。
 
-**接口**：`POST /iam/auth/login`
+### 登录
 
-**认证**：无需 Bearer Token。
+**方法**：`POST`  
+**路径**：`/iam/auth/login`
 
-**请求体示例**：
+请求体示例：
 
 ```json
 {
@@ -195,55 +241,46 @@ IAM 负责“这个 Principal 是否有权访问这个 Resource”，宿主系�
 }
 ```
 
-**预期结果**：
+预期：
 
-- 合法凭据：HTTP `200`；
-- 返回 `accessToken`、`sessionId`、`expiresAt` 和 `principal`；
-- 非法凭据或不允许的 `clientType`：认证失败。
+- 合法凭据返回 HTTP `200`；
+- 响应包含 `accessToken`、`sessionId`、`expiresAt` 与 `principal`。
 
-### 9.2 获取当前 Principal
+### 当前 Principal
 
-**接口**：`GET /iam/auth/me`
+**方法**：`GET`  
+**路径**：`/iam/auth/me`  
+**认证**：`Authorization: Bearer <accessToken>`
 
-**认证**：`Authorization: Bearer <accessToken>`。
+预期：HTTP `200`，返回当前 `IamPrincipal`。
 
-**预期结果**：HTTP `200`，返回当前 `IamPrincipal`。
+## 12. 验证权限与 Resource Scope
 
-### 9.3 声明式权限示例
+`muer-example` 的 Document 场景可用于理解：
 
-以 `iam-example` 的 Document 场景为例：
-
-| 请求 | Reader Profile | Editor Profile | 说明 |
+| 请求 | Reader | Editor | 含义 |
 | --- | --- | --- | --- |
 | `GET /api/documents/1001` | `200` | `200` | Project 101 范围内读取 |
 | `POST /api/documents/1001` | `403` | `200` | 写入需要 `document:update` + WRITE Scope |
-| `GET /api/documents/2001` | `403` | `403` | Document 2001 属于 Project 202，超出 Project 101 Scope |
+| `GET /api/documents/2001` | `403` | `403` | Document 2001 属于 Project 202，超出 Scope |
 
-更新文档时的请求体示例：
+这说明 Permission 解决“能做什么”，Resource Scope 解决“能在哪里做”。
 
-```json
-{
-  "status": "PUBLISHED"
-}
-```
+## 13. 切换 Profile
 
-### 9.4 切换 Profile
+**方法**：`POST`  
+**路径**：`/iam/authorization/profiles/{profileId}/switch`
 
-**接口**：`POST /iam/authorization/profiles/{profileId}/switch`
+预期：HTTP `200`，返回新的 Token 与新的 Session。
 
-**认证**：Bearer Token。
+Profile Switch 不会提升或覆盖旧 Token；原 Token 继续保持原授权身份。
 
-**预期结果**：HTTP `200`，返回新的 `accessToken` 与新的 `sessionId`。
+## 14. 查看授权诊断
 
-Profile Switch **不会提升或覆盖原 Token**。原 Reader Token 仍然保持 Reader 权限，新 Token 才使用目标 Profile。
+**方法**：`POST`  
+**路径**：`/iam/authorization/diagnostics`
 
-### 9.5 授权诊断
-
-**接口**：`POST /iam/authorization/diagnostics`
-
-**认证**：Bearer Token。
-
-示例请求：
+请求示例：
 
 ```json
 {
@@ -256,26 +293,110 @@ Profile Switch **不会提升或覆盖原 Token**。原 Reader Token 仍然保�
 }
 ```
 
-**预期结果**：HTTP `200`，返回当前 Principal 的真实 `AuthorizationDecision`。例如 Reader 缺少 `document:update` 时，`allowed=false`，常见 `decisionCode=PERMISSION_DENIED`。
+预期：HTTP `200`，返回当前 Principal 的真实 `AuthorizationDecision`。
 
-### 9.6 撤销 Session
+该接口始终是 **Authenticated Self Diagnostics**：只诊断当前登录 Principal，不是管理员专属接口，也不能指定别人。
 
-**接口**：`POST /iam/sessions/{sessionId}/revoke`
+## 15. 撤销 Session
 
-**认证**：Bearer Token。
+**方法**：`POST`  
+**路径**：`/iam/sessions/{sessionId}/revoke`
 
-**预期结果**：成功撤销返回 HTTP `204`；对应 Token 随后访问受保护接口应返回 `401`。同一用户的其他独立 Session 不应被连带撤销。
+预期：成功返回 HTTP `204`；该 Session 的 Token 之后访问受保护接口返回 `401`，其他独立 Session 不被连带撤销。
 
-## 10. 如果想直接运行仓库示例
+## 16. 权限如何管理
 
-`iam-example` 已经提供 Alice / Reader / Editor 的演示数据。你可以：
+接入 Muer 后，一般不需要自己再开发一套授权管理后端。
 
-1. 手动准备一个空 MySQL 数据库和一个可用 Redis；
-2. 配置以下环境变量或在 IDE Run Configuration 中填写同等配置；
-3. 启用 `dev` Profile 和演示种子；
-4. 启动 `IamExampleApplication`。
+```text
+PermissionDefinitionProvider
+        ↓
+Permission Registry
+        ↓
+Permission Template Version
+        ↓
+Authorization Profile
+        ↓
+Resource Scope
+        ↓
+User / Session
+```
 
-常用配置：
+两种正式管理方式：
+
+1. 使用随 0.1.0 提供的 `iam-admin-web`；
+2. 企业已有统一后台时，调用 Muer Management API 做自己的前端。
+
+不要直接操作 `iam_*` 表。
+
+## 17. 手工验收 IAM Admin Console（可选）
+
+### 准备开发管理员
+
+使用 `muer-example` 时，只有同时设置：
+
+```text
+SPRING_PROFILES_ACTIVE=dev
+MUER_EXAMPLE_SEED_ADMIN=true
+```
+
+才会创建：
+
+```text
+username: admin-demo
+password: demo-pass
+clientType: WEB
+```
+
+生产不会自动创建该账户，也不存在公开 Bootstrap Admin HTTP 接口。
+
+### 启动前端
+
+```bash
+cd iam-admin-web
+npm ci
+npm run api:generate
+npm run dev
+```
+
+浏览器打开 Vite 输出地址，通常是 `http://localhost:5173`。
+
+建议手工确认：登录、Dashboard、Users、Profiles、Scopes、Sessions、Audit、Diagnostics、403 路由和 Logout。
+
+完整说明见 [IAM_ADMIN_CONSOLE_DEPLOYMENT.md](IAM_ADMIN_CONSOLE_DEPLOYMENT.md)。
+
+## 18. 查看运行状态（可选）
+
+如果宿主项目引入 Spring Boot Actuator / Micrometer，Muer 会条件化提供运行可观测能力；未引入时不会影响 Starter。
+
+### Health
+
+Muer 会贡献 `muer` Health Indicator，用来说明框架自动配置已加载。
+
+MySQL / Redis 连通性继续由宿主 Spring Boot 的 DataSource / Redis Health 检查负责，Muer 不重复执行昂贵探测。
+
+### Metrics
+
+目前可记录：
+
+```text
+muer.authentication.attempts
+muer.authorization.decisions
+muer.authorization.duration
+muer.sessions.created
+muer.sessions.revoked
+muer.token.lookups
+```
+
+不会使用 username、userId、sessionId、token 或 resourceId 作为指标 Tag。
+
+详细说明见文档站 `Operations → Observability`。
+
+## 19. 直接运行仓库示例
+
+`muer-example` 提供 Alice / Reader / Editor 示例。
+
+常用环境变量：
 
 | 环境变量 | 示例 |
 | --- | --- |
@@ -285,81 +406,31 @@ Profile Switch **不会提升或覆盖原 Token**。原 Reader Token 仍然保�
 | `IAM_EXAMPLE_REDIS_HOST` | `127.0.0.1` |
 | `IAM_EXAMPLE_REDIS_PORT` | `6379` |
 | `SPRING_PROFILES_ACTIVE` | `dev` |
-| `IAM_EXAMPLE_SEED_DEMO` | `true` |
+| `MUER_EXAMPLE_SEED_DEMO` | `true` |
 
-`QuickStartDemoSeeder` 只允许用于专用演示数据库，因为它会重置 IAM 演示投影。不要对共享数据库或生产数据库启用它。
+`QuickStartDemoSeeder` 会重置演示 IAM 投影，只能用于专用本地演示数据库。
 
-如果本机没有 MySQL / Redis，也可以选择使用 `examples/quickstart/docker-compose.yml` 快速启动它们；这是可选方案，不是 IAM 的部署要求。
+没有现成 MySQL / Redis 时可以选择 `examples/quickstart/docker-compose.yml`，但它只是可选工具。
 
-## 11. 启动并手工验收 IAM Admin Console（可选）
+## 20. 什么时候算接入成功
 
-0.1.0 同时提供 `iam-admin-web`，但它只是可选管理客户端，不影响 Starter 的独立使用。
+普通 Starter 用户做到以下几点即可：
 
-### 11.1 准备本地管理员
+- 应用正常启动；
+- MySQL、Redis 连接正常；
+- IAM Schema Migration 成功或已经由组织部署流程管理；
+- Permission 能从 `PermissionDefinitionProvider` 注册；
+- 合法用户可以登录；
+- `GET /iam/auth/me` 返回正确 Principal；
+- 至少一个业务接口能够得到预期的 Allow / Deny；
+- 如使用 Admin Console，主要管理页面与写操作可正常使用；
+- 如启用 Actuator / Micrometer，可以查看 Muer Health 与运行指标。
 
-若使用 `iam-example` 验收控制台，可在**专用开发数据库**中显式开启管理员种子：
+不需要为了证明 Muer 能工作而执行仓库的全量测试。
 
-```text
-SPRING_PROFILES_ACTIVE=dev
-IAM_EXAMPLE_SEED_ADMIN=true
-```
+更多内容见：
 
-同时使用前面的 MySQL/Redis 配置启动 `IamExampleApplication`。只有 `dev` Profile 与 `seed-admin=true` 同时存在时才会创建：
-
-```text
-username: admin-demo
-password: demo-pass
-clientType: WEB
-```
-
-生产环境不会自动创建这个账号，也不存在公开的管理员 bootstrap HTTP 接口。
-
-### 11.2 启动前端
-
-```bash
-cd iam-admin-web
-npm ci
-npm run api:generate
-npm run dev
-```
-
-浏览器打开 Vite 输出地址，通常为 `http://localhost:5173`。
-
-### 11.3 建议手工验收路径
-
-无需跑仓库完整自动化测试。浏览器中按下面路径确认即可：
-
-1. 使用 `admin-demo / demo-pass / WEB` 登录，进入 Dashboard；
-2. 打开用户列表与用户详情，Identity/Profile/Session 信息可以正常读取；
-3. 打开 Permission、Template、Profile 页面，确认列表和详情能够加载；
-4. 修改一个开发 Profile 或 Scope，保存后刷新仍能读取新值；
-5. 在 Session 页面撤销一个测试 Session，确认目标会话失效；
-6. 在 Audit 页面确认相关管理操作产生可查询审计记录；
-7. 在 Diagnostics 页面输入 Permission/Resource 条件，能够显示 ALLOW/DENY 和决策步骤；
-8. 使用缺少某项 `iam.admin.*` Capability 的测试 Profile 访问对应路由，前端应进入 403，后端接口也必须返回 403；
-9. 点击退出后，前端清理会话且后端 Session/Token 不再可继续使用。
-
-管理控制台页面隐藏、菜单和路由 Guard 只是用户体验层；真正授权始终由后端 `AuthorizationEngine` 执行。
-
-完整部署、Nginx、CSP、生产首个管理员初始化见 [IAM_ADMIN_CONSOLE_DEPLOYMENT.md](IAM_ADMIN_CONSOLE_DEPLOYMENT.md)。
-
-## 12. 什么时候算接入成功
-
-对于普通 Starter 使用者，完成以下几点即可：
-
-- Spring Boot 应用能正常启动；
-- IAM Flyway migration 成功，或你已经按组织流程手动管理 schema；
-- MySQL 与 Redis 连接正常；
-- 合法用户可以通过 `POST /iam/auth/login` 登录；
-- 携带 Token 访问 `GET /iam/auth/me` 能得到正确 Principal；
-- 你的一个业务接口能按 `@RequirePermission` / `AuthorizationEngine` 得到符合预期的允许或拒绝结果。
-
-如果同时使用 Admin Console，再额外确认：
-
-- 控制台可以登录并加载主要管理页面；
-- 管理写操作可持久化；
-- Session revoke、Audit、Diagnostics、403 权限边界符合预期。
-
-无需运行 IAM 仓库的完整 Testcontainers 验收套件。
-
-更多内容见 [IAM_INTEGRATION_GUIDE.md](IAM_INTEGRATION_GUIDE.md)、[PUBLIC_API.md](PUBLIC_API.md)、[IAM_ADMIN_CONSOLE_DEPLOYMENT.md](IAM_ADMIN_CONSOLE_DEPLOYMENT.md) 与文档站。
+- [IAM_INTEGRATION_GUIDE.md](IAM_INTEGRATION_GUIDE.md)
+- [PUBLIC_API.md](PUBLIC_API.md)
+- [IAM_ADMIN_CONSOLE_DEPLOYMENT.md](IAM_ADMIN_CONSOLE_DEPLOYMENT.md)
+- `iam-docs/` 文档站

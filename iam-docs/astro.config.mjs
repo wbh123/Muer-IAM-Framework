@@ -2,14 +2,18 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 
+const site = process.env.SITE_URL ?? 'https://wbh123.github.io/iam/';
+const base = process.env.BASE_PATH ?? '/iam';
+
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://wbh123.github.io/iam/',
+  site,
+  base,
   integrations: [
     starlight({
-      title: 'IAM Spring Boot Starter',
+      title: 'Muer',
       description:
-        '为 Spring Boot 应用提供可嵌入的认证、细粒度授权、资源范围与会话治理能力。',
+        'A lightweight identity and access management framework for modern applications.',
       editLink: {
         baseUrl: 'https://github.com/wbh123/iam/edit/main/iam-docs',
       },
@@ -30,6 +34,8 @@ export default defineConfig({
             { label: '快速开始', slug: 'getting-started/quick-start' },
             { label: '安装', slug: 'getting-started/installation' },
             { label: '基础配置', slug: 'getting-started/configuration' },
+            { label: '定义权限', slug: 'getting-started/define-permissions' },
+            { label: '权限管理', slug: 'getting-started/permission-management' },
             { label: '手动部署', slug: 'getting-started/manual-deployment' },
             { label: '工程结构', slug: 'getting-started/project-structure' },
           ],
@@ -102,6 +108,7 @@ export default defineConfig({
             { label: 'Reverse Proxy', slug: 'operations/reverse-proxy' },
             { label: 'Security Model', slug: 'operations/security-model' },
             { label: 'Production Checklist', slug: 'operations/production-checklist' },
+            { label: '可观测性', slug: 'operations/observability' },
           ],
         },
         {

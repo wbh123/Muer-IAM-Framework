@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.github.muer.persistence.mapper.IamOverviewMapper">
+    <resultMap id="overview" type="io.github.muer.persistence.OverviewRow">
+        <constructor>
+            <arg column="total_users" javaType="_long"/>
+            <arg column="enabled_users" javaType="_long"/>
+            <arg column="active_sessions" javaType="_long"/>
+            <arg column="active_profiles" javaType="_long"/>
+            <arg column="template_versions" javaType="_long"/>
+            <arg column="audit_events_today" javaType="_long"/>
+        </constructor>
+    </resultMap>
+
+    <select id="load" resultMap="overview">
+        SELECT
+            (SELECT COUNT(*) FROM iam_user) AS total_users,
+            (SELECT COUNT(*) FROM iam_user WHERE enabled = TRUE) AS enabled_users,
+            (SELECT COUNT(*) FROM iam_session
+              WHERE revoked_at IS NULL AND expires_at &gt; CURRENT_TIMESTAMP(6)) AS active_sessions,
+            (SELECT COUNT(*) FROM iam_authorization_profile
+              WHERE enabled = TRUE AND revoked_at IS NULL) AS active_profiles,
+            (SELECT COUNT(*) FROM iam_permission_template_version) AS template_versions,
+            (SELECT COUNT(*) FROM iam_audit_log
+              WHERE occurred_at &gt;= CURRENT_DATE) AS audit_events_today
+    </select>
+</mapper>

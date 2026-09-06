@@ -7,19 +7,19 @@ sidebar:
 
 ## 模块列表
 
-- **iam-core**：核心模型与端口。`IamPrincipal`、`ScopeAccess`、`ResourceDescriptor`、`ResourceScope`、`ResourceHierarchyProvider`（端口）等。被其它模块依赖。
-- **iam-authentication**：认证。`IdentityAuthenticator`、`LoginRequest`、`AuthenticationResult`、profile 切换服务。
-- **iam-authorization**：授权引擎。`AuthorizationEngine`、`AuthorizationRequest`、`AuthorizationDecision`、`AuthorizationProfile`、`PermissionTemplateVersion`。
-- **iam-session**：会话与令牌。`AuthSession`、`TokenRecord`、`LoginResult`，基于 Redis 存储。
-- **iam-spring-boot-autoconfigure**：Spring Boot 自动配置。`IamProperties`、`IamBearerTokenFilter`、`RequirePermission`、`MvcResourceDescriptorResolver`、`IamAuthorizationInterceptor`。
-- **iam-management-web**：HTTP 管理层。暴露 `/iam/**` 端点，含 `openapi/iam.yaml`。
-- **iam-example**：演示。`ExampleIdentityAdapter`、`QuickStartDemoSeeder`、`DocumentController`（alice/demo-pass 场景）。
+- **muer-core**：核心模型与端口。`IamPrincipal`、`ScopeAccess`、`ResourceDescriptor`、`ResourceScope`、`ResourceHierarchyProvider`（端口）等。被其它模块依赖。
+- **muer-authentication**：认证。`IdentityAuthenticator`、`LoginRequest`、`AuthenticationResult`、profile 切换服务。
+- **muer-authorization**：授权引擎。`AuthorizationEngine`、`AuthorizationRequest`、`AuthorizationDecision`、`AuthorizationProfile`、`PermissionTemplateVersion`。
+- **muer-session**：会话与令牌。`AuthSession`、`TokenRecord`、`LoginResult`，基于 Redis 存储。
+- **muer-spring-boot-autoconfigure**：Spring Boot 自动配置。`MuerProperties`、`IamBearerTokenFilter`、`RequirePermission`、`MvcResourceDescriptorResolver`、`IamAuthorizationInterceptor`。
+- **muer-management-web**：HTTP 管理层。暴露 `/iam/**` 端点，含 `openapi/iam.yaml`。
+- **muer-example**：演示。`ExampleIdentityAdapter`、`QuickStartDemoSeeder`、`DocumentController`（alice/demo-pass 场景）。
 
 ## 依赖方向
 
-`autoconfigure` 依赖 `core/authentication/authorization/session`；`management-web` 与 `example` 为可独立运行的装配层。宿主一般只引入 `iam-spring-boot-autoconfigure` 并实现 `IdentityAuthenticator` 与 `MvcResourceDescriptorResolver`。
+`autoconfigure` 依赖 `core/authentication/authorization/session`；`management-web` 与 `example` 为可独立运行的装配层。宿主一般只引入 `muer-spring-boot-autoconfigure` 并实现 `IdentityAuthenticator` 与 `MvcResourceDescriptorResolver`。
 
 ## 源码参考
 
 - 仓库根：<https://github.com/wbh123/iam>
-- autoconfigure：<https://github.com/wbh123/iam/blob/main/iam-spring-boot-autoconfigure/src/main/java/io/github/iamstarter/autoconfigure/>
+- autoconfigure：<https://github.com/wbh123/iam/blob/main/muer-spring-boot-autoconfigure/src/main/java/io/github/muer/autoconfigure/>

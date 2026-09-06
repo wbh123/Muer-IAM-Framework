@@ -7,15 +7,15 @@ sidebar:
 
 ## 它解决什么问题
 
-IAM 是一个多模块 Maven 工程，但普通宿主应用通常只需要依赖 `iam-spring-boot-starter`。了解模块边界有助于避免业务代码直接依赖内部实现。
+IAM 是一个多模块 Maven 工程，但普通宿主应用通常只需要依赖 `muer-spring-boot-starter`。了解模块边界有助于避免业务代码直接依赖内部实现。
 
 ## 宿主应用真正需要关心的模块
 
-### `iam-spring-boot-starter`
+### `muer-spring-boot-starter`
 
 业务应用的统一依赖入口。
 
-### `iam-spring-boot-autoconfigure`
+### `muer-spring-boot-autoconfigure`
 
 负责 Spring Boot 自动配置、Bearer Token 解析、声明式 MVC 授权等集成能力。宿主通常通过 Starter 间接获得它。
 
@@ -44,16 +44,16 @@ IAM 是一个多模块 Maven 工程，但普通宿主应用通常只需要依赖
 - persistence implementation；
 - `internal` / `impl` 包。
 
-## `iam-example` 的角色
+## `muer-example` 的角色
 
-`iam-example` 是仓库中的 Consumer Showcase，用于证明 Starter 可以被独立 Spring Boot 应用消费。
+`muer-example` 是仓库中的 Consumer Showcase，用于证明 Starter 可以被独立 Spring Boot 应用消费。
 
 它同时提供 QuickStart 的 Alice / Document 示例，但**不是**要求用户照搬的生产项目模板。生产应用应该保留自己的用户模型、业务资源和部署方式，只接入 IAM 公共 API / SPI。
 
 ## 文档与测试的边界
 
 - 用户文档负责说明如何配置、启动和调用 IAM；
-- `iam-example` 展示真实接入方式；
+- `muer-example` 展示真实接入方式；
 - Testcontainers、独立 Consumer 验收与完整回归由项目 CI 负责。
 
 因此普通使用者无需复制仓库测试环境，也不需要为了部署 IAM 运行所有测试。

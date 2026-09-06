@@ -19,7 +19,7 @@ This report is a documentation-only follow-up and does not change product runtim
 
 0.1.0 is defined as the first complete product baseline and contains:
 
-- `iam-spring-boot-starter` and Spring Boot auto-configuration;
+- `muer-spring-boot-starter` and Spring Boot auto-configuration;
 - host-owned credential authentication through `IdentityAuthenticator`;
 - opaque token issuance, durable MySQL Session state and Redis token index;
 - Permission, immutable Permission Template Version, Profile and Resource Scope authorization;
@@ -93,7 +93,7 @@ Security and compatibility boundaries reviewed before merge:
 
 ## Administrator bootstrap
 
-`iam-example` provides an explicit development-only administrator for manual Console acceptance only when **both** conditions hold:
+`muer-example` provides an explicit development-only administrator for manual Console acceptance only when **both** conditions hold:
 
 ```text
 SPRING_PROFILES_ACTIVE=dev
@@ -132,7 +132,7 @@ The same feature head `03e723ff` also passed all three PR workflows before PR #2
 | Priority | Finding | Status |
 | --- | --- | --- |
 | P0 | No release-blocking software correctness or security issue recorded after final review. | Closed / none |
-| P1 | No `LICENSE` file exists. License metadata is intentionally omitted rather than invented. This blocks public open-source / Maven Central distribution. | Open — owner decision required |
+| P1 | No `LICENSE` file existed; license metadata was intentionally omitted rather than invented, which blocked public open-source / Maven Central distribution. | Resolved — Apache License 2.0 added (`LICENSE`, root POM `<licenses>`, README and docs). Final public-distribution readiness still gated on a passing Muer CI baseline. |
 | P2 | `main` currently has no enforced branch protection / required status checks. | Open — repository governance improvement |
 | P2 | GitHub Actions still use v4 checkout/setup actions that have deprecation/runtime notices; upgrade can be handled separately without changing 0.1.0 product semantics. | Open — technical debt |
 | P3 | Browser-level Playwright end-to-end coverage for the Admin Console is deferred; backend integration, OpenAPI generation, frontend unit/component tests, type checking and production build are present. | Deferred |
@@ -143,6 +143,6 @@ The same feature head `03e723ff` also passed all three PR workflows before PR #2
 
 The product candidate is merged into `main`, the Starter/Management/Consumer/Admin Console/Documentation verification matrix is green, the compatibility regression around self diagnostics was corrected, and the Admin Demo Seeder is explicitly scoped to demo-owned permissions.
 
-**Public Maven / open-source distribution**: `NOT READY` until the repository owner chooses and adds a `LICENSE` and corresponding Maven license metadata.
+**Public Maven / open-source distribution**: pending. The repository owner has chosen **Apache License 2.0**; a `LICENSE` file and matching Maven license metadata are now in place. The distribution gate will be re-evaluated once the Muer migration baseline (this branch) is green in CI.
 
 The repository intentionally remains `0.1.0-SNAPSHOT`. No `v0.1.0` tag, Maven publication, or GitHub Release has been created yet.

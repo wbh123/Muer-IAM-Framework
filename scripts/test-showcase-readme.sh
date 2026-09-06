@@ -2,7 +2,7 @@
 set -euo pipefail
 
 repository_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-readme="$repository_root/iam-example/README.md"
+readme="$repository_root/muer-example/README.md"
 root_readme="$repository_root/README.md"
 
 require() {
@@ -26,8 +26,8 @@ require 'profile switch endpoint' 'POST[[:space:]]+/iam/authorization/profiles/.
 require 'authorization diagnostics endpoint' 'POST[[:space:]]+/iam/authorization/diagnostics'
 require 'session revoke endpoint' 'POST[[:space:]]+/iam/sessions/.*/revoke'
 require 'post-revocation unauthorized result' '401'
-require 'container-free smoke command' 'mvn[[:space:]]+-pl[[:space:]]+iam-example[[:space:]]+-am.*-Dtest=IamStarterAutoConfigurationSmokeTest.*test'
-require 'Testcontainers integration command' 'mvn[[:space:]]+-pl[[:space:]]+iam-example[[:space:]]+-am[[:space:]]+-Pintegration.*IamStarterConsumptionTest.*IamSecurityIntegrationTest.*test'
+require 'container-free smoke command' 'mvn[[:space:]]+-pl[[:space:]]+muer-example[[:space:]]+-am.*-Dtest=IamStarterAutoConfigurationSmokeTest.*test'
+require 'Testcontainers integration command' 'mvn[[:space:]]+-pl[[:space:]]+muer-example[[:space:]]+-am[[:space:]]+-Pintegration.*IamStarterConsumptionTest.*IamSecurityIntegrationTest.*test'
 require 'declarative permission annotation' '@RequirePermission'
 require 'MVC resource resolver SPI' 'MvcResourceDescriptorResolver'
 require 'declarative unauthenticated status' '401'

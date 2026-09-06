@@ -68,5 +68,5 @@ revokeReason
 
 ## 源码
 
-- `AuthSession` / `TokenRecord`：<https://github.com/wbh123/iam/tree/main/iam-session/src/main/java/io/github/iamstarter/session>
-- `IamProperties`：<https://github.com/wbh123/iam/tree/main/iam-spring-boot-autoconfigure/src/main/java/io/github/iamstarter/autoconfigure>
+- `AuthSession` / `TokenRecord`：<https://github.com/wbh123/iam/tree/main/muer-session/src/main/java/io/github/muer/session>
+- `MuerProperties`：<https://github.com/wbh123/iam/tree/main/muer-spring-boot-autoconfigure/src/main/java/io/github/muer/autoconfigure>

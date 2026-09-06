@@ -106,8 +106,8 @@ IAM 默认复用宿主 Spring Boot 的 `DataSource`。因此 IAM 表可以和宿
 
 ## 源码参考
 
-- `IamProperties`：<https://github.com/wbh123/iam/blob/main/iam-spring-boot-autoconfigure/src/main/java/io/github/iamstarter/autoconfigure/>
-- IAM migration：<https://github.com/wbh123/iam/tree/main/iam-persistence-mybatis/src/main/resources/db/iam/migration>
-- Session 模型：<https://github.com/wbh123/iam/tree/main/iam-session/src/main/java/io/github/iamstarter/session>
+- `MuerProperties`：<https://github.com/wbh123/iam/blob/main/muer-spring-boot-autoconfigure/src/main/java/io/github/muer/autoconfigure/>
+- IAM migration：<https://github.com/wbh123/iam/tree/main/muer-persistence-mybatis/src/main/resources/db/iam/migration>
+- Session 模型：<https://github.com/wbh123/iam/tree/main/muer-session/src/main/java/io/github/muer/session>
 
 下一步：阅读[Redis 存储](/operations/redis/)和[手动部署](/getting-started/manual-deployment/)。

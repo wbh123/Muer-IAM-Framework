@@ -1,20 +1,22 @@
-name: Publish IAM Documentation (manual)
+name: Publish Muer Documentation
 
-# Manual Pages preparation: build the static documentation site and upload it as
-# an Actions artifact. Deployment to GitHub Pages is intentionally NOT enabled by
-# this workflow and no GitHub Release is created. A human must enable Pages and
-# attach the produced artifact manually as part of the release gate.
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: read
+  pages: write
+  id-token: write
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - uses: actions/configure-pages@v5
 
       - uses: actions/setup-node@v4
         with:
@@ -36,10 +38,15 @@ jobs:
       - name: Build the documentation site
         working-directory: iam-docs
         run: npm run build
+        env:
+          SITE_URL: https://wbh123.github.io/iam/
+          BASE_PATH: /iam
 
-      - name: Upload static documentation artifact
-        uses: actions/upload-artifact@v4
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          name: iam-docs-site
           path: iam-docs/dist
           if-no-files-found: error
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4

@@ -8,7 +8,7 @@ sidebar:
 IAM 配置分为两层：
 
 - `spring.datasource` / `spring.data.redis`：由 Spring Boot 管理 MySQL 与 Redis 连接；
-- `iam.*`：由 `IamProperties` 管理 IAM 行为。
+- `iam.*`：由 `MuerProperties` 管理 IAM 行为。
 
 ## 基础设施连接
 
@@ -89,7 +89,7 @@ iam:
     - WEB
 ```
 
-`iam.example.seed-demo` 属于 `iam-example` 的演示配置，不是通用 Starter 的 `IamProperties`。只有运行仓库演示时才需要它。
+`muer.example.seed-demo` 属于 `muer-example` 的演示配置，不是通用 Starter 的 `MuerProperties`。只有运行仓库演示时才需要它。
 
 ## 推荐生产配置示例
 
@@ -149,5 +149,5 @@ iam:
 
 ## 源码参考
 
-- `IamProperties`：<https://github.com/wbh123/iam/blob/main/iam-spring-boot-autoconfigure/src/main/java/io/github/iamstarter/autoconfigure/IamProperties.java>
+- `MuerProperties`：<https://github.com/wbh123/iam/blob/main/muer-spring-boot-autoconfigure/src/main/java/io/github/muer/autoconfigure/MuerProperties.java>
 - 手动部署教程：[手动部署](/getting-started/manual-deployment/)

@@ -45,5 +45,5 @@ sidebar:
 
 ## 源码
 
-- `AuthSession.revoke`：<https://github.com/wbh123/iam/tree/main/iam-session/src/main/java/io/github/iamstarter/session>
-- OpenAPI：<https://github.com/wbh123/iam/blob/main/iam-management-web/src/main/resources/openapi/iam.yaml>
+- `AuthSession.revoke`：<https://github.com/wbh123/iam/tree/main/muer-session/src/main/java/io/github/muer/session>
+- OpenAPI：<https://github.com/wbh123/iam/blob/main/muer-management-web/src/main/resources/openapi/iam.yaml>

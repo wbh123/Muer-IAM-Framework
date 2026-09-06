@@ -130,7 +130,7 @@ Redis 是 Token 索引层。Redis 数据被清空后，已有不透明 Token 可
 
 ## 源码参考
 
-- `TokenRecord` / `AuthSession`：<https://github.com/wbh123/iam/tree/main/iam-session/src/main/java/io/github/iamstarter/session>
-- `IamBearerTokenFilter`：<https://github.com/wbh123/iam/tree/main/iam-spring-boot-autoconfigure/src/main/java/io/github/iamstarter/autoconfigure>
+- `TokenRecord` / `AuthSession`：<https://github.com/wbh123/iam/tree/main/muer-session/src/main/java/io/github/muer/session>
+- `IamBearerTokenFilter`：<https://github.com/wbh123/iam/tree/main/muer-spring-boot-autoconfigure/src/main/java/io/github/muer/autoconfigure>
 
 下一步：阅读[MySQL 存储](/operations/mysql/)和[手动部署](/getting-started/manual-deployment/)。
