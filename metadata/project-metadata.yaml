@@ -1,9 +1,29 @@
+# Muer IAM Framework — canonical project identity.
+#
+# This file is the Source of Truth for the Muer brand, Maven coordinates,
+# artifact names and Java package root. CI identity verification
+# (scripts/verify-project-identity.ps1) reads it and cross-checks the
+# reactor POMs against it, so keep values here in sync with pom.xml.
+
 project:
-  displayName: IAM Spring Boot Starter
+  displayName: Muer IAM Framework
   repositoryName: IAM-Spring-Boot-Starter
-  description: Reusable identity and access management starter for Spring Boot.
+  description: Identity infrastructure that grows naturally with your applications.
+
 coordinates:
   groupId: io.github.muer
   version: 0.1.0-SNAPSHOT
+
+brand:
+  name: Muer
+  chineseName: 木耳
+  tagline: A lightweight identity and access management framework for modern applications.
+  website: https://muer.github.io
+
+artifact:
+  rootArtifact: muer-parent
+  starterArtifact: muer-spring-boot-starter
+  managementArtifact: muer-management-web
+
 java:
   basePackage: io.github.muer
