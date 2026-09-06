@@ -43,5 +43,5 @@ sidebar:
 
 ## 源码参考
 
-- 拦截器：<https://github.com/wbh123/iam/blob/main/muer-spring-boot-autoconfigure/src/main/java/io/github/iamstarter/autoconfigure/web/IamAuthorizationInterceptor.java>
-- `AuthorizationDecision`：<https://github.com/wbh123/iam/blob/main/muer-authorization/src/main/java/io/github/iamstarter/authorization/AuthorizationDecision.java>
+- 拦截器：<https://github.com/wbh123/iam/blob/main/muer-spring-boot-autoconfigure/src/main/java/io/github/muer/autoconfigure/web/IamAuthorizationInterceptor.java>
+- `AuthorizationDecision`：<https://github.com/wbh123/iam/blob/main/muer-authorization/src/main/java/io/github/muer/authorization/AuthorizationDecision.java>

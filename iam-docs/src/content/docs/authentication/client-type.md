@@ -30,6 +30,6 @@ iam:
 
 ## 源码
 
-- IamProperties：<https://github.com/wbh123/iam/blob/main/muer-spring-boot-autoconfigure/src/main/java/io/github/iamstarter/autoconfigure/IamProperties.java>
+- IamProperties：<https://github.com/wbh123/iam/blob/main/muer-spring-boot-autoconfigure/src/main/java/io/github/muer/autoconfigure/MuerProperties.java>
 
 相关：见 [identity-authenticator](/authentication/identity-authenticator/) 与 [current-user](/authentication/current-user/)。

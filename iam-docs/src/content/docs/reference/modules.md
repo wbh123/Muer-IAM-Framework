@@ -11,7 +11,7 @@ sidebar:
 - **muer-authentication**：认证。`IdentityAuthenticator`、`LoginRequest`、`AuthenticationResult`、profile 切换服务。
 - **muer-authorization**：授权引擎。`AuthorizationEngine`、`AuthorizationRequest`、`AuthorizationDecision`、`AuthorizationProfile`、`PermissionTemplateVersion`。
 - **muer-session**：会话与令牌。`AuthSession`、`TokenRecord`、`LoginResult`，基于 Redis 存储。
-- **muer-spring-boot-autoconfigure**：Spring Boot 自动配置。`IamProperties`、`IamBearerTokenFilter`、`RequirePermission`、`MvcResourceDescriptorResolver`、`IamAuthorizationInterceptor`。
+- **muer-spring-boot-autoconfigure**：Spring Boot 自动配置。`MuerProperties`、`IamBearerTokenFilter`、`RequirePermission`、`MvcResourceDescriptorResolver`、`IamAuthorizationInterceptor`。
 - **muer-management-web**：HTTP 管理层。暴露 `/iam/**` 端点，含 `openapi/iam.yaml`。
 - **muer-example**：演示。`ExampleIdentityAdapter`、`QuickStartDemoSeeder`、`DocumentController`（alice/demo-pass 场景）。
 
@@ -22,4 +22,4 @@ sidebar:
 ## 源码参考
 
 - 仓库根：<https://github.com/wbh123/iam>
-- autoconfigure：<https://github.com/wbh123/iam/blob/main/muer-spring-boot-autoconfigure/src/main/java/io/github/iamstarter/autoconfigure/>
+- autoconfigure：<https://github.com/wbh123/iam/blob/main/muer-spring-boot-autoconfigure/src/main/java/io/github/muer/autoconfigure/>

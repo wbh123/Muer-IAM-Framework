@@ -37,6 +37,6 @@ POST /iam/auth/login
 
 ## 源码
 
-<https://github.com/wbh123/iam/blob/main/muer-authentication/src/main/java/io/github/iamstarter/authentication/IdentityAuthenticator.java>
+<https://github.com/wbh123/iam/blob/main/muer-authentication/src/main/java/io/github/muer/authentication/IdentityAuthenticator.java>
 
 相关：见 [client-type](/authentication/client-type/) 与 [login](/authentication/login/)。
