@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * Supplies the IAM Admin Console demo identity to the {@link ExampleIdentityAdapter}.
- * Exists only when the dev profile and {@code iam.example.seed-admin=true} are both
+ * Exists only when the dev profile and {@code muer.example.seed-admin=true} are both
  * active, so the demo account can never authenticate in a production-like setup.
  */
 @Component

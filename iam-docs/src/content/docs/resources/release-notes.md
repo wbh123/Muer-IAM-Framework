@@ -25,7 +25,7 @@ sidebar:
 
 - `/iam/admin/**` 始终由后端 `AuthorizationEngine` 重新授权；
 - 前端菜单和 Router Guard 不是安全边界；
-- `admin-demo / demo-pass` 只有 `dev + iam.example.seed-admin=true` 时才创建；
+- `admin-demo / demo-pass` 只有 `dev + muer.example.seed-admin=true` 时才创建；
 - 生产环境没有默认管理员，也没有公开 bootstrap HTTP 接口；
 - 第一个生产管理员通过受控 provisioning 创建。
 

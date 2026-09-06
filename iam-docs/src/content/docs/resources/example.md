@@ -13,7 +13,7 @@ sidebar:
 - `author-a` → 独立消费身份 `app-user-101`，editor 模板 302。
 - `reader-b`(userId 102)、`disabled-c`(已禁用)、`operator-a/b`。
 
-## Seeder 数据（QuickStartDemoSeeder，dev + iam.example.seed-demo=true）
+## Seeder 数据（QuickStartDemoSeeder，dev + muer.example.seed-demo=true）
 
 - 权限：701 `document:read`、702 `document:update`
 - 模板：201 quickstart-document-reader、202 quickstart-document-editor

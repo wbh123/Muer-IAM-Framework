@@ -89,7 +89,7 @@ iam:
     - WEB
 ```
 
-`iam.example.seed-demo` 属于 `muer-example` 的演示配置，不是通用 Starter 的 `MuerProperties`。只有运行仓库演示时才需要它。
+`muer.example.seed-demo` 属于 `muer-example` 的演示配置，不是通用 Starter 的 `MuerProperties`。只有运行仓库演示时才需要它。
 
 ## 推荐生产配置示例
 

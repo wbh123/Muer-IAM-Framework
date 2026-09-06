@@ -88,6 +88,6 @@ class QuickStartDemoSeedIntegrationTest {
                 "--spring.datasource.password=" + MYSQL.getPassword(),
                 "--spring.data.redis.host=" + REDIS.getHost(),
                 "--spring.data.redis.port=" + REDIS.getMappedPort(6379),
-                "--iam.example.seed-demo=" + seedEnabled);
+                "--muer.example.seed-demo=" + seedEnabled);
     }
 }

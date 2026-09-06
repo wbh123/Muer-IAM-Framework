@@ -254,7 +254,7 @@ Principal 必填：`userId,identityId,identityDomain,clientType,authorizationVer
 
 ### QuickStartDemoSeeder
 
-仅在 `dev` Profile + `iam.example.seed-demo=true` 时启用：
+仅在 `dev` Profile + `muer.example.seed-demo=true` 时启用：
 
 - permission：701 document:read、702 document:update；
 - template：201 reader、202 editor；

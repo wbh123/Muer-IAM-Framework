@@ -34,7 +34,7 @@
 - 前端菜单与路由 Capability Guard 只改善用户体验，后端授权才是安全边界；
 - `POST /iam/authorization/diagnostics` 保持“当前已认证 Principal 自诊断”语义，不要求 `iam.admin.*`，也不能指定其他用户/Profile；
 - `muer-example` 的 `admin-demo / demo-pass` 仅在 `dev` Profile 且显式
-  `iam.example.seed-admin=true` 时创建，生产环境不会自动创建默认管理员；
+  `muer.example.seed-admin=true` 时创建，生产环境不会自动创建默认管理员；
 - 生产第一个管理员必须由受控 SQL / migration / deployment seeder 或宿主 initial provisioning 完成，不提供公开 bootstrap HTTP 后门。
 
 ## 已知边界和限制

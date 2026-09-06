@@ -17,7 +17,7 @@ import static io.github.muer.example.AdminDemoSeedConstants.PERMISSION_ID_BASE;
 /**
  * Creates the explicit opt-in IAM Admin Console demo administrator for the
  * example application (admin-demo / demo-pass). It runs only when the dev
- * profile AND {@code iam.example.seed-admin=true} are active; production and
+ * profile AND {@code muer.example.seed-admin=true} are active; production and
  * ordinary dev never create the account. No default admin/password is ever
  * auto-provisioned.
  */
