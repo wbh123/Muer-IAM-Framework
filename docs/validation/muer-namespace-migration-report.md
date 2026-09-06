@@ -47,7 +47,7 @@ iam_*           保持（数据库表）
 iam.admin.*     保持（权限码）
 IAM 类型名      保持（IamPrincipal / IamAuthorizationInterceptor / IamBearerTokenFilter 等为领域名，非品牌）
 redisPrefix 默认 "iam"、history-table "iam_flyway_schema_history"  保持（DB/Redis key 名）
-legacy Wust 扫描 保持（Wust / com.wust / com.wust.iam / 武汉科技大学 仍为 forbidden tokens）
+历史组织/包名扫描 保持（迁移前组织名、旧包根与学校品牌标识继续作为 forbidden tokens）
 ```
 
 ## 5. License
@@ -66,7 +66,7 @@ Docs:                ✅ iam-docs resources/contributing 增加许可证说明
 io.github.iamstarter:      运行时/活跃文档 0 处（git 跟踪仅 MIGRATION.md + docs/superpowers，均排除/Legacy）
 old Maven modules:         0 处（.github/scripts 无 `-pl iam-*` 残留）
 old starter artifact:      0 处（运行时/CI 无 `iam-spring-boot-starter`）
-legacy Wust identifiers:   保留校验通过（CI "Forbidden-identifier scan passed."）
+legacy organization ids:   保留严格校验并通过（CI "Forbidden-identifier scan passed."）
 遗留 iam-* 目录外壳:        已删除（12 个，均 0 跟踪文件，仅空 scaffold + target 构建产物）
 ```
 
