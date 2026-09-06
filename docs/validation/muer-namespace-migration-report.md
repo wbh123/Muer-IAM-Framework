@@ -33,7 +33,7 @@ Website:         https://muer.github.io
 | ---------------------------- | ---- |
 | Java package                | ✅ 全部 `io.github.muer`（运行时扫描 0 旧命名空间源码引用） |
 | Maven group                 | ✅ `io.github.muer` |
-| Maven modules               | ✅ 全部 `muer-*`（reactor 12 模块），遗留 `iam-*` 空壳目录已清除 |
+| Maven modules               | ✅ 全部 `muer-*`（reactor 12 模块），遗留旧模块空壳目录已清除 |
 | Starter artifact            | ✅ `muer-spring-boot-starter`（依赖链指向 muer-autoconfigure） |
 | Spring properties           | ✅ 运行时前缀 `muer:`（`MuerProperties`）；demo seeder opt-in 对齐 `muer.example.*` |
 | Docs                        | ✅ 活跃文档源码路径 `io/github/muer`、`MuerProperties`；迁移/历史文档（superpowers/MIGRATION.md）保留旧名标 Legacy |
@@ -63,11 +63,11 @@ Docs:                ✅ iam-docs resources/contributing 增加许可证说明
 ## 6. Legacy Scan
 
 ```text
-io.github.iamstarter:      运行时/活跃文档 0 处（git 跟踪仅 MIGRATION.md + docs/superpowers，均排除/Legacy）
-old Maven modules:         0 处（.github/scripts 无 `-pl iam-*` 残留）
-old starter artifact:      0 处（运行时/CI 无 `iam-spring-boot-starter`）
+legacy Java namespace:     运行时/活跃文档 0 处（仅明确标注的迁移/历史文档保留）
+old Maven modules:         0 处（CI/scripts 无旧 reactor module 选择器残留）
+old starter artifact:      0 处（运行时/CI 无旧 Starter artifact 引用）
 legacy organization ids:   保留严格校验并通过（CI "Forbidden-identifier scan passed."）
-遗留 iam-* 目录外壳:        已删除（12 个，均 0 跟踪文件，仅空 scaffold + target 构建产物）
+遗留旧模块目录外壳:          已删除（12 个，均 0 跟踪文件，仅空 scaffold + target 构建产物）
 ```
 
 ## 7. Local Verification
@@ -102,7 +102,7 @@ Result:  success（verify / Verify IAM Management API / Independent Consumer acc
 ```text
 P0: 无（无阻断性正确性/安全问题；全模块本地+远端测试绿）
 P1: 无（LICENSE P1 已 Resolved）
-P2: 活跃参考文档的配置示例前缀仍展示 iam:（reference/configuration.md 等），运行时前缀已是 muer:；
+P2: 活跃参考文档的配置示例前缀仍展示旧品牌前缀，运行时前缀已是 muer:；
     iam-docs/src 与 docs/ 中少量此类文档示例待最终 README/Docs 产品化阶段统一（不影响编译/测试/扫描）。
     另：admin-web/docs CI 合并 main 前无法在本分支远端复验（触发条件限制，非回归）。
 P3: 遗留 ~10 个历史 docs/superpowers 设计文档保留旧命名空间作档案，符合 Legacy 标注策略。
