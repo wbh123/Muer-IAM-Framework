@@ -17,6 +17,8 @@ import io.github.muer.authorization.AuthorizationProfileService;
 import io.github.muer.authorization.AuthorizationScopeMutation;
 import io.github.muer.authorization.AuthorizationVersionService;
 import io.github.muer.authorization.PermissionTemplateService;
+import io.github.muer.authorization.PermissionRegistrationService;
+import io.github.muer.authorization.PermissionRepository;
 import io.github.muer.core.port.ResourceHierarchyProvider;
 import io.github.muer.core.port.IamUserRepository;
 import io.github.muer.core.port.IdentityRepository;
@@ -49,6 +51,7 @@ import io.github.muer.persistence.MyBatisAuthorizationProfileRepository;
 import io.github.muer.persistence.MyBatisAuthorizationScopeMutation;
 import io.github.muer.persistence.MyBatisAuthorizationVersionRepository;
 import io.github.muer.persistence.MyBatisPermissionTemplateVersionRepository;
+import io.github.muer.persistence.MyBatisPermissionRepository;
 import io.github.muer.persistence.MyBatisSessionRepository;
 import io.github.muer.persistence.RedisTokenStore;
 import io.github.muer.persistence.MyBatisLoginEventRepository;
@@ -110,6 +113,7 @@ public class MuerAutoConfiguration {
             "mapper/iam/IamAuthorizationVersionMapper.xml",
             "mapper/iam/IamAuthorizationProfileMapper.xml",
             "mapper/iam/IamPermissionTemplateVersionMapper.xml",
+            "mapper/iam/IamPermissionMapper.xml",
             "mapper/iam/IamPermissionTemplateQueryMapper.xml",
             "mapper/iam/IamOverviewMapper.xml",
             "mapper/iam/IamAuditMapper.xml");
@@ -168,6 +172,26 @@ public class MuerAutoConfiguration {
     @ConditionalOnMissingBean(PermissionTemplateVersionRepository.class)
     PermissionTemplateVersionRepository iamPermissionTemplateVersionRepository(SqlSessionFactory sessions) {
         return new MyBatisPermissionTemplateVersionRepository(sessions);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(PermissionRepository.class)
+    PermissionRepository iamPermissionRepository(SqlSessionFactory sessions) {
+        return new MyBatisPermissionRepository(sessions);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    PermissionRegistrationService iamPermissionRegistrationService(PermissionRepository permissions) {
+        return new PermissionRegistrationService(permissions);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    PermissionDefinitionRegistrationListener iamPermissionDefinitionRegistrationListener(
+            PermissionRegistrationService registration,
+            java.util.List<io.github.muer.authorization.PermissionDefinitionProvider> providers) {
+        return new PermissionDefinitionRegistrationListener(registration, providers);
     }
 
     @Bean

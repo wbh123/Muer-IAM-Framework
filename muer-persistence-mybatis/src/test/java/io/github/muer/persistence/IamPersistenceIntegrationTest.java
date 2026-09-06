@@ -212,6 +212,39 @@ class IamPersistenceIntegrationTest {
     }
 
     @Test
+    void permission_definition_upsert_refreshes_metadata_without_deleting_or_enabling_rows() throws Exception {
+        var repository = new MyBatisPermissionRepository(sessionFactory());
+        repository.upsert(new io.github.muer.authorization.PermissionDefinition(
+                "registered:read", "Read registered", "Initial description"));
+        executeSql("UPDATE iam_permission SET enabled = FALSE WHERE permission_code = 'registered:read'");
+        executeSql("INSERT INTO iam_permission (permission_code, display_name, description) "
+                + "VALUES ('legacy:read', 'Legacy read', 'Preserved row')");
+
+        repository.upsert(new io.github.muer.authorization.PermissionDefinition(
+                "registered:read", "Read registration", "Updated description"));
+
+        try (var connection = DriverManager.getConnection(MYSQL.getJdbcUrl(), MYSQL.getUsername(), MYSQL.getPassword());
+             var statement = connection.prepareStatement("""
+                     SELECT display_name, description, enabled
+                     FROM iam_permission WHERE permission_code = 'registered:read'
+                     """)) {
+            try (var row = statement.executeQuery()) {
+                assertTrue(row.next());
+                assertEquals("Read registration", row.getString(1));
+                assertEquals("Updated description", row.getString(2));
+                assertEquals(false, row.getBoolean(3));
+            }
+        }
+        try (var connection = DriverManager.getConnection(MYSQL.getJdbcUrl(), MYSQL.getUsername(), MYSQL.getPassword());
+             var statement = connection.prepareStatement("SELECT COUNT(*) FROM iam_permission WHERE permission_code = 'legacy:read'")) {
+            try (var row = statement.executeQuery()) {
+                assertTrue(row.next());
+                assertEquals(1, row.getInt(1));
+            }
+        }
+    }
+
+    @Test
     void audit_append_persists_json_and_subjects_and_rolls_back_partial_writes() throws Exception {
         var repository = new MyBatisAuditRepository(sessionFactory());
         var record = new io.github.muer.audit.AuditRecord(
@@ -342,6 +375,7 @@ class IamPersistenceIntegrationTest {
                 "mapper/iam/IamAuthorizationVersionMapper.xml",
                 "mapper/iam/IamAuthorizationProfileMapper.xml",
                 "mapper/iam/IamPermissionTemplateVersionMapper.xml",
+                "mapper/iam/IamPermissionMapper.xml",
                 "mapper/iam/IamPermissionTemplateQueryMapper.xml",
                 "mapper/iam/IamOverviewMapper.xml",
                 "mapper/iam/IamAuditMapper.xml")) {
