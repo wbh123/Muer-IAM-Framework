@@ -61,9 +61,9 @@ Starter 不会替你持有用户与业务资源。根据使用能力注册 Sprin
 
 示例实现：
 
-- [ExampleIdentityAdapter.java](https://github.com/wbh123/iam/blob/main/muer-example/src/main/java/io/github/iamstarter/example/ExampleIdentityAdapter.java)
-- [ExampleResourceHierarchyAdapter.java](https://github.com/wbh123/iam/blob/main/muer-example/src/main/java/io/github/iamstarter/example/ExampleResourceHierarchyAdapter.java)
-- [ExampleDocumentResourceResolver.java](https://github.com/wbh123/iam/blob/main/muer-example/src/main/java/io/github/iamstarter/example/ExampleDocumentResourceResolver.java)
+- [ExampleIdentityAdapter.java](https://github.com/wbh123/iam/blob/main/muer-example/src/main/java/io/github/muer/example/ExampleIdentityAdapter.java)
+- [ExampleResourceHierarchyAdapter.java](https://github.com/wbh123/iam/blob/main/muer-example/src/main/java/io/github/muer/example/ExampleResourceHierarchyAdapter.java)
+- [ExampleDocumentResourceResolver.java](https://github.com/wbh123/iam/blob/main/muer-example/src/main/java/io/github/muer/example/ExampleDocumentResourceResolver.java)
 
 ## 不需要做什么
 

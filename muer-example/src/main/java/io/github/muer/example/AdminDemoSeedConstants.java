@@ -9,7 +9,7 @@ import java.util.Set;
  * Shared identifiers and permission codes for the explicit opt-in
  * IAM Admin Console development demo. The demo account never exists in
  * production: both the seed and the authenticator entry are guarded by
- * {@code dev} profile + {@code iam.example.seed-admin=true}.
+ * {@code dev} profile + {@code muer.example.seed-admin=true}.
  */
 final class AdminDemoSeedConstants {
     static final long USER_ID = 110L;

@@ -18,7 +18,7 @@ IAM 源码位于 GitHub：<https://github.com/wbh123/iam>（分支 `main`）。
 ## 开发流程
 
 1. Fork 并在 `main` 切出特性分支。
-2. 本地以 `dev`  profile + `iam.example.seed-demo=true` 启动 `muer-example`，用 alice/demo-pass 验证。
+2. 本地以 `dev`  profile + `muer.example.seed-demo=true` 启动 `muer-example`，用 alice/demo-pass 验证。
 3. 保持 API 与本文档站一致：新增/修改端点须同步更新 `iam.yaml` 与 `src/content/docs/`。
 4. 提交信息清晰说明动机与影响范围。
 
@@ -32,3 +32,7 @@ IAM 源码位于 GitHub：<https://github.com/wbh123/iam>（分支 `main`）。
 ## 提交 Pull Request
 
 在 GitHub 发起 PR，描述问题背景、变更与验证方式；维护者会在候选版本内评审合并。
+
+## 许可证
+
+Muer 采用 [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0.txt) 授权，仓库根目录的 [`LICENSE`](https://github.com/wbh123/iam/blob/main/LICENSE) 为许可证全文。

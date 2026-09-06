@@ -72,7 +72,7 @@
 进行对应 `iam.admin.*` permission 的授权检查，详见 OpenAPI 和 controller 实现。
 
 | 分组 | 操作 | 路径 | 成功 | 其他声明状态 |
-| --- | --- | --- | --- | --- |
+| --- | --- | --- | --- |
 | Authentication | `login` | `POST /iam/auth/login` | 200 | 401 |
 | Authentication | `logout` | `POST /iam/auth/logout` | 204 | 401 |
 | Authentication | `getCurrentPrincipal` | `GET /iam/auth/me` | 200 | 401 |

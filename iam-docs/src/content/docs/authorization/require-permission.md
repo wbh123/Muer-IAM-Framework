@@ -40,6 +40,6 @@ public Document update(@PathVariable String id, @RequestBody DocumentUpdate u) {
 
 ## 源码
 
-<https://github.com/wbh123/iam/blob/main/muer-spring-boot-autoconfigure/src/main/java/io/github/iamstarter/autoconfigure/web/RequirePermission.java>
+<https://github.com/wbh123/iam/blob/main/muer-spring-boot-autoconfigure/src/main/java/io/github/muer/autoconfigure/web/RequirePermission.java>
 
 相关：见 [authorization-engine](/authorization/authorization-engine/) 与 [mvc-resource-descriptor-resolver](/authorization/mvc-resource-descriptor-resolver/)。

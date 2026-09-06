@@ -53,7 +53,7 @@ Redis 不需要手工初始化 Key。IAM 使用 `iam.token.redis-prefix` 隔离�
 
 ## 3. IAM 配置项
 
-`IamProperties` 使用前缀 `iam`：
+`MuerProperties` 使用前缀 `iam`：
 
 | 属性 | 类型 | 默认 | 约束 |
 | --- | --- | --- | --- |

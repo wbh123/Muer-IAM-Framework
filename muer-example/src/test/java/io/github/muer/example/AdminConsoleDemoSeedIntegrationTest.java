@@ -108,6 +108,6 @@ class AdminConsoleDemoSeedIntegrationTest {
                 "--spring.datasource.password=" + MYSQL.getPassword(),
                 "--spring.data.redis.host=" + REDIS.getHost(),
                 "--spring.data.redis.port=" + REDIS.getMappedPort(6379),
-                "--iam.example.seed-admin=" + seedEnabled);
+                "--muer.example.seed-admin=" + seedEnabled);
     }
 }

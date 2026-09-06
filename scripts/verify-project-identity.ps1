@@ -25,11 +25,16 @@ $groupId = Get-MetadataValue -Content $metadata -Key 'groupId'
 $version = Get-MetadataValue -Content $metadata -Key 'version'
 $displayName = Get-MetadataValue -Content $metadata -Key 'displayName'
 $basePackage = Get-MetadataValue -Content $metadata -Key 'basePackage'
+$rootArtifact = Get-MetadataValue -Content $metadata -Key 'rootArtifact'
+$starterArtifact = Get-MetadataValue -Content $metadata -Key 'starterArtifact'
 
 $rootPomPath = Join-Path $RepositoryRoot 'pom.xml'
 [xml]$rootPom = Get-Content -LiteralPath $rootPomPath -Raw -Encoding utf8
 if ($rootPom.project.groupId -ne $groupId) {
     throw "Root POM groupId '$($rootPom.project.groupId)' does not match '$groupId'."
+}
+if ($rootPom.project.artifactId -ne $rootArtifact) {
+    throw "Root POM artifactId '$($rootPom.project.artifactId)' does not match '$rootArtifact'."
 }
 if ($rootPom.project.version -ne $version) {
     throw "Root POM version '$($rootPom.project.version)' does not match '$version'."
@@ -48,6 +53,20 @@ foreach ($moduleName in $moduleNames) {
     if ($modulePom.project.parent.version -ne $version) {
         throw "Module '$moduleName' parent version does not match '$version'."
     }
+    if ($modulePom.project.artifactId -ne $moduleName) {
+        throw "Module POM artifactId '$($modulePom.project.artifactId)' does not match its directory '$moduleName'."
+    }
+}
+
+# Muer is the single canonical brand identity: the consumable starter
+# artifact must exist under the Muer group and the canonical package root.
+$starterPomPath = Join-Path (Join-Path $RepositoryRoot $starterArtifact) 'pom.xml'
+if (-not (Test-Path -LiteralPath $starterPomPath)) {
+    throw "Missing canonical starter artifact POM: $starterPomPath"
+}
+[xml]$starterPom = Get-Content -LiteralPath $starterPomPath -Raw -Encoding utf8
+if ($starterPom.project.artifactId -ne $starterArtifact) {
+    throw "Starter artifactId '$($starterPom.project.artifactId)' does not match '$starterArtifact'."
 }
 
 $javaFiles = Get-ChildItem -LiteralPath $RepositoryRoot -Recurse -File -Filter '*.java' |

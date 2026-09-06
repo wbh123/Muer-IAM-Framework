@@ -46,5 +46,5 @@ authorizationVersion
 
 ## 源码
 
-- `IamPrincipal`：<https://github.com/wbh123/iam/blob/main/muer-core/src/main/java/io/github/iamstarter/core/model/IamPrincipal.java>
-- `IamBearerTokenFilter`：<https://github.com/wbh123/iam/blob/main/muer-spring-boot-autoconfigure/src/main/java/io/github/iamstarter/autoconfigure/IamBearerTokenFilter.java>
+- `IamPrincipal`：<https://github.com/wbh123/iam/blob/main/muer-core/src/main/java/io/github/muer/core/model/IamPrincipal.java>
+- `IamBearerTokenFilter`：<https://github.com/wbh123/iam/blob/main/muer-spring-boot-autoconfigure/src/main/java/io/github/muer/autoconfigure/IamBearerTokenFilter.java>

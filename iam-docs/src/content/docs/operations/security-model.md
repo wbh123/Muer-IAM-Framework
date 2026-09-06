@@ -29,7 +29,7 @@ sidebar:
 
 ## 源码
 
-- `IamPrincipal`：https://github.com/wbh123/iam/blob/main/muer-core/src/main/java/io/github/iamstarter/core/model/IamPrincipal.java
-- `IamBearerTokenFilter`：https://github.com/wbh123/iam/blob/main/muer-spring-boot-autoconfigure/src/main/java/io/github/iamstarter/autoconfigure/
+- `IamPrincipal`：https://github.com/wbh123/iam/blob/main/muer-core/src/main/java/io/github/muer/core/model/IamPrincipal.java
+- `IamBearerTokenFilter`：https://github.com/wbh123/iam/blob/main/muer-spring-boot-autoconfigure/src/main/java/io/github/muer/autoconfigure/
 
 当前版本：`0.1.0-SNAPSHOT`（Release Candidate），尚未发布。
