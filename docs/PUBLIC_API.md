@@ -10,6 +10,7 @@
 | 用途 | 类型 | 源码位置 |
 | --- | --- | --- |
 | 登录凭据校验 | `IdentityAuthenticator` | `muer-authentication/src/main/java/io/github/muer/authentication/IdentityAuthenticator.java` |
+| 应用权限声明 | `PermissionDefinition`、`PermissionDefinitionProvider` | `muer-authorization/src/main/java/io/github/muer/authorization/` |
 | 已认证主体 | `IamPrincipal` | `muer-core/src/main/java/io/github/muer/core/model/IamPrincipal.java` |
 | 资源范围关系 | `ResourceHierarchyProvider`、`ResourceDescriptor`、`ResourceScope` | `muer-core/src/main/java/io/github/muer/core/port/ResourceHierarchyProvider.java` |
 | 授权请求与决定 | `AuthorizationEngine`、`AuthorizationRequest`、`AuthorizationDecision` | `muer-authorization/src/main/java/io/github/muer/authorization/AuthorizationEngine.java` |
@@ -49,21 +50,21 @@
 
 ## 配置
 
-配置前缀是 `iam`，源码为
+配置前缀是 `muer`，源码为
 `muer-spring-boot-autoconfigure/src/main/java/io/github/muer/autoconfigure/MuerProperties.java`。
 
 | 属性 | 默认值 | 说明与约束 |
 | --- | --- | --- |
-| `iam.enabled` | `true` | `true` 时自动配置生效；缺省也生效。 |
-| `iam.token.ttl` | `8h` | 必须为正 duration。 |
-| `iam.token.redis-prefix` | `iam` | 必须非空；共享 Redis 时应使用宿主专属前缀。 |
-| `iam.session.enabled` | `true` | `MuerProperties` 暴露的 session 标志；当前自动配置未按此属性声明条件化 bean。 |
-| `iam.session.touch-interval` | `10m` | session touch 间隔。 |
-| `iam.schema.enabled` | `true` | 启用 IAM schema migrator。 |
-| `iam.schema.history-table` | `iam_flyway_schema_history` | 必须非空，且应独立于宿主 Flyway history。 |
-| `iam.audit.enabled` | `true` | `MuerProperties` 暴露的 audit 标志；当前自动配置未按此属性声明条件化 bean。 |
-| `iam.diagnostics.enabled` | `true` | `MuerProperties` 暴露的 diagnostics 标志；当前自动配置未按此属性声明条件化 bean。 |
-| `iam.client-types` | `[WEB]` | 至少一个非空值；登录 `clientType` 必须精确匹配其中一项。 |
+| `muer.enabled` | `true` | `true` 时自动配置生效；缺省也生效。 |
+| `muer.token.ttl` | `8h` | 必须为正 duration。 |
+| `muer.token.redis-prefix` | `iam` | 必须非空；共享 Redis 时应使用宿主专属前缀。 |
+| `muer.session.enabled` | `true` | `MuerProperties` 暴露的 session 标志；当前自动配置未按此属性声明条件化 bean。 |
+| `muer.session.touch-interval` | `10m` | session touch 间隔。 |
+| `muer.schema.enabled` | `true` | 启用 IAM schema migrator。 |
+| `muer.schema.history-table` | `iam_flyway_schema_history` | 必须非空，且应独立于宿主 Flyway history。 |
+| `muer.audit.enabled` | `true` | `MuerProperties` 暴露的 audit 标志；当前自动配置未按此属性声明条件化 bean。 |
+| `muer.diagnostics.enabled` | `true` | `MuerProperties` 暴露的 diagnostics 标志；当前自动配置未按此属性声明条件化 bean。 |
+| `muer.client-types` | `[WEB]` | 至少一个非空值；登录 `clientType` 必须精确匹配其中一项。 |
 
 ## HTTP contract
 
@@ -71,7 +72,7 @@
 进行对应 `iam.admin.*` permission 的授权检查，详见 OpenAPI 和 controller 实现。
 
 | 分组 | 操作 | 路径 | 成功 | 其他声明状态 |
-| --- | --- | --- | --- | --- |
+| --- | --- | --- | --- |
 | Authentication | `login` | `POST /iam/auth/login` | 200 | 401 |
 | Authentication | `logout` | `POST /iam/auth/logout` | 204 | 401 |
 | Authentication | `getCurrentPrincipal` | `GET /iam/auth/me` | 200 | 401 |
