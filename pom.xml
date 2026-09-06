@@ -7,15 +7,9 @@
     <artifactId>muer-parent</artifactId>
     <version>0.1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>IAM Spring Boot Starter</name>
-    <description>
-        A Spring Boot starter that provides embeddable authentication, fine-grained
-        permission/scope authorization, and session governance for Spring Boot
-        applications. Built with a permission-and-scope model backed by reusable
-        identity (Profile), resource-scoped permissions, and session lifecycle
-        management. No external identity provider or SSO is required.
-    </description>
-    <url>https://github.com/wbh123/iam</url>
+    <name>Muer IAM Framework</name>
+    <description>Identity infrastructure that grows naturally with your applications.</description>
+    <url>https://muer.github.io</url>
 
     <scm>
         <connection>scm:git:https://github.com/wbh123/iam.git</connection>
