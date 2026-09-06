@@ -1,9 +1,10 @@
 package io.github.muer.example;
 
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Profile;
+import org.springframework.context.event.EventListener;
+import org.springframework.core.annotation.Order;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
@@ -14,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Profile("dev")
 @ConditionalOnProperty(prefix = "muer.example", name = "seed-demo", havingValue = "true")
-final class QuickStartDemoSeeder implements ApplicationRunner {
+final class QuickStartDemoSeeder {
     private final JdbcTemplate jdbc;
     private final DocumentCatalog documents;
 
@@ -23,11 +24,11 @@ final class QuickStartDemoSeeder implements ApplicationRunner {
         this.documents = documents;
     }
 
-    @Override
-    public void run(ApplicationArguments args) {
+    @EventListener(ApplicationReadyEvent.class)
+    @Order(1)
+    public void seedAfterPermissionRegistration() {
         clearIamProjection();
         seedAlice();
-        seedDocumentPermissions();
         seedProfilesAndScopes();
         documents.seedQuickStartDocuments();
     }
@@ -42,7 +43,6 @@ final class QuickStartDemoSeeder implements ApplicationRunner {
         jdbc.update("DELETE FROM iam_template_permission");
         jdbc.update("DELETE FROM iam_permission_template_version");
         jdbc.update("DELETE FROM iam_permission_template");
-        jdbc.update("DELETE FROM iam_permission");
         jdbc.update("DELETE FROM iam_identity");
         jdbc.update("DELETE FROM iam_user");
     }
@@ -58,12 +58,7 @@ final class QuickStartDemoSeeder implements ApplicationRunner {
                 """);
     }
 
-    private void seedDocumentPermissions() {
-        jdbc.update("""
-                INSERT INTO iam_permission (id, permission_code, display_name)
-                VALUES (701, 'document:read', 'Read document'),
-                       (702, 'document:update', 'Update document')
-                """);
+    private void seedProfilesAndScopes() {
         jdbc.update("""
                 INSERT INTO iam_permission_template (id, template_key, display_name)
                 VALUES (201, 'quickstart-document-reader', 'QuickStart Document Reader'),
@@ -77,11 +72,10 @@ final class QuickStartDemoSeeder implements ApplicationRunner {
                 """);
         jdbc.update("""
                 INSERT INTO iam_template_permission (template_version_id, permission_id)
-                VALUES (301, 701), (302, 701), (302, 702)
+                SELECT 301, id FROM iam_permission WHERE permission_code = 'document:read'
+                UNION ALL SELECT 302, id FROM iam_permission WHERE permission_code = 'document:read'
+                UNION ALL SELECT 302, id FROM iam_permission WHERE permission_code = 'document:update'
                 """);
-    }
-
-    private void seedProfilesAndScopes() {
         jdbc.update("""
                 INSERT INTO iam_authorization_profile
                     (id, user_id, template_version_id, profile_key, display_name,

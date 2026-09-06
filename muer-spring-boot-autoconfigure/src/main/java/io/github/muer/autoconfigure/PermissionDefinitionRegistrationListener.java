@@ -4,6 +4,7 @@ import io.github.muer.authorization.PermissionDefinitionProvider;
 import io.github.muer.authorization.PermissionRegistrationService;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.core.annotation.Order;
 
 import java.util.List;
 import java.util.Objects;
@@ -20,6 +21,7 @@ final class PermissionDefinitionRegistrationListener {
     }
 
     @EventListener(ApplicationReadyEvent.class)
+    @Order(0)
     public void onApplicationReady() {
         registration.register(providers);
     }

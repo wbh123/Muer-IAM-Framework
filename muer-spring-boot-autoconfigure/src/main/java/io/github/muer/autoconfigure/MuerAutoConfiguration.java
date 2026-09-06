@@ -62,6 +62,7 @@ import io.github.muer.autoconfigure.web.IamAuthorizationWebMvcConfiguration;
 import io.github.muer.autoconfigure.web.IamAuthorizationFailureHandler;
 import io.github.muer.autoconfigure.web.MvcResourceDescriptorResolver;
 import io.github.muer.autoconfigure.web.ProblemDetailIamAuthorizationFailureHandler;
+import io.github.muer.autoconfigure.web.RequirePermissionDefinitionWarningListener;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.builder.xml.XMLMapperBuilder;
 import org.apache.ibatis.io.Resources;
@@ -297,6 +298,15 @@ public class MuerAutoConfiguration {
     @ConditionalOnMissingBean(IamAuthorizationWebMvcConfiguration.class)
     WebMvcConfigurer iamAuthorizationWebMvcConfigurer(IamAuthorizationInterceptor interceptor) {
         return new IamAuthorizationWebMvcConfiguration(interceptor);
+    }
+
+    @Bean
+    @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
+    @ConditionalOnMissingBean(RequirePermissionDefinitionWarningListener.class)
+    RequirePermissionDefinitionWarningListener iamRequirePermissionDefinitionWarningListener(
+            PermissionRegistrationService registration,
+            ObjectProvider<org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping> mappings) {
+        return new RequirePermissionDefinitionWarningListener(registration, mappings);
     }
 
     @Bean(name = "iamBearerTokenFilterRegistration")
