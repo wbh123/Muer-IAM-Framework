@@ -32,18 +32,20 @@ jobs:
             ([char[]](0x6B66,0x6C49,0x79D1,0x6280,0x5927,0x5B66) -join '')
           )
           ./scripts/test-identity-check.ps1 -RepositoryRoot $PWD
-          ./scripts/test-rename-project.ps1 -RepositoryRoot $PWD
           ./scripts/verify-no-legacy-identifiers.ps1 -RepositoryRoot $PWD -ForbiddenToken $forbiddenTokens
+
+      - name: Verify Muer project identity
+        run: bash scripts/test-muer-identity.sh
 
       - name: Test Spring Boot auto-configuration
         run: >-
-          mvn -B -pl iam-spring-boot-autoconfigure -am
-          -Dtest=IamAutoConfigurationTest
+          mvn -B -pl muer-spring-boot-autoconfigure -am
+          -Dtest=MuerAutoConfigurationTest
           -Dsurefire.failIfNoSpecifiedTests=false test
 
       - name: Smoke test the starter from a consumer application
         run: >-
-          mvn -B -pl iam-example -am
+          mvn -B -pl muer-example -am
           -Dtest=IamStarterAutoConfigurationSmokeTest
           -Dsurefire.failIfNoSpecifiedTests=false test
 
@@ -51,7 +53,7 @@ jobs:
         run: bash scripts/test-showcase-readme.sh
 
       - name: Package the consumable Starter
-        run: mvn -B -pl iam-spring-boot-starter -am package -DskipTests
+        run: mvn -B -pl muer-spring-boot-starter -am package -DskipTests
 
   management-verify:
     name: Verify IAM Management API
