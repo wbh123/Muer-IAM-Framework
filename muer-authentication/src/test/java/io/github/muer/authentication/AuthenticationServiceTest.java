@@ -1,6 +1,7 @@
 package io.github.muer.authentication;
 
 import io.github.muer.core.model.IamPrincipal;
+import io.github.muer.core.metrics.MuerMetrics;
 import io.github.muer.session.TokenRecord;
 import io.github.muer.session.TokenStore;
 import io.github.muer.session.AuthSession;
@@ -45,6 +46,24 @@ class AuthenticationServiceTest {
         assertEquals("token-1", result.accessToken());
         assertEquals("session-1", result.sessionId());
         assertEquals("session-1", store.record.sessionId());
+    }
+
+    @Test
+    void records_authentication_and_token_lookup_outcomes_without_sensitive_values() {
+        var principal = new IamPrincipal(7L, "id-7", "BUSINESS", 19L, 3L, "WEB", 2L);
+        var metrics = new RecordingMetrics();
+        var service = new AuthenticationService(new SingleTokenStore(new TokenRecord(
+                "session-1", principal, Instant.parse("2026-08-27T00:00:00Z"))), new CapturingSessions(),
+                event -> { }, userId -> 2L, request -> Optional.of(principal),
+                Clock.fixed(Instant.parse("2026-08-26T00:00:00Z"), ZoneOffset.UTC), Duration.ofHours(8),
+                Duration.ofMinutes(10), () -> "event-1", () -> "token-1", () -> "session-1", metrics);
+
+        service.login(new LoginRequest("alex", "secret", "WEB")).orElseThrow();
+        service.resolve("opaque");
+        service.resolve("unknown");
+
+        assertEquals(List.of("success:WEB"), metrics.authentication);
+        assertEquals(List.of("hit", "miss"), metrics.tokenLookups);
     }
 
     @Test
@@ -264,6 +283,19 @@ class AuthenticationServiceTest {
             touchLeaseInterval = interval;
             return touchLeaseGranted;
         }
+    }
+
+    private static final class RecordingMetrics implements MuerMetrics {
+        private final List<String> authentication = new java.util.ArrayList<>();
+        private final List<String> tokenLookups = new java.util.ArrayList<>();
+
+        @Override public void authenticationAttempt(String result, String clientType) {
+            authentication.add(result + ":" + clientType);
+        }
+        @Override public void authorizationDecision(boolean allowed, String decisionCode, Duration duration) { }
+        @Override public void sessionCreated() { }
+        @Override public void sessionRevoked() { }
+        @Override public void tokenLookup(String result) { tokenLookups.add(result); }
     }
 
     private static final class CapturingSessions implements SessionRepository {

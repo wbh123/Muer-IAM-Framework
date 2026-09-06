@@ -3,6 +3,8 @@ package io.github.muer.authorization;
 import io.github.muer.core.model.IamPrincipal;
 import io.github.muer.core.model.ResourceScope;
 import io.github.muer.core.port.ResourceHierarchyProvider;
+import io.github.muer.core.metrics.MuerMetrics;
+import io.github.muer.core.metrics.NoOpMuerMetrics;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -22,6 +24,7 @@ public final class DefaultAuthorizationEngine implements AuthorizationEngine {
     private final List<AuthorizationPolicy> policies;
     private final Function<IamPrincipal, AuthorizationProfile> activeProfileResolver;
     private final Clock clock;
+    private final MuerMetrics metrics;
 
     public DefaultAuthorizationEngine(ResourceHierarchyProvider hierarchy,
                                       Function<IamPrincipal, Set<String>> permissions,
@@ -32,8 +35,15 @@ public final class DefaultAuthorizationEngine implements AuthorizationEngine {
     public DefaultAuthorizationEngine(ResourceHierarchyProvider hierarchy,
                                       Function<IamPrincipal, Set<String>> permissions,
                                       Function<IamPrincipal, List<ResourceScope>> scopes,
+                                      MuerMetrics metrics) {
+        this(hierarchy, permissions, scopes, List.of(), null, Clock.systemUTC(), metrics);
+    }
+
+    public DefaultAuthorizationEngine(ResourceHierarchyProvider hierarchy,
+                                      Function<IamPrincipal, Set<String>> permissions,
+                                      Function<IamPrincipal, List<ResourceScope>> scopes,
                                       List<AuthorizationPolicy> policies) {
-        this(hierarchy, permissions, scopes, policies, null, Clock.systemUTC());
+        this(hierarchy, permissions, scopes, policies, null, Clock.systemUTC(), NoOpMuerMetrics.INSTANCE);
     }
 
     /**
@@ -47,7 +57,7 @@ public final class DefaultAuthorizationEngine implements AuthorizationEngine {
                                       Function<IamPrincipal, List<ResourceScope>> scopes,
                                       Function<IamPrincipal, AuthorizationProfile> activeProfileResolver,
                                       Clock clock) {
-        this(hierarchy, permissions, scopes, List.of(), activeProfileResolver, clock);
+        this(hierarchy, permissions, scopes, List.of(), activeProfileResolver, clock, NoOpMuerMetrics.INSTANCE);
     }
 
     /**
@@ -59,12 +69,23 @@ public final class DefaultAuthorizationEngine implements AuthorizationEngine {
                                       List<AuthorizationPolicy> policies,
                                       Function<IamPrincipal, AuthorizationProfile> activeProfileResolver,
                                       Clock clock) {
+        this(hierarchy, permissions, scopes, policies, activeProfileResolver, clock, NoOpMuerMetrics.INSTANCE);
+    }
+
+    public DefaultAuthorizationEngine(ResourceHierarchyProvider hierarchy,
+                                      Function<IamPrincipal, Set<String>> permissions,
+                                      Function<IamPrincipal, List<ResourceScope>> scopes,
+                                      List<AuthorizationPolicy> policies,
+                                      Function<IamPrincipal, AuthorizationProfile> activeProfileResolver,
+                                      Clock clock,
+                                      MuerMetrics metrics) {
         this.hierarchy = Objects.requireNonNull(hierarchy);
         this.permissions = Objects.requireNonNull(permissions);
         this.scopes = Objects.requireNonNull(scopes);
         this.policies = List.copyOf(policies);
         this.activeProfileResolver = activeProfileResolver;
         this.clock = Objects.requireNonNull(clock);
+        this.metrics = Objects.requireNonNull(metrics);
     }
 
     /**
@@ -72,6 +93,17 @@ public final class DefaultAuthorizationEngine implements AuthorizationEngine {
      */
     @Override
     public AuthorizationDecision decide(IamPrincipal principal, AuthorizationRequest request) {
+        long started = System.nanoTime();
+        AuthorizationDecision decision = null;
+        try {
+            decision = decideInternal(principal, request);
+            return decision;
+        } finally {
+            if (decision != null) recordDecision(decision, started);
+        }
+    }
+
+    private AuthorizationDecision decideInternal(IamPrincipal principal, AuthorizationRequest request) {
         Objects.requireNonNull(principal, "principal must not be null");
         Objects.requireNonNull(request, "request must not be null");
         var steps = new ArrayList<AuthorizationDecisionStep>();
@@ -97,6 +129,15 @@ public final class DefaultAuthorizationEngine implements AuthorizationEngine {
             if (!result.allowed()) return new AuthorizationDecision(false, result.code(), steps);
         }
         return new AuthorizationDecision(true, "ALLOWED", steps);
+    }
+
+    private void recordDecision(AuthorizationDecision decision, long started) {
+        try {
+            metrics.authorizationDecision(decision.allowed(), decision.decisionCode(),
+                    java.time.Duration.ofNanos(System.nanoTime() - started));
+        } catch (RuntimeException ignored) {
+            // Observability must never alter an authorization decision.
+        }
     }
 
     /**

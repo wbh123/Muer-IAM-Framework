@@ -24,6 +24,8 @@ import io.github.muer.core.port.IamUserRepository;
 import io.github.muer.core.port.IdentityRepository;
 import io.github.muer.core.port.OverviewRepository;
 import io.github.muer.core.port.UserQueryRepository;
+import io.github.muer.core.metrics.MuerMetrics;
+import io.github.muer.core.metrics.NoOpMuerMetrics;
 import io.github.muer.diagnostics.AuthorizationDiagnosticsService;
 import io.github.muer.session.SessionQueryRepository;
 import io.github.muer.session.SessionRepository;
@@ -177,22 +179,31 @@ public class MuerAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(PermissionRepository.class)
+    @ConditionalOnBean(SqlSessionFactory.class)
     PermissionRepository iamPermissionRepository(SqlSessionFactory sessions) {
         return new MyBatisPermissionRepository(sessions);
     }
 
     @Bean
     @ConditionalOnMissingBean
+    @ConditionalOnBean(PermissionRepository.class)
     PermissionRegistrationService iamPermissionRegistrationService(PermissionRepository permissions) {
         return new PermissionRegistrationService(permissions);
     }
 
     @Bean
     @ConditionalOnMissingBean
+    @ConditionalOnBean(PermissionRegistrationService.class)
     PermissionDefinitionRegistrationListener iamPermissionDefinitionRegistrationListener(
             PermissionRegistrationService registration,
             java.util.List<io.github.muer.authorization.PermissionDefinitionProvider> providers) {
         return new PermissionDefinitionRegistrationListener(registration, providers);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(MuerMetrics.class)
+    MuerMetrics iamNoOpMuerMetrics() {
+        return NoOpMuerMetrics.INSTANCE;
     }
 
     @Bean
@@ -235,7 +246,8 @@ public class MuerAutoConfiguration {
     AuthorizationEngine iamAuthorizationEngine(ResourceHierarchyProvider hierarchy,
                                                AuthorizationProfileRepository profiles,
                                                PermissionTemplateVersionRepository templates,
-                                               ObjectProvider<AuthorizationPolicy> policies) {
+                                               ObjectProvider<AuthorizationPolicy> policies,
+                                               MuerMetrics metrics) {
         return new DefaultAuthorizationEngine(hierarchy,
                 principal -> principal.activeProfileId() == null ? java.util.Set.of()
                         : templates.require(profiles.require(principal.activeProfileId()).templateVersionId()).permissions(),
@@ -244,7 +256,7 @@ public class MuerAutoConfiguration {
                 policies.orderedStream().toList(),
                 principal -> principal.activeProfileId() == null ? null
                         : profiles.require(principal.activeProfileId()),
-                java.time.Clock.systemUTC());
+                java.time.Clock.systemUTC(), metrics);
     }
 
     @Bean
@@ -254,7 +266,7 @@ public class MuerAutoConfiguration {
                                                    ObjectProvider<LoginEventRepository> loginEvents,
                                                    AuthorizationVersionRepository versions,
                                                    ObjectProvider<IdentityAuthenticator> authenticator,
-                                                   MuerProperties properties) {
+                                                   MuerProperties properties, MuerMetrics metrics) {
         var allowedClientTypes = Set.copyOf(properties.getClientTypes());
         var hostAuthenticator = authenticator.getIfAvailable(() -> request -> Optional.empty());
         IdentityAuthenticator configuredAuthenticator = request -> allowedClientTypes.contains(request.clientType())
@@ -265,7 +277,7 @@ public class MuerAutoConfiguration {
                 configuredAuthenticator, Clock.systemUTC(),
                 properties.getToken().getTtl(), properties.getSession().getTouchInterval(),
                 MuerAutoConfiguration::randomId,
-                MuerAutoConfiguration::randomId, MuerAutoConfiguration::randomId);
+                MuerAutoConfiguration::randomId, MuerAutoConfiguration::randomId, metrics);
     }
 
     @Bean
@@ -302,6 +314,7 @@ public class MuerAutoConfiguration {
 
     @Bean
     @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
+    @ConditionalOnBean(PermissionRegistrationService.class)
     @ConditionalOnMissingBean(RequirePermissionDefinitionWarningListener.class)
     RequirePermissionDefinitionWarningListener iamRequirePermissionDefinitionWarningListener(
             PermissionRegistrationService registration,
@@ -368,8 +381,8 @@ public class MuerAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    SessionService iamSessionService(SessionRepository sessions, TokenStore tokens) {
-        return new SessionService(sessions, tokens);
+    SessionService iamSessionService(SessionRepository sessions, TokenStore tokens, MuerMetrics metrics) {
+        return new SessionService(sessions, tokens, metrics);
     }
 
     @Bean

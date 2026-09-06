@@ -4,10 +4,12 @@ import io.github.muer.core.model.IamPrincipal;
 import io.github.muer.core.model.ResourceDescriptor;
 import io.github.muer.core.model.ResourceScope;
 import io.github.muer.core.model.ScopeAccess;
+import io.github.muer.core.metrics.MuerMetrics;
 import org.junit.jupiter.api.Test;
 
 import java.time.Clock;
 import java.time.Instant;
+import java.time.Duration;
 import java.util.List;
 import java.util.Set;
 
@@ -32,6 +34,20 @@ class DefaultAuthorizationEngineTest {
         var scope = new ResourceScope("DEPARTMENT", "7", ScopeAccess.WRITE);
         var decision = engine(Set.of("order.approve"), List.of(scope)).decide(principal, request("BUSINESS", "order.approve"));
         assertTrue(decision.allowed());
+    }
+
+    @Test
+    void records_allow_and_deny_decisions_with_duration() {
+        var metrics = new RecordingMetrics();
+        var scope = new ResourceScope("DEPARTMENT", "7", ScopeAccess.WRITE);
+        var engine = new DefaultAuthorizationEngine((resource, candidate) -> "7".equals(candidate.scopeRefId()),
+                ignored -> Set.of("order.approve"), ignored -> List.of(scope), metrics);
+
+        engine.decide(principal, request("BUSINESS", "order.approve"));
+        engine.decide(principal, request("BUSINESS", "order.read"));
+
+        assertEquals(List.of("allow:ALLOWED", "deny:PERMISSION_DENIED"), metrics.decisions);
+        assertTrue(metrics.durations.stream().allMatch(duration -> !duration.isNegative()));
     }
 
     @Test
@@ -97,5 +113,19 @@ class DefaultAuthorizationEngineTest {
 
     private AuthorizationRequest request(String domain, String permission) {
         return new AuthorizationRequest(permission, domain, "WEB", new ResourceDescriptor("ORDER", "o-1", List.of(), java.util.Map.of()), ScopeAccess.WRITE);
+    }
+
+    private static final class RecordingMetrics implements MuerMetrics {
+        private final List<String> decisions = new java.util.ArrayList<>();
+        private final List<Duration> durations = new java.util.ArrayList<>();
+
+        @Override public void authenticationAttempt(String result, String clientType) { }
+        @Override public void authorizationDecision(boolean allowed, String decisionCode, Duration duration) {
+            decisions.add((allowed ? "allow:" : "deny:") + decisionCode);
+            durations.add(duration);
+        }
+        @Override public void sessionCreated() { }
+        @Override public void sessionRevoked() { }
+        @Override public void tokenLookup(String result) { }
     }
 }

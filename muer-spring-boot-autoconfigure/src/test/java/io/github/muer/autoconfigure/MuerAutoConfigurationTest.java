@@ -8,6 +8,10 @@ import io.github.muer.authentication.AuthenticationService;
 import io.github.muer.authentication.IdentityAuthenticator;
 import io.github.muer.authentication.LoginRequest;
 import io.github.muer.core.model.IamPrincipal;
+import io.github.muer.core.metrics.MuerMetrics;
+import io.github.muer.core.metrics.NoOpMuerMetrics;
+import io.github.muer.autoconfigure.observability.MicrometerMuerMetrics;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import io.github.muer.core.port.ResourceHierarchyProvider;
 import io.github.muer.session.TokenStore;
 import io.github.muer.session.SessionRepository;
@@ -95,6 +99,20 @@ class MuerAutoConfigurationTest {
                     assertFalse(context.containsBean("iamAuthorizationEngine"));
                     assertFalse(context.containsBean("iamBearerTokenFilter"));
                 });
+    }
+
+    @Test
+    void observability_selects_micrometer_only_when_a_registry_is_available() {
+        new ApplicationContextRunner()
+                .withConfiguration(org.springframework.boot.autoconfigure.AutoConfigurations.of(
+                        MuerMicrometerAutoConfiguration.class, MuerObservabilityAutoConfiguration.class))
+                .run(context -> assertEquals(NoOpMuerMetrics.INSTANCE, context.getBean(MuerMetrics.class)));
+
+        new ApplicationContextRunner()
+                .withBean(SimpleMeterRegistry.class)
+                .withConfiguration(org.springframework.boot.autoconfigure.AutoConfigurations.of(
+                        MuerMicrometerAutoConfiguration.class, MuerObservabilityAutoConfiguration.class))
+                .run(context -> assertEquals(MicrometerMuerMetrics.class, context.getBean(MuerMetrics.class).getClass()));
     }
 
     @Test

@@ -1,5 +1,6 @@
 package io.github.muer.session;
 
+import io.github.muer.core.metrics.MuerMetrics;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
@@ -78,6 +79,18 @@ class SessionServiceTest {
         assertEquals(List.of("one", "two"), tokens.revokedSessions);
     }
 
+    @Test
+    void records_each_successfully_revoked_session() {
+        var sessions = new InMemorySessions(List.of(active("one"), active("two")));
+        var tokens = new RecordingTokenStore();
+        var metrics = new RecordingMetrics();
+        var service = new SessionService(sessions, tokens, metrics);
+
+        service.revokeAll(7L, "USER_REQUEST");
+
+        assertEquals(2, metrics.revokedSessions);
+    }
+
     private static AuthSession active(String id) {
         return active(id, 7L);
     }
@@ -109,5 +122,15 @@ class SessionServiceTest {
         public void revokeSession(String sessionId) { revokedSessions.add(sessionId); }
         public void revokeUser(long userId) { }
         public void refreshTtl(String token, Duration ttl) { }
+    }
+
+    private static final class RecordingMetrics implements MuerMetrics {
+        private int revokedSessions;
+
+        public void authenticationAttempt(String result, String clientType) { }
+        public void authorizationDecision(boolean allowed, String decisionCode, Duration duration) { }
+        public void sessionCreated() { }
+        public void sessionRevoked() { revokedSessions++; }
+        public void tokenLookup(String result) { }
     }
 }
