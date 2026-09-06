@@ -1,14 +1,12 @@
 #!/usr/bin/env bash
-# Verify that the documentation site CI and manual Pages preparation are correct.
+# Verify that the documentation site CI and GitHub Pages deployment are correct.
 #
 # Checks:
 #   1. .github/workflows/docs.yml exists and:
 #        - triggers on pull_request to main and on push to main/release
 #        - sets up Node 22 (Astro 7 requires Node >= 22.12)
 #        - runs npm ci, npm run check, npm run build
-#   2. If a Pages workflow exists (.github/workflows/docs-pages.yml) it is
-#        triggerable ONLY by workflow_dispatch (never push/schedule) and also
-#        builds with Node 22.
+#   2. The Pages workflow deploys main with official Pages actions and Node 22.
 #   3. The starter verify workflow (.github/workflows/verify.yml) runs on
 #        release/** so pushes to a release branch trigger backend verification.
 set -euo pipefail
@@ -54,14 +52,15 @@ require_content 'builds static site' "$docs_workflow" 'npm[[:space:]]+run[[:spac
 # local and remote toolchains stay aligned with iam-docs/package.json engines.
 require_content 'Node 22 in docs CI' "$docs_workflow" 'node-version:[[:space:]]*22'
 
-# If present, the Pages workflow may only be manually dispatched and must also
-# build with the same Node 22 toolchain as the docs CI workflow.
+# Pages deployment is limited to main; pull requests only build in docs.yml.
 if [[ -f "$pages_workflow" ]]; then
-  if grep -Eq -- '^\s+push:|^\s+pull_request:|^\s+schedule:' "$pages_workflow"; then
-    printf 'Docs Pages workflow must be workflow_dispatch only (no push/pull_request/schedule).\n' >&2
+  if grep -Eq -- '^\s+pull_request:' "$pages_workflow"; then
+    printf 'Docs Pages workflow must not deploy pull requests.\n' >&2
     exit 1
   fi
-  require_content 'Pages manual dispatch' "$pages_workflow" 'workflow_dispatch:'
+  require_content 'Pages main trigger' "$pages_workflow" 'branches: \[main\]'
+  require_content 'Pages artifact upload' "$pages_workflow" 'actions/upload-pages-artifact@v'
+  require_content 'Pages deployment' "$pages_workflow" 'actions/deploy-pages@v'
   require_content 'Node 22 in docs Pages' "$pages_workflow" 'node-version:[[:space:]]*22'
 fi
 
