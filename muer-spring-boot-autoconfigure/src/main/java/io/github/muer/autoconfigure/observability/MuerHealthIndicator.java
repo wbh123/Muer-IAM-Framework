@@ -7,6 +7,6 @@ import org.springframework.boot.health.contributor.HealthIndicator;
 public final class MuerHealthIndicator implements HealthIndicator {
     @Override
     public Health health() {
-        return Health.up().withDetail("muer", "available").build();
+        return Health.up().withDetail("enabled", true).build();
     }
 }

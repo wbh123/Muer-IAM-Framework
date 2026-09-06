@@ -11,6 +11,7 @@ import io.github.muer.core.model.IamPrincipal;
 import io.github.muer.core.metrics.MuerMetrics;
 import io.github.muer.core.metrics.NoOpMuerMetrics;
 import io.github.muer.autoconfigure.observability.MicrometerMuerMetrics;
+import io.github.muer.autoconfigure.observability.MuerHealthIndicator;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import io.github.muer.core.port.ResourceHierarchyProvider;
 import io.github.muer.session.TokenStore;
@@ -113,6 +114,14 @@ class MuerAutoConfigurationTest {
                 .withConfiguration(org.springframework.boot.autoconfigure.AutoConfigurations.of(
                         MuerMicrometerAutoConfiguration.class, MuerObservabilityAutoConfiguration.class))
                 .run(context -> assertEquals(MicrometerMuerMetrics.class, context.getBean(MuerMetrics.class).getClass()));
+    }
+
+    @Test
+    void health_indicator_reports_framework_availability_without_a_datastore_probe() {
+        var health = new MuerHealthIndicator().health();
+
+        assertEquals("UP", health.getStatus().getCode());
+        assertEquals(true, health.getDetails().get("enabled"));
     }
 
     @Test
