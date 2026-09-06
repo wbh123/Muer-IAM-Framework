@@ -26,12 +26,10 @@
         <tag>HEAD</tag>
     </scm>
 
-    <!-- P2: No LICENSE file is present yet; publish/license metadata is intentionally
-         omitted (P1 blocker for a Central release) rather than invented here. -->
     <developers>
         <developer>
             <id>wbh123</id>
-            <name>IAM Starter maintainer</name>
+            <name>Muer maintainer</name>
             <url>https://github.com/wbh123</url>
         </developer>
     </developers>
