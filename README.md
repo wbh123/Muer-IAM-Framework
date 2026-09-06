@@ -145,3 +145,7 @@ Applications normally depend only on `muer-spring-boot-starter`. Internal module
 ## Security defaults
 
 The starter uses an isolated `/iam/**` stateless security chain. Login is anonymous; every other IAM route requires a resolved Bearer principal. Host business routes remain host-owned and must explicitly reuse the IAM filter or principal resolver in their own security chain. The default hierarchy provider denies access until a host adapter is supplied.
+
+## License
+
+Muer is licensed under the [Apache License 2.0](LICENSE).

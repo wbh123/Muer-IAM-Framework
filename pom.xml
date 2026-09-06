@@ -11,6 +11,14 @@
     <description>Identity infrastructure that grows naturally with your applications.</description>
     <url>https://muer.github.io</url>
 
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
     <scm>
         <connection>scm:git:https://github.com/wbh123/iam.git</connection>
         <developerConnection>scm:git:git@github.com:wbh123/iam.git</developerConnection>
