@@ -34,6 +34,8 @@ export default defineConfig({
             { label: '快速开始', slug: 'getting-started/quick-start' },
             { label: '安装', slug: 'getting-started/installation' },
             { label: '基础配置', slug: 'getting-started/configuration' },
+            { label: '定义权限', slug: 'getting-started/define-permissions' },
+            { label: '权限管理', slug: 'getting-started/permission-management' },
             { label: '手动部署', slug: 'getting-started/manual-deployment' },
             { label: '工程结构', slug: 'getting-started/project-structure' },
           ],
@@ -106,6 +108,7 @@ export default defineConfig({
             { label: 'Reverse Proxy', slug: 'operations/reverse-proxy' },
             { label: 'Security Model', slug: 'operations/security-model' },
             { label: 'Production Checklist', slug: 'operations/production-checklist' },
+            { label: '可观测性', slug: 'operations/observability' },
           ],
         },
         {

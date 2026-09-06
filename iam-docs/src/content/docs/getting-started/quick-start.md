@@ -60,7 +60,7 @@ iam:
 
 Starter 会自动执行 `classpath:db/iam/migration` 中的 Flyway migration，并使用独立的 `iam_flyway_schema_history`。因此一般**不需要手工创建 IAM 表**。
 
-如果你的团队已经由 DBA 或统一迁移平台管理 IAM schema，再设置 `iam.schema.enabled=false`。
+如果你的团队已经由 DBA 或统一迁移平台管理 IAM schema，再设置 `muer.schema.enabled=false`。
 
 完整说明见[手动部署](/getting-started/manual-deployment/)和[MySQL 存储](/operations/mysql/)。
 
@@ -78,7 +78,7 @@ Redis 用作不透明 Token 的快速索引。已有 Redis 7 可以直接使用�
 | Database | 默认 `0` 即可 |
 | IAM Key Prefix | 默认 `iam` |
 
-多应用共享 Redis 时，建议为不同应用设置不同的 `iam.token.redis-prefix`。生产 Redis 应放在受控网络中，不要直接暴露公网。
+多应用共享 Redis 时，建议为不同应用设置不同的 `muer.token.redis-prefix`。生产 Redis 应放在受控网络中，不要直接暴露公网。
 
 ## 4. 配置 application.yml
 
@@ -130,7 +130,7 @@ IdentityAuthenticator identityAuthenticator(AccountGateway accounts) {
 }
 ```
 
-`iam.client-types` 由 IAM 层统一检查，`IdentityAuthenticator` 不需要重复维护 Client Type 白名单。
+`muer.client-types` 由 IAM 层统一检查，`IdentityAuthenticator` 不需要重复维护 Client Type 白名单。
 
 进一步阅读：[IdentityAuthenticator](/authentication/identity-authenticator/)。
 
@@ -147,6 +147,8 @@ ResourceHierarchyProvider resourceHierarchyProvider(ResourceGateway resources) {
 
 使用声明式 MVC 授权时，再提供 `MvcResourceDescriptorResolver`，把业务对象映射成 IAM 的 `ResourceDescriptor`。
 
+在启动前还应通过 `PermissionDefinitionProvider` 声明业务权限；不要把权限代码作为演示种子或数据库初始化数据。完整示例与注册规则见[定义权限](/getting-started/define-permissions/)。
+
 ```java
 @GetMapping("/api/documents/{id}")
 @RequirePermission("document:read")
@@ -161,7 +163,7 @@ IAM 不查询你的 Document / Project 表。宿主告诉 IAM “这个资源是
 
 可以直接在 IDE 中运行 Spring Boot 主类，也可以使用你现有项目的 JAR / 服务部署方式。
 
-首次启动且 `iam.schema.enabled=true` 时，确认：
+首次启动且 `muer.schema.enabled=true` 时，确认：
 
 - MySQL 连接成功；
 - Redis 连接成功；
@@ -279,7 +281,7 @@ Profile Switch 不会修改原 Reader Token，因此：
 | `IAM_EXAMPLE_REDIS_HOST` | `127.0.0.1` |
 | `IAM_EXAMPLE_REDIS_PORT` | `6379` |
 | `SPRING_PROFILES_ACTIVE` | `dev` |
-| `IAM_EXAMPLE_SEED_DEMO` | `true` |
+| `MUER_EXAMPLE_SEED_DEMO` | `true` |
 
 `QuickStartDemoSeeder` 会重置演示 IAM 投影，只能用于专用本地演示数据库。
 

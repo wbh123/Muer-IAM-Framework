@@ -140,7 +140,7 @@ IdentityAuthenticator identityAuthenticator(AccountGateway accounts) {
 }
 ```
 
-`iam.client-types` 是 IAM 层的客户端类型白名单。宿主 `IdentityAuthenticator` 只负责凭据认证，不需要复制这段白名单判断。
+`muer.client-types` 是 IAM 层的客户端类型白名单。宿主 `IdentityAuthenticator` 只负责凭据认证，不需要复制这段白名单判断。
 
 ## 7. 接入资源范围
 
@@ -167,11 +167,26 @@ public Document get(@PathVariable String id) {
 
 IAM 负责“这个 Principal 是否有权访问这个 Resource”，宿主系统负责“这个 Document 是什么、属于哪个 Project”。
 
+### 7.1 声明业务权限
+
+权限代码由应用通过 `PermissionDefinitionProvider` 声明，而不是写入初始化 SQL：
+
+```java
+@Bean
+PermissionDefinitionProvider documentPermissions() {
+    return () -> List.of(
+            new PermissionDefinition("document:read", "Read document", "Read a document"),
+            new PermissionDefinition("document:update", "Update document", "Update a document"));
+}
+```
+
+Starter 会在应用就绪后创建缺失权限、更新显示元数据，不删除历史权限，也不改变启用状态。管理员负责把已声明权限配置到模板、Profile 和 Scope；不要直接写入 `iam_*` 表。
+
 ## 8. 启动应用
 
 你可以直接在 IDE 中运行 Spring Boot 主类，也可以按项目自己的标准方式构建并启动 JAR。
 
-首次启动时，若 `iam.schema.enabled=true`，应能看到 IAM schema migration 正常完成，随后应用成功启动。
+首次启动时，若 `muer.schema.enabled=true`，应能看到 IAM schema migration 正常完成，随后应用成功启动。
 
 使用者不需要为了接入 IAM 再执行仓库中的完整自动化测试；这些测试由 IAM 项目的 CI 负责。
 
@@ -285,7 +300,7 @@ Profile Switch **不会提升或覆盖原 Token**。原 Reader Token 仍然保�
 | `IAM_EXAMPLE_REDIS_HOST` | `127.0.0.1` |
 | `IAM_EXAMPLE_REDIS_PORT` | `6379` |
 | `SPRING_PROFILES_ACTIVE` | `dev` |
-| `IAM_EXAMPLE_SEED_DEMO` | `true` |
+| `MUER_EXAMPLE_SEED_DEMO` | `true` |
 
 `QuickStartDemoSeeder` 只允许用于专用演示数据库，因为它会重置 IAM 演示投影。不要对共享数据库或生产数据库启用它。
 
@@ -301,7 +316,7 @@ Profile Switch **不会提升或覆盖原 Token**。原 Reader Token 仍然保�
 
 ```text
 SPRING_PROFILES_ACTIVE=dev
-IAM_EXAMPLE_SEED_ADMIN=true
+MUER_EXAMPLE_SEED_ADMIN=true
 ```
 
 同时使用前面的 MySQL/Redis 配置启动 `IamExampleApplication`。只有 `dev` Profile 与 `seed-admin=true` 同时存在时才会创建：
