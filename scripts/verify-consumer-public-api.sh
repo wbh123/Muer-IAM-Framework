@@ -13,7 +13,7 @@ fi
 # only on the public API/SPI. Internal MyBatis persistence and any
 # internal/impl implementation packages under io.github.muer are off-limits.
 forbidden_pattern='^[[:space:]]*import[[:space:]]+io\.github\.muer\.([a-z][a-zA-Z]*\.)*(internal|impl|persistence)(\.|;)'
-if matches="$(rg -n --glob '*.java' "$forbidden_pattern" "$source_root" 2>/dev/null)"; then
+if matches="$(grep -rInE --include='*.java' "$forbidden_pattern" "$source_root" 2>/dev/null)"; then
     echo "consumer production code must depend only on IAM public API/SPI:" >&2
     printf '%s\n' "$matches" >&2
     exit 1
