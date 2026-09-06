@@ -68,7 +68,7 @@ jobs:
           cache: maven
 
       - name: Test management module and its domain dependencies
-        run: mvn -B -pl iam-management-web -am test
+        run: mvn -B -pl muer-management-web -am test
 
   showcase-integration:
     name: Docker/Testcontainers consumer showcase
@@ -87,13 +87,13 @@ jobs:
 
       - name: Run MySQL and Redis consumer walkthrough
         run: >-
-          mvn -B -pl iam-example -am -Pintegration
+          mvn -B -pl muer-example -am -Pintegration
           -Dtest=IamStarterConsumptionTest,IamSecurityIntegrationTest
           -Dsurefire.failIfNoSpecifiedTests=false test
 
       - name: Verify opt-in admin demo seeder isolation
         run: >-
-          mvn -B -pl iam-example -am -Pintegration
+          mvn -B -pl muer-example -am -Pintegration
           -Dtest=AdminConsoleDemoSeedIntegrationTest
           -Dsurefire.failIfNoSpecifiedTests=false test
 
@@ -117,6 +117,6 @@ jobs:
 
       - name: Run independent Consumer acceptance
         run: >-
-          mvn -B -pl iam-example -am -Pintegration
+          mvn -B -pl muer-example -am -Pintegration
           -Dtest=IamConsumerIntegrationTest
           -Dsurefire.failIfNoSpecifiedTests=false test
