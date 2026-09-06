@@ -50,8 +50,8 @@
 
 ## 配置
 
-配置前缀是 `iam`，源码为
-`muer-spring-boot-autoconfigure/src/main/java/io/github/muer/autoconfigure/IamProperties.java`。
+配置前缀是 `muer`，源码为
+`muer-spring-boot-autoconfigure/src/main/java/io/github/muer/autoconfigure/MuerProperties.java`。
 
 | 属性 | 默认值 | 说明与约束 |
 | --- | --- | --- |
