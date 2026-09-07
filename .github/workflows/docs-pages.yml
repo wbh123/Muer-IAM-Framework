@@ -30,6 +30,9 @@ jobs:
       - name: Verify documentation workflow configuration
         run: bash scripts/test-docs-workflow.sh
 
+      - name: Verify documentation matches the runtime contract
+        run: bash scripts/verify-documentation-contract.sh
+
       - name: Install documentation dependencies
         working-directory: muer-docs
         run: npm ci
