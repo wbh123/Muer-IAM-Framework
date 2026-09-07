@@ -44,7 +44,7 @@ MySQL 和 Redis 可以是：
 1. 在现有 Spring Boot 工程添加 `muer-spring-boot-starter`；
 2. 准备一个可读写的 MySQL 数据库账号；
 3. 准备一个可连接的 Redis 7 服务；
-4. 配置 `spring.datasource`、`spring.data.redis` 与 `iam.*`；
+4. 配置 `spring.datasource`、`spring.data.redis` 与 `muer.*`；
 5. 实现宿主身份和资源范围 SPI；
 6. 启动应用；
 7. 调用登录与当前用户接口确认基础链路。

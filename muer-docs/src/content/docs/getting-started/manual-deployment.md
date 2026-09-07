@@ -38,7 +38,7 @@ IAM 不限制宿主应用使用哪一种部署方式，你可以继续使用现�
 - Docker；
 - 云平台应用服务。
 
-关键要求只有一个：宿主 Spring Boot 应用能读取正确的 MySQL、Redis 与 `iam.*` 配置。
+关键要求只有一个：宿主 Spring Boot 应用能读取正确的 MySQL、Redis 与 `muer.*` 配置。
 
 ## 2. 手动准备 MySQL
 

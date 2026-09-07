@@ -1,6 +1,6 @@
 ---
 title: 配置参考
-description: Spring Boot 基础设施连接与 IamProperties 的真实配置项，以及开发和生产建议。
+description: Spring Boot 基础设施连接与 MuerProperties 的真实配置项，以及开发和生产建议。
 sidebar:
   order: 1
 ---
@@ -8,7 +8,7 @@ sidebar:
 IAM 配置分为两层：
 
 - `spring.datasource` / `spring.data.redis`：由 Spring Boot 管理 MySQL 与 Redis 连接；
-- `iam.*`：由 `MuerProperties` 管理 IAM 行为。
+- `muer.*`：由 `MuerProperties` 管理 Muer 行为。
 
 ## 基础设施连接
 
@@ -35,7 +35,7 @@ spring:
 
 Docker、本机安装、云数据库最终都使用同样的 Spring Boot 连接属性。IAM 不定义第二套 MySQL / Redis 地址配置。
 
-## `iam.*` 配置属性
+## `muer.*` 配置属性
 
 | Property | Type | Default | Required | Description |
 | --- | --- | --- | --- | --- |
