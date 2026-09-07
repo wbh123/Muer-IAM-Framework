@@ -49,8 +49,49 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: iam-docs/dist
-          if-no-files-found: error
 
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: Verify published HTML and static assets
+        env:
+          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          set -euo pipefail
+
+          page_url="${PAGE_URL%/}/"
+          origin="$(printf '%s' "$page_url" | sed -E 's#^(https?://[^/]+).*#\1#')"
+
+          fetch() {
+            curl --fail --silent --show-error --location \
+              --retry 6 --retry-delay 3 --retry-all-errors "$1"
+          }
+
+          html="$(fetch "$page_url")"
+          css_path="$(printf '%s' "$html" | grep -oE 'href="[^"]+\.css"' | head -n 1 | cut -d'"' -f2)"
+          js_path="$(printf '%s' "$html" | grep -oE 'src="[^"]+\.js"' | head -n 1 | cut -d'"' -f2)"
+
+          test -n "$css_path" || { echo 'No CSS asset found in published HTML.' >&2; exit 1; }
+          test -n "$js_path" || { echo 'No JavaScript asset found in published HTML.' >&2; exit 1; }
+
+          case "$css_path" in
+            http://*|https://*) css_url="$css_path" ;;
+            /*) css_url="${origin}${css_path}" ;;
+            *) css_url="${page_url}${css_path}" ;;
+          esac
+
+          case "$js_path" in
+            http://*|https://*) js_url="$js_path" ;;
+            /*) js_url="${origin}${js_path}" ;;
+            *) js_url="${page_url}${js_path}" ;;
+          esac
+
+          echo "Checking page: $page_url"
+          echo "Checking CSS:  $css_url"
+          echo "Checking JS:   $js_url"
+          fetch "$css_url" >/dev/null
+          fetch "$js_url" >/dev/null
+          fetch "${origin}/favicon.svg" >/dev/null
+
+          echo 'Published Muer documentation assets are reachable.'
