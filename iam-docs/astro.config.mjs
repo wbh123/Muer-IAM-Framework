@@ -2,8 +2,8 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 
-const site = process.env.SITE_URL ?? 'https://wbh123.github.io/iam/';
-const base = process.env.BASE_PATH ?? '/iam';
+const site = process.env.SITE_URL ?? 'https://muer.cloud';
+const base = process.env.BASE_PATH ?? '/';
 
 // https://astro.build/config
 export default defineConfig({
@@ -15,7 +15,7 @@ export default defineConfig({
       description:
         'A lightweight identity and access management framework for modern applications.',
       editLink: {
-        baseUrl: 'https://github.com/wbh123/iam/edit/main/iam-docs',
+        baseUrl: 'https://github.com/wbh123/Muer-IAM-Framework/edit/main/iam-docs',
       },
       components: {},
       sidebar: [
