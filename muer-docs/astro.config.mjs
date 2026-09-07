@@ -109,6 +109,7 @@ export default defineConfig({
             { label: 'Security Model', slug: 'operations/security-model' },
             { label: 'Production Checklist', slug: 'operations/production-checklist' },
             { label: '可观测性', slug: 'operations/observability' },
+            { label: '排障', slug: 'operations/troubleshooting' },
           ],
         },
         {
@@ -126,6 +127,7 @@ export default defineConfig({
             { label: 'HTTP API', slug: 'reference/http-api' },
             { label: 'Error Codes', slug: 'reference/error-codes' },
             { label: 'Modules', slug: 'reference/modules' },
+            { label: '术语表', slug: 'reference/glossary' },
           ],
         },
         {

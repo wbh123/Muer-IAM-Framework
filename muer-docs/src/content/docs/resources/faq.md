@@ -46,3 +46,9 @@ resolver 返回 empty → 404 `IAM_RESOURCE_NOT_FOUND`（`RESOURCE_NOT_FOUND`）
 
 ### IAM 会不会接管宿主所有 Spring Security？
 不会。`muer.enabled=false` 可整体关闭；IAM 仅通过自身拦截器与 Bearer 过滤器参与，不替换宿主其它 Security 配置。
+
+### 第一次看文档，怎么快速搞清楚这些词？
+先看[术语表](/reference/glossary/)，它把 Identity / Principal / Permission / Template / Version / Profile / Scope / Session / Authorization Version 的一句话定义与关系列在一起。
+
+### 我的接口 403，最快怎么定位？
+按固定流程排查：403 → 调用 `POST /iam/authorization/diagnostics` → 看 `AuthorizationDecision.steps` 与 `decisionCode` → 判断是 Principal / Profile / Permission / Scope 哪一层。详见[排障](/operations/troubleshooting/)与[错误码](/reference/error-codes/)。
