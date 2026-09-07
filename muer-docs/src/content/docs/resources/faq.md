@@ -9,7 +9,7 @@ sidebar:
 不要求。IAM 通过 `IdentityAuthenticator.authenticate(LoginRequest)` 把宿主现有登录映射为 `IamPrincipal(userId, identityId, identityDomain, ...)`，用户数据仍由宿主持有。
 
 ### Role 和 Permission 区别是什么？
-IAM 没有 Role 概念。权限单位是 `permissionCode`（如 `document:read`）。`AuthorizationProfile` 通过 `PermissionTemplateVersion` 聚合一组 permission，并用 `ResourceScope` 限定资源范围；"角色"由宿主在 `IdentityAuthenticator` 中自行映射。
+Muer 支持 `Role` 作为**可选的权限分组元数据**（`cloud.muer.core.model.Role`：`roleKey`、`displayName`、`domain`、`permissionCodes`、`enabled`），用来把一组原子 Permission 组织成有名字的集合。但运行时授权**不依赖 Role 名称做旁路判断**，最终仍基于原子 Permission、Profile、Template Version、Scope 与 `AuthorizationEngine`。所以：`Role ≠ 最终授权依据`；真正决定能否访问的是 Permission 与 Resource Scope。宿主也可以在 `IdentityAuthenticator` 中把旧系统的 Role 映射成对应的 Profile / Template / Scope。
 
 ### 为什么要 Redis？
 Token 与 session 以 `TokenRecord(sessionId, principal, expiresAt)` 存于 Redis（`muer.token.redis-prefix` 默认 `iam`），支持分布式、快速失效与集中撤销（revoke）。

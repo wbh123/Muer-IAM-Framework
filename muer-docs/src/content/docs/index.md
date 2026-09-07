@@ -53,10 +53,11 @@ public Document get(@PathVariable String id) {
 
 ## 从这里开始
 
-- 想立刻上手？阅读[快速开始](/getting-started/quick-start/)，用真实 HTTP 请求走通完整链路。
-- 想理解设计？从[核心概念](/concepts/identity-principal/)开始。
-- 想接入已有系统？看[已有系统接入](/migration/overview/)。
+- 🚀 **第一次使用**：想立刻上手？阅读[快速开始](/getting-started/quick-start/)，用真实 HTTP 请求走通完整链路。
+- 🔌 **接入已有系统**：已经有自己的用户表 / Role / 部门数据？看[已有系统接入](/migration/overview/)，通过 `IdentityAuthenticator`、Permission Provider 与 Resolver 映射进来。
+- 🛡️ **管理权限**：用 Template / Profile / Scope 决定"谁拥有什么"？看[权限管理](/getting-started/permission-management/)与[管理控制台](/management/console/)。
+- 🚢 **准备上线**：要部署并做健康检查？看[手动部署](/getting-started/manual-deployment/)、[可观测性](/operations/observability/)与[生产检查清单](/operations/production-checklist/)。
 
-## Roadmap（不在 0.1.0 范围内）
+## Roadmap
 
-OAuth 2.0、OpenID Connect、SSO、SAML、LDAP、多租户、ABAC DSL、管理后台等能力不在本发布内，均记录在后续 Roadmap。
+Muer Admin Console 属于 0.1.0 首发能力。后续计划包括：OAuth 2.0、OpenID Connect、SSO、SAML、LDAP、多租户、ABAC DSL。

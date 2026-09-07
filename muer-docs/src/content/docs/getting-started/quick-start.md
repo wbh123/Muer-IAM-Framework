@@ -328,11 +328,11 @@ Micrometer 当前可记录认证尝试、授权 Allow/Deny、授权耗时、Sess
 
 | 环境变量 | 示例 |
 | --- | --- |
-| `IAM_EXAMPLE_JDBC_URL` | `jdbc:mysql://127.0.0.1:3306/iam_example` |
-| `IAM_EXAMPLE_DB_USERNAME` | `iam` |
-| `IAM_EXAMPLE_DB_PASSWORD` | `your-password` |
-| `IAM_EXAMPLE_REDIS_HOST` | `127.0.0.1` |
-| `IAM_EXAMPLE_REDIS_PORT` | `6379` |
+| `MUER_EXAMPLE_JDBC_URL` | `jdbc:mysql://127.0.0.1:3306/iam_example` |
+| `MUER_EXAMPLE_DB_USERNAME` | `iam` |
+| `MUER_EXAMPLE_DB_PASSWORD` | `your-password` |
+| `MUER_EXAMPLE_REDIS_HOST` | `127.0.0.1` |
+| `MUER_EXAMPLE_REDIS_PORT` | `6379` |
 | `SPRING_PROFILES_ACTIVE` | `dev` |
 | `MUER_EXAMPLE_SEED_DEMO` | `true` |
 

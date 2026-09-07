@@ -48,7 +48,7 @@ IAM Spring Boot Starter
 
 ```text
 SPRING_PROFILES_ACTIVE=dev
-IAM_EXAMPLE_SEED_ADMIN=true
+MUER_EXAMPLE_SEED_ADMIN=true
 ```
 
 登录信息：
