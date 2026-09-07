@@ -1,9 +1,9 @@
-package io.github.muer.persistence;
+package cloud.muer.persistence;
 
-import io.github.muer.audit.AuditRecord;
-import io.github.muer.audit.AuditRepository;
-import io.github.muer.audit.AuditSubjectLink;
-import io.github.muer.persistence.mapper.IamAuditMapper;
+import cloud.muer.audit.AuditRecord;
+import cloud.muer.audit.AuditRepository;
+import cloud.muer.audit.AuditSubjectLink;
+import cloud.muer.persistence.mapper.IamAuditMapper;
 import org.apache.ibatis.session.SqlSessionFactory;
 
 import java.util.List;

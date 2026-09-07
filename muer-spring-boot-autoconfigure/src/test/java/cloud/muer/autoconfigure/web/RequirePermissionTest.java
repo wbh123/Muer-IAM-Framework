@@ -1,6 +1,6 @@
-package io.github.muer.autoconfigure.web;
+package cloud.muer.autoconfigure.web;
 
-import io.github.muer.core.model.ScopeAccess;
+import cloud.muer.core.model.ScopeAccess;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.method.HandlerMethod;

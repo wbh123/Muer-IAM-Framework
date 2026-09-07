@@ -1,4 +1,4 @@
-package io.github.muer.audit;
+package cloud.muer.audit;
 
 import java.time.Instant;
 import java.util.Map;

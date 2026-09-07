@@ -1,10 +1,10 @@
-package io.github.muer.authorization;
+package cloud.muer.authorization;
 
-import io.github.muer.core.model.IamPrincipal;
-import io.github.muer.core.model.ResourceDescriptor;
-import io.github.muer.core.model.ResourceScope;
-import io.github.muer.core.model.ScopeAccess;
-import io.github.muer.core.metrics.MuerMetrics;
+import cloud.muer.core.model.IamPrincipal;
+import cloud.muer.core.model.ResourceDescriptor;
+import cloud.muer.core.model.ResourceScope;
+import cloud.muer.core.model.ScopeAccess;
+import cloud.muer.core.metrics.MuerMetrics;
 import org.junit.jupiter.api.Test;
 
 import java.time.Clock;

@@ -11,7 +11,7 @@ sidebar:
 `DefaultAuthorizationEngine`，按其校验顺序排列（遇到首个不满足即返回，`steps` 记录已检查的步骤）：
 
 - `IDENTITY_DOMAIN_MISMATCH`：`principal.identityDomain` 与请求 `domain` 不匹配。
-- `CLIENT_TYPE_MISMATCH`：`principal.clientType` 与请求 `clientType` 不匹配（需与 `iam.client-types` 精确匹配）。
+- `CLIENT_TYPE_MISMATCH`：`principal.clientType` 与请求 `clientType` 不匹配（需与 `muer.client-types` 精确匹配）。
 - `PROFILE_MISSING`：令牌未携带 `activeProfileId`，或活动 Profile 无法解析。
 - `PROFILE_UNAVAILABLE`：解析活动 Profile 时底层抛异常。
 - `PROFILE_OWNER_MISMATCH`：Profile 的 `profileId`/`userId` 与令牌主体不一致。
@@ -43,5 +43,5 @@ sidebar:
 
 ## 源码参考
 
-- 拦截器：<https://github.com/wbh123/iam/blob/main/muer-spring-boot-autoconfigure/src/main/java/io/github/muer/autoconfigure/web/IamAuthorizationInterceptor.java>
-- `AuthorizationDecision`：<https://github.com/wbh123/iam/blob/main/muer-authorization/src/main/java/io/github/muer/authorization/AuthorizationDecision.java>
+- 拦截器：<https://github.com/wbh123/Muer-IAM-Framework/blob/main/muer-spring-boot-autoconfigure/src/main/java/cloud/muer/autoconfigure/web/IamAuthorizationInterceptor.java>
+- `AuthorizationDecision`：<https://github.com/wbh123/Muer-IAM-Framework/blob/main/muer-authorization/src/main/java/cloud/muer/authorization/AuthorizationDecision.java>

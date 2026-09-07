@@ -1,3 +1,3 @@
-package io.github.muer.authorization;
+package cloud.muer.authorization;
 
 public enum TemplateVersionStatus { DRAFT, PUBLISHED, RETIRED }

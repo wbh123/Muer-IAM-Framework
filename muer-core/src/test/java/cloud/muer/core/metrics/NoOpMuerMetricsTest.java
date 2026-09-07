@@ -1,4 +1,4 @@
-package io.github.muer.core.metrics;
+package cloud.muer.core.metrics;
 
 import org.junit.jupiter.api.Test;
 

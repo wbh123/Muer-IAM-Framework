@@ -1,12 +1,12 @@
-package io.github.muer.web;
+package cloud.muer.web;
 
-import io.github.muer.authorization.AuthorizationDecision;
-import io.github.muer.authorization.AuthorizationEngine;
-import io.github.muer.core.model.IamPrincipal;
-import io.github.muer.core.model.IamUser;
-import io.github.muer.core.port.UserQueryRepository;
-import io.github.muer.session.AuthSession;
-import io.github.muer.session.SessionQueryRepository;
+import cloud.muer.authorization.AuthorizationDecision;
+import cloud.muer.authorization.AuthorizationEngine;
+import cloud.muer.core.model.IamPrincipal;
+import cloud.muer.core.model.IamUser;
+import cloud.muer.core.port.UserQueryRepository;
+import cloud.muer.session.AuthSession;
+import cloud.muer.session.SessionQueryRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

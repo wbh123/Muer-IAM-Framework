@@ -19,15 +19,15 @@ IAM 不是一个独立身份服务器，而是一组**可嵌入**的 Spring Boot
 | 会话 | `muer-session` | `AuthSession`、`TokenRecord` 及其生命周期 |
 | 持久化 | `muer-persistence-mybatis` | Schema 迁移与数据访问 |
 | 诊断 | `muer-diagnostics` | 复用同一引擎的授权诊断 |
-| 管理 Web | `muer-management-web` | 登录、Session、Profile、诊断等 HTTP 端点（见 [OpenAPI](https://github.com/wbh123/iam/blob/main/muer-management-web/src/main/resources/openapi/iam.yaml)） |
+| 管理 Web | `muer-management-web` | 登录、Session、Profile、诊断等 HTTP 端点（见 [OpenAPI](https://github.com/wbh123/Muer-IAM-Framework/blob/main/muer-management-web/src/main/resources/openapi/iam.yaml)） |
 | 自动装配 | `muer-spring-boot-autoconfigure` | Bearer Filter、`RequirePermission` 拦截器、`MuerProperties` |
 | 聚合 | `muer-spring-boot-starter` | 聚合上述依赖，宿主只需引入它 |
 | 示例 | `muer-example` | 唯一消费应用，演示完整链路 |
 
 ## 宿主接入的三个 SPI
 
-1. `IdentityAuthenticator`：校验凭据并投影 `IamPrincipal`（源码 [IdentityAuthenticator.java](https://github.com/wbh123/iam/blob/main/muer-authentication/src/main/java/io/github/muer/authentication/IdentityAuthenticator.java)）；
-2. `ResourceHierarchyProvider`：判断资源是否落在 scope 内（源码 [ResourceHierarchyProvider.java](https://github.com/wbh123/iam/blob/main/muer-core/src/main/java/io/github/muer/core/port/ResourceHierarchyProvider.java)）；
+1. `IdentityAuthenticator`：校验凭据并投影 `IamPrincipal`（源码 [IdentityAuthenticator.java](https://github.com/wbh123/Muer-IAM-Framework/blob/main/muer-authentication/src/main/java/cloud/muer/authentication/IdentityAuthenticator.java)）；
+2. `ResourceHierarchyProvider`：判断资源是否落在 scope 内（源码 [ResourceHierarchyProvider.java](https://github.com/wbh123/Muer-IAM-Framework/blob/main/muer-core/src/main/java/cloud/muer/core/port/ResourceHierarchyProvider.java)）；
 3. `MvcResourceDescriptorResolver`：把请求解析为 `ResourceDescriptor`。
 
 ## 下一步

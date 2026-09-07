@@ -1,15 +1,15 @@
-package io.github.muer.authentication;
+package cloud.muer.authentication;
 
-import io.github.muer.core.model.IamPrincipal;
-import io.github.muer.core.metrics.MuerMetrics;
-import io.github.muer.core.metrics.NoOpMuerMetrics;
-import io.github.muer.authorization.AuthorizationProfile;
-import io.github.muer.session.TokenStore;
-import io.github.muer.session.AuthSession;
-import io.github.muer.session.SessionRepository;
-import io.github.muer.session.LoginEvent;
-import io.github.muer.session.LoginEventRepository;
-import io.github.muer.session.LoginResult;
+import cloud.muer.core.model.IamPrincipal;
+import cloud.muer.core.metrics.MuerMetrics;
+import cloud.muer.core.metrics.NoOpMuerMetrics;
+import cloud.muer.authorization.AuthorizationProfile;
+import cloud.muer.session.TokenStore;
+import cloud.muer.session.AuthSession;
+import cloud.muer.session.SessionRepository;
+import cloud.muer.session.LoginEvent;
+import cloud.muer.session.LoginEventRepository;
+import cloud.muer.session.LoginResult;
 
 import java.time.Clock;
 import java.time.Duration;
@@ -19,7 +19,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.LongUnaryOperator;
 import java.util.function.Supplier;
-import io.github.muer.session.TokenRecord;
+import cloud.muer.session.TokenRecord;
 
 public final class AuthenticationService {
     private final TokenStore tokens;

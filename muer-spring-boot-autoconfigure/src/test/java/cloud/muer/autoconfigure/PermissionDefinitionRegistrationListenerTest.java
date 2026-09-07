@@ -1,9 +1,9 @@
-package io.github.muer.autoconfigure;
+package cloud.muer.autoconfigure;
 
-import io.github.muer.authorization.PermissionDefinition;
-import io.github.muer.authorization.PermissionDefinitionProvider;
-import io.github.muer.authorization.PermissionRegistrationService;
-import io.github.muer.authorization.PermissionRepository;
+import cloud.muer.authorization.PermissionDefinition;
+import cloud.muer.authorization.PermissionDefinitionProvider;
+import cloud.muer.authorization.PermissionRegistrationService;
+import cloud.muer.authorization.PermissionRepository;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;

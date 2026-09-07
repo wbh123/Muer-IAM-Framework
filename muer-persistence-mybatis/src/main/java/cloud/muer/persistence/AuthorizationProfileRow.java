@@ -1,4 +1,4 @@
-package io.github.muer.persistence;
+package cloud.muer.persistence;
 
 import java.time.Instant;
 

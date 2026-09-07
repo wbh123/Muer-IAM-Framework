@@ -1,6 +1,6 @@
-package io.github.muer.autoconfigure.web;
+package cloud.muer.autoconfigure.web;
 
-import io.github.muer.core.model.ResourceDescriptor;
+import cloud.muer.core.model.ResourceDescriptor;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.method.HandlerMethod;
 

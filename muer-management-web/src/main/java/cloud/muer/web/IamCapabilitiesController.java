@@ -1,12 +1,12 @@
-package io.github.muer.web;
+package cloud.muer.web;
 
-import io.github.muer.authorization.AuthorizationProfile;
-import io.github.muer.authorization.AuthorizationProfileRepository;
-import io.github.muer.authorization.PermissionTemplateVersionRepository;
-import io.github.muer.core.model.IamPrincipal;
-import io.github.muer.web.api.CapabilitiesApi;
-import io.github.muer.web.dto.PrincipalCapabilitiesResponse;
-import io.github.muer.web.dto.PrincipalResponse;
+import cloud.muer.authorization.AuthorizationProfile;
+import cloud.muer.authorization.AuthorizationProfileRepository;
+import cloud.muer.authorization.PermissionTemplateVersionRepository;
+import cloud.muer.core.model.IamPrincipal;
+import cloud.muer.web.api.CapabilitiesApi;
+import cloud.muer.web.dto.PrincipalCapabilitiesResponse;
+import cloud.muer.web.dto.PrincipalResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import static io.github.muer.web.WebSecurity.currentPrincipal;
+import static cloud.muer.web.WebSecurity.currentPrincipal;
 
 /**
  * Returns only capabilities that belong to the current principal itself. No other
@@ -38,7 +38,7 @@ public class IamCapabilitiesController implements CapabilitiesApi {
         if (principal == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 
         Set<String> permissions = Set.of();
-        List<io.github.muer.core.model.ResourceScope> scopes = List.of();
+        List<cloud.muer.core.model.ResourceScope> scopes = List.of();
         Long activeProfileId = principal.activeProfileId();
         Long templateVersionId = principal.templateVersionId();
         try {
@@ -59,9 +59,9 @@ public class IamCapabilitiesController implements CapabilitiesApi {
                 .activeProfileId(activeProfileId)
                 .templateVersionId(templateVersionId);
         var scopeResponses = scopes.stream()
-                .map(scope -> new io.github.muer.web.dto.ResourceScope(
+                .map(scope -> new cloud.muer.web.dto.ResourceScope(
                         scope.scopeType(), scope.scopeRefId(),
-                        io.github.muer.web.dto.ResourceScope.AccessModeEnum.fromValue(scope.accessMode().name())))
+                        cloud.muer.web.dto.ResourceScope.AccessModeEnum.fromValue(scope.accessMode().name())))
                 .toList();
         return ResponseEntity.ok(new PrincipalCapabilitiesResponse(
                 principalResponse, activeProfileId, templateVersionId,

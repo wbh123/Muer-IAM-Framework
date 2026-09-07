@@ -7,18 +7,18 @@
 
 project:
   displayName: Muer IAM Framework
-  repositoryName: IAM-Spring-Boot-Starter
+  repositoryName: Muer-IAM-Framework
   description: Identity infrastructure that grows naturally with your applications.
 
 coordinates:
-  groupId: io.github.muer
+  groupId: cloud.muer
   version: 0.1.0-SNAPSHOT
 
 brand:
   name: Muer
   chineseName: 木耳
   tagline: A lightweight identity and access management framework for modern applications.
-  website: https://muer.github.io
+  website: https://muer.cloud
 
 artifact:
   rootArtifact: muer-parent
@@ -26,4 +26,4 @@ artifact:
   managementArtifact: muer-management-web
 
 java:
-  basePackage: io.github.muer
+  basePackage: cloud.muer

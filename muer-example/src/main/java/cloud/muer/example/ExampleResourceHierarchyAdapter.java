@@ -1,8 +1,8 @@
-package io.github.muer.example;
+package cloud.muer.example;
 
-import io.github.muer.core.model.ResourceDescriptor;
-import io.github.muer.core.model.ResourceScope;
-import io.github.muer.core.port.ResourceHierarchyProvider;
+import cloud.muer.core.model.ResourceDescriptor;
+import cloud.muer.core.model.ResourceScope;
+import cloud.muer.core.port.ResourceHierarchyProvider;
 import org.springframework.stereotype.Component;
 
 @Component

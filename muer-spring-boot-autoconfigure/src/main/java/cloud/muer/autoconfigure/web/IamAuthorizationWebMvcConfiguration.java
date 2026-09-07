@@ -1,4 +1,4 @@
-package io.github.muer.autoconfigure.web;
+package cloud.muer.autoconfigure.web;
 
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;

@@ -11,12 +11,12 @@ sidebar:
 
 ## 关键检查项
 
-1. **MySQL 为真相来源**：确认 `iam.schema.enabled=true`，Flyway 历史表已建；切勿让 Redis 决定授权。
-2. **Redis 仅索引**：`iam.token.redis-prefix` 非空，`iam.token.ttl` 为正；Redis 清空可回源重建。
-3. **会话配置**：`iam.session.enabled=true`，`touch-interval` 合理（默认 `10m`）。
-4. **clientType**：`iam.client-types` ≥1 且非空，登录 `clientType` 精确匹配。
-5. **审计开启**：`iam.audit.enabled=true`（属性已暴露），事件可回溯。
-6. **诊断可用**：`iam.diagnostics.enabled=true`，便于排障（见 [授权诊断](/diagnostics/authorization-diagnostics/)）。
+1. **MySQL 为真相来源**：确认 `muer.schema.enabled=true`，Flyway 历史表已建；切勿让 Redis 决定授权。
+2. **Redis 仅索引**：`muer.token.redis-prefix` 非空，`muer.token.ttl` 为正；Redis 清空可回源重建。
+3. **会话配置**：`muer.session.enabled=true`，`touch-interval` 合理（默认 `10m`）。
+4. **clientType**：`muer.client-types` ≥1 且非空，登录 `clientType` 精确匹配。
+5. **审计开启**：`muer.audit.enabled=true`（属性已暴露），事件可回溯。
+6. **诊断可用**：`muer.diagnostics.enabled=true`，便于排障（见 [授权诊断](/diagnostics/authorization-diagnostics/)）。
 7. **反向代理**：透传 `Authorization` 与 `X-Forwarded-*` 头（见 [反向代理](/operations/reverse-proxy/)）。
 8. **吊销能力**：确认 `POST /iam/sessions/{sessionId}/revoke` 可达，异常可强制下线。
 
@@ -25,7 +25,7 @@ sidebar:
 最小生产配置（application.yml）：
 
 ```yaml
-iam:
+muer:
   enabled: true
   token: { ttl: 8h, redis-prefix: iam }
   session: { enabled: true, touch-interval: 10m }
@@ -37,6 +37,6 @@ iam:
 
 ## 源码
 
-- 配置全集 `MuerProperties`：https://github.com/wbh123/iam/blob/main/muer-spring-boot-autoconfigure/src/main/java/io/github/muer/autoconfigure/
+- 配置全集 `MuerProperties`：https://github.com/wbh123/Muer-IAM-Framework/blob/main/muer-spring-boot-autoconfigure/src/main/java/cloud/muer/autoconfigure/
 
 当前版本：`0.1.0-SNAPSHOT`（Release Candidate），尚未发布。

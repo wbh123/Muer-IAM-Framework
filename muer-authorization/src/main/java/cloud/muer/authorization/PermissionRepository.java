@@ -1,4 +1,4 @@
-package io.github.muer.authorization;
+package cloud.muer.authorization;
 
 /** Internal persistence port for registered permission definitions. */
 public interface PermissionRepository {

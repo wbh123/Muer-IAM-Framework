@@ -1,7 +1,7 @@
-package io.github.muer.authentication;
+package cloud.muer.authentication;
 
-import io.github.muer.authorization.AuthorizationProfileService;
-import io.github.muer.core.model.IamPrincipal;
+import cloud.muer.authorization.AuthorizationProfileService;
+import cloud.muer.core.model.IamPrincipal;
 
 import java.util.Objects;
 import java.util.Optional;

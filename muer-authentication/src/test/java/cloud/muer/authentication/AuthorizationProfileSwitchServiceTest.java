@@ -1,13 +1,13 @@
-package io.github.muer.authentication;
+package cloud.muer.authentication;
 
-import io.github.muer.authorization.AuthorizationProfile;
-import io.github.muer.authorization.AuthorizationProfileRepository;
-import io.github.muer.authorization.AuthorizationProfileService;
-import io.github.muer.authorization.AuthorizationVersionRepository;
-import io.github.muer.authorization.AuthorizationVersionService;
-import io.github.muer.core.model.IamPrincipal;
-import io.github.muer.session.TokenRecord;
-import io.github.muer.session.TokenStore;
+import cloud.muer.authorization.AuthorizationProfile;
+import cloud.muer.authorization.AuthorizationProfileRepository;
+import cloud.muer.authorization.AuthorizationProfileService;
+import cloud.muer.authorization.AuthorizationVersionRepository;
+import cloud.muer.authorization.AuthorizationVersionService;
+import cloud.muer.core.model.IamPrincipal;
+import cloud.muer.session.TokenRecord;
+import cloud.muer.session.TokenStore;
 import org.junit.jupiter.api.Test;
 
 import java.time.Clock;

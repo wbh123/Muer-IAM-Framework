@@ -1,11 +1,11 @@
 ---
 title: Management Console 介绍
-description: IAM Admin Console 的定位、能力、启动方式与权限模型概述。
+description: Muer Admin Console 的定位、能力、启动方式与权限模型概述。
 sidebar:
   order: 1
 ---
 
-`iam-admin-web` 是 **IAM 0.1.0 首发范围内的可选管理控制台**。它通过
+`muer-admin-web` 是 **IAM 0.1.0 首发范围内的可选管理控制台**。它通过
 `muer-management-web` 暴露的 Management API 完成 IAM 运维与权限治理，而不是直接读取数据库或 Redis。
 
 它属于 0.1.0 产品能力，但不是 Starter 的运行依赖：只使用 `muer-spring-boot-starter` 的宿主应用不需要部署前端。
@@ -23,7 +23,7 @@ IAM Spring Boot Starter
    Java Server API   TypeScript Client (openapi-generator)
                                   │
                                   ▼
-                         IAM Admin Console (Vue 3)
+                         Muer Admin Console (Vue 3)
 ```
 
 ## 能力
@@ -62,7 +62,7 @@ clientType: WEB
 前端：
 
 ```bash
-cd iam-admin-web
+cd muer-admin-web
 npm ci
 npm run api:generate
 npm run dev
@@ -86,7 +86,7 @@ npm run dev
 6. 缺少某项 `iam.admin.*` Capability 时，对应路由进入 403，同时后端接口也拒绝访问；
 7. Logout 调用后端登出并清理浏览器会话。
 
-详细部署和生产初始化见 [Admin Console 部署指南](https://github.com/wbh123/iam/blob/main/docs/IAM_ADMIN_CONSOLE_DEPLOYMENT.md)。
+详细部署和生产初始化见 [Admin Console 部署指南](https://github.com/wbh123/Muer-IAM-Framework/blob/main/docs/IAM_ADMIN_CONSOLE_DEPLOYMENT.md)。
 
 ## 权限模型（IAM 管理 IAM）
 

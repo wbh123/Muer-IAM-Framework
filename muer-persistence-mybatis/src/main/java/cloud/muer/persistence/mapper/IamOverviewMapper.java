@@ -1,6 +1,6 @@
-package io.github.muer.persistence.mapper;
+package cloud.muer.persistence.mapper;
 
-import io.github.muer.persistence.OverviewRow;
+import cloud.muer.persistence.OverviewRow;
 
 /**
  * Read-only operational overview counters.

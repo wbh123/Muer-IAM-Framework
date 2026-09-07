@@ -18,9 +18,9 @@ IAM 的访问凭据是 Token，背后是 `AuthSession(sessionId, userId, clientT
 1. **撤销单个会话**：`POST /iam/sessions/{sessionId}/revoke`（204/401/404）。
 2. **撤销当前用户其他会话**：`POST /iam/sessions/revoke-others`（204/401）。
 3. **管理员批量撤销**：`POST /iam/admin/sessions/{sessionId}/revoke`、`POST /iam/admin/users/{userId}/sessions/revoke`。
-4. **整体退出**：将配置 `iam.enabled=false` 并重启，IAM 拦截器与 Bearer 过滤器不再参与，回到宿主原有权限路径。注意 Token 仍留在 Redis，必要时清理 `iam.token.redis-prefix`（默认 `iam`）对应的键。
+4. **整体退出**：将配置 `muer.enabled=false` 并重启，IAM 拦截器与 Bearer 过滤器不再参与，回到宿主原有权限路径。注意 Token 仍留在 Redis，必要时清理 `muer.token.redis-prefix`（默认 `iam`）对应的键。
 
 ## 源码参考
 
-- `AuthSession`：<https://github.com/wbh123/iam/blob/main/muer-session/src/main/java/io/github/muer/session/AuthSession.java>
-- `MuerProperties`：<https://github.com/wbh123/iam/blob/main/muer-spring-boot-autoconfigure/src/main/java/io/github/muer/autoconfigure/MuerProperties.java>
+- `AuthSession`：<https://github.com/wbh123/Muer-IAM-Framework/blob/main/muer-session/src/main/java/cloud/muer/session/AuthSession.java>
+- `MuerProperties`：<https://github.com/wbh123/Muer-IAM-Framework/blob/main/muer-spring-boot-autoconfigure/src/main/java/cloud/muer/autoconfigure/MuerProperties.java>

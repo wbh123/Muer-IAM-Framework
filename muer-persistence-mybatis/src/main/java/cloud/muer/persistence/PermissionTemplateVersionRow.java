@@ -1,6 +1,6 @@
-package io.github.muer.persistence;
+package cloud.muer.persistence;
 
-import io.github.muer.authorization.TemplateVersionStatus;
+import cloud.muer.authorization.TemplateVersionStatus;
 
 public record PermissionTemplateVersionRow(long versionId, long templateId, int versionNumber,
                                            TemplateVersionStatus status) {

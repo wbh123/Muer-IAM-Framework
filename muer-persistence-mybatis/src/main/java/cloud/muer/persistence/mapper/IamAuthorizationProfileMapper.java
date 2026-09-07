@@ -1,8 +1,8 @@
-package io.github.muer.persistence.mapper;
+package cloud.muer.persistence.mapper;
 
-import io.github.muer.authorization.AuthorizationProfile;
-import io.github.muer.core.model.ResourceScope;
-import io.github.muer.persistence.AuthorizationProfileRow;
+import cloud.muer.authorization.AuthorizationProfile;
+import cloud.muer.core.model.ResourceScope;
+import cloud.muer.persistence.AuthorizationProfileRow;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;

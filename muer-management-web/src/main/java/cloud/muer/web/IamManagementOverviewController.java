@@ -1,17 +1,17 @@
-package io.github.muer.web;
+package cloud.muer.web;
 
-import io.github.muer.authorization.AuthorizationEngine;
-import io.github.muer.core.port.OverviewRepository;
-import io.github.muer.web.api.ManagementOverviewApi;
-import io.github.muer.web.dto.OverviewResponse;
+import cloud.muer.authorization.AuthorizationEngine;
+import cloud.muer.core.port.OverviewRepository;
+import cloud.muer.web.api.ManagementOverviewApi;
+import cloud.muer.web.dto.OverviewResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Objects;
 
-import static io.github.muer.web.WebSecurity.allowedRead;
-import static io.github.muer.web.WebSecurity.currentPrincipal;
+import static cloud.muer.web.WebSecurity.allowedRead;
+import static cloud.muer.web.WebSecurity.currentPrincipal;
 
 @RestController
 public class IamManagementOverviewController implements ManagementOverviewApi {

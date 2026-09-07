@@ -39,23 +39,23 @@ Docker、本机安装、云数据库最终都使用同样的 Spring Boot 连接�
 
 | Property | Type | Default | Required | Description |
 | --- | --- | --- | --- | --- |
-| `iam.enabled` | boolean | `true` | 否 | 是否启用 IAM 自动配置的主要集成行为。 |
-| `iam.token.ttl` | Duration | `8h` | 否 | Access Token 有效期，必须为正。 |
-| `iam.token.redis-prefix` | String | `iam` | 否 | Redis Key 前缀，必须非空；多应用共享 Redis 时应使用应用独立值。 |
-| `iam.session.enabled` | boolean | `true` | 否 | Session 属性开关；当前自动配置并未完全据此条件化 Bean。 |
-| `iam.session.touch-interval` | Duration | `10m` | 否 | Session 活跃时间更新间隔。 |
-| `iam.schema.enabled` | boolean | `true` | 否 | 是否由 Starter 执行 IAM Flyway migration。 |
-| `iam.schema.history-table` | String | `iam_flyway_schema_history` | 否 | IAM Flyway 历史表名，必须非空。 |
-| `iam.audit.enabled` | boolean | `true` | 否 | 审计属性已暴露；当前自动配置并未完全据此条件化 Bean。 |
-| `iam.diagnostics.enabled` | boolean | `true` | 否 | 诊断属性已暴露；当前自动配置并未完全据此条件化 Bean。 |
-| `iam.client-types` | List<String> | `[WEB]` | 否 | 登录 Client Type 允许列表，至少一个非空值并精确匹配。 |
+| `muer.enabled` | boolean | `true` | 否 | 是否启用 IAM 自动配置的主要集成行为。 |
+| `muer.token.ttl` | Duration | `8h` | 否 | Access Token 有效期，必须为正。 |
+| `muer.token.redis-prefix` | String | `iam` | 否 | Redis Key 前缀，必须非空；多应用共享 Redis 时应使用应用独立值。 |
+| `muer.session.enabled` | boolean | `true` | 否 | Session 属性开关；当前自动配置并未完全据此条件化 Bean。 |
+| `muer.session.touch-interval` | Duration | `10m` | 否 | Session 活跃时间更新间隔。 |
+| `muer.schema.enabled` | boolean | `true` | 否 | 是否由 Starter 执行 IAM Flyway migration。 |
+| `muer.schema.history-table` | String | `iam_flyway_schema_history` | 否 | IAM Flyway 历史表名，必须非空。 |
+| `muer.audit.enabled` | boolean | `true` | 否 | 审计属性已暴露；当前自动配置并未完全据此条件化 Bean。 |
+| `muer.diagnostics.enabled` | boolean | `true` | 否 | 诊断属性已暴露；当前自动配置并未完全据此条件化 Bean。 |
+| `muer.client-types` | List<String> | `[WEB]` | 否 | 登录 Client Type 允许列表，至少一个非空值并精确匹配。 |
 
 ## 最小配置
 
 基础设施连接已经由宿主 Spring Boot 配好时：
 
 ```yaml
-iam:
+muer:
   enabled: true
   client-types:
     - WEB
@@ -74,7 +74,7 @@ spring:
       host: 127.0.0.1
       port: 6379
 
-iam:
+muer:
   enabled: true
   token:
     ttl: 8h
@@ -105,7 +105,7 @@ spring:
       port: ${APP_REDIS_PORT:6379}
       password: ${APP_REDIS_PASSWORD:}
 
-iam:
+muer:
   enabled: true
   token:
     ttl: 2h
@@ -126,7 +126,7 @@ iam:
 ### Starter 自动管理
 
 ```yaml
-iam:
+muer:
   schema:
     enabled: true
 ```
@@ -136,7 +136,7 @@ iam:
 ### 外部部署流程管理
 
 ```yaml
-iam:
+muer:
   schema:
     enabled: false
 ```
@@ -149,5 +149,5 @@ iam:
 
 ## 源码参考
 
-- `MuerProperties`：<https://github.com/wbh123/iam/blob/main/muer-spring-boot-autoconfigure/src/main/java/io/github/muer/autoconfigure/MuerProperties.java>
+- `MuerProperties`：<https://github.com/wbh123/Muer-IAM-Framework/blob/main/muer-spring-boot-autoconfigure/src/main/java/cloud/muer/autoconfigure/MuerProperties.java>
 - 手动部署教程：[手动部署](/getting-started/manual-deployment/)

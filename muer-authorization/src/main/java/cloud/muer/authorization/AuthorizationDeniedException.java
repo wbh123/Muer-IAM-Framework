@@ -1,4 +1,4 @@
-package io.github.muer.authorization;
+package cloud.muer.authorization;
 
 public final class AuthorizationDeniedException extends RuntimeException {
     private final AuthorizationDecision decision;

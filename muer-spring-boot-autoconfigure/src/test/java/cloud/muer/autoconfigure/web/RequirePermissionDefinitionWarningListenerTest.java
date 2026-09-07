@@ -1,8 +1,8 @@
-package io.github.muer.autoconfigure.web;
+package cloud.muer.autoconfigure.web;
 
-import io.github.muer.authorization.PermissionDefinition;
-import io.github.muer.authorization.PermissionRegistrationService;
-import io.github.muer.authorization.PermissionRepository;
+import cloud.muer.authorization.PermissionDefinition;
+import cloud.muer.authorization.PermissionRegistrationService;
+import cloud.muer.authorization.PermissionRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.method.HandlerMethod;
 

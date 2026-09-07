@@ -1,6 +1,6 @@
-package io.github.muer.autoconfigure.web;
+package cloud.muer.autoconfigure.web;
 
-import io.github.muer.core.model.ScopeAccess;
+import cloud.muer.core.model.ScopeAccess;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

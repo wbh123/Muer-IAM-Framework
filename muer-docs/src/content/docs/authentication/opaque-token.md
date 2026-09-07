@@ -13,7 +13,7 @@ IAM 发行的 `accessToken` 是**不透明令牌（opaque token）**：它本身
 
 - **TokenRecord**（record）：`(sessionId, principal, expiresAt)`，是 Redis 中令牌对应的主体记录。
 - **AuthSession**（record）：`(sessionId, userId, clientType, clientInstance, ipAddress, userAgent, loginAt, lastSeenAt, expiresAt, revokedAt, logoutAt, revokeReason)`，提供 `revoked()/revoke(at,reason)/touch(at)`。
-- 令牌 TTL 由 `iam.token.ttl`（默认 8h，必须为正）控制；Redis 键前缀由 `iam.token.redis-prefix`（默认 `iam`，非空）配置。
+- 令牌 TTL 由 `muer.token.ttl`（默认 8h，必须为正）控制；Redis 键前缀由 `muer.token.redis-prefix`（默认 `iam`，非空）配置。
 
 ## 解析流程
 
@@ -26,5 +26,5 @@ IAM 发行的 `accessToken` 是**不透明令牌（opaque token）**：它本身
 
 ## 源码
 
-- TokenRecord / AuthSession / LoginResult：<https://github.com/wbh123/iam/blob/main/muer-session/src/main/java/io/github/muer/session/>
-- IamBearerTokenFilter：<https://github.com/wbh123/iam/blob/main/muer-spring-boot-autoconfigure/src/main/java/io/github/muer/autoconfigure/IamBearerTokenFilter.java>
+- TokenRecord / AuthSession / LoginResult：<https://github.com/wbh123/Muer-IAM-Framework/blob/main/muer-session/src/main/java/cloud/muer/session/>
+- IamBearerTokenFilter：<https://github.com/wbh123/Muer-IAM-Framework/blob/main/muer-spring-boot-autoconfigure/src/main/java/cloud/muer/autoconfigure/IamBearerTokenFilter.java>

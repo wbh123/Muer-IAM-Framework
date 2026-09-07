@@ -1,12 +1,12 @@
-package io.github.muer.web;
+package cloud.muer.web;
 
-import io.github.muer.authorization.AuthorizationEngine;
-import io.github.muer.core.port.UserQueryRepository;
-import io.github.muer.session.AuthSession;
-import io.github.muer.session.SessionQueryRepository;
-import io.github.muer.web.api.ManagementSessionsApi;
-import io.github.muer.web.dto.AdminSessionListResponse;
-import io.github.muer.web.dto.SessionResponse;
+import cloud.muer.authorization.AuthorizationEngine;
+import cloud.muer.core.port.UserQueryRepository;
+import cloud.muer.session.AuthSession;
+import cloud.muer.session.SessionQueryRepository;
+import cloud.muer.web.api.ManagementSessionsApi;
+import cloud.muer.web.dto.AdminSessionListResponse;
+import cloud.muer.web.dto.SessionResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,8 +16,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-import static io.github.muer.web.WebSecurity.allowedRead;
-import static io.github.muer.web.WebSecurity.currentPrincipal;
+import static cloud.muer.web.WebSecurity.allowedRead;
+import static cloud.muer.web.WebSecurity.currentPrincipal;
 
 @RestController
 public class IamManagementSessionsController implements ManagementSessionsApi {

@@ -1,4 +1,4 @@
-package io.github.muer.core.model;
+package cloud.muer.core.model;
 
 import org.junit.jupiter.api.Test;
 

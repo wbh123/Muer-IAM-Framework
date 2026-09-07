@@ -1,7 +1,7 @@
-package io.github.muer.example;
+package cloud.muer.example;
 
-import io.github.muer.autoconfigure.web.MvcResourceDescriptorResolver;
-import io.github.muer.core.model.ResourceDescriptor;
+import cloud.muer.autoconfigure.web.MvcResourceDescriptorResolver;
+import cloud.muer.core.model.ResourceDescriptor;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;

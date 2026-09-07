@@ -26,7 +26,7 @@ Starter
 - MySQL 8.x（发布基线验证使用 MySQL 8.4）；
 - Redis 7。
 
-如果还要使用 IAM Admin Console，需要 Node.js 22+ 与 npm。
+如果还要使用 Muer Admin Console，需要 Node.js 22+ 与 npm。
 
 普通使用者不需要运行仓库中的 Testcontainers、Independent Consumer 或完整 Maven Reactor 验证。
 
@@ -36,7 +36,7 @@ Starter
 
 ```xml
 <dependency>
-    <groupId>io.github.muer</groupId>
+    <groupId>cloud.muer</groupId>
     <artifactId>muer-spring-boot-starter</artifactId>
     <version>0.1.0-SNAPSHOT</version>
 </dependency>
@@ -324,12 +324,12 @@ User / Session
 
 两种正式管理方式：
 
-1. 使用随 0.1.0 提供的 `iam-admin-web`；
+1. 使用随 0.1.0 提供的 `muer-admin-web`；
 2. 企业已有统一后台时，调用 Muer Management API 做自己的前端。
 
 不要直接操作 `iam_*` 表。
 
-## 17. 手工验收 IAM Admin Console（可选）
+## 17. 手工验收 Muer Admin Console（可选）
 
 ### 准备开发管理员
 
@@ -353,7 +353,7 @@ clientType: WEB
 ### 启动前端
 
 ```bash
-cd iam-admin-web
+cd muer-admin-web
 npm ci
 npm run api:generate
 npm run dev
@@ -433,4 +433,4 @@ muer.token.lookups
 - [IAM_INTEGRATION_GUIDE.md](IAM_INTEGRATION_GUIDE.md)
 - [PUBLIC_API.md](PUBLIC_API.md)
 - [IAM_ADMIN_CONSOLE_DEPLOYMENT.md](IAM_ADMIN_CONSOLE_DEPLOYMENT.md)
-- `iam-docs/` 文档站
+- `muer-docs/` 文档站

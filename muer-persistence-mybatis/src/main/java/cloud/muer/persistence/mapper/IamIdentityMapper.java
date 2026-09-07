@@ -1,6 +1,6 @@
-package io.github.muer.persistence.mapper;
+package cloud.muer.persistence.mapper;
 
-import io.github.muer.core.model.Identity;
+import cloud.muer.core.model.Identity;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;

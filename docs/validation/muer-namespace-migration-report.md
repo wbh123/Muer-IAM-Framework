@@ -18,11 +18,11 @@ Behind: 0
 ```text
 Brand:           Muer
 Chinese Brand:   木耳
-Group ID:        io.github.muer
+Group ID:        cloud.muer
 Root Artifact:   muer-parent
 Starter Artifact: muer-spring-boot-starter
-Package Root:    io.github.muer
-Website:         https://muer.github.io
+Package Root:    cloud.muer
+Website:         https://muer.cloud
 ```
 
 `metadata/project-metadata.yaml` 是身份 Source of Truth；`verify-project-identity.ps1` 校验 root POM groupId/artifactId(name `Muer IAM Framework`)/version、各 module 父坐标与 artifactId、以及 consumable starter 存在性。
@@ -31,13 +31,13 @@ Website:         https://muer.github.io
 
 | 项目                         | 结果 |
 | ---------------------------- | ---- |
-| Java package                | ✅ 全部 `io.github.muer`（运行时扫描 0 旧命名空间源码引用） |
-| Maven group                 | ✅ `io.github.muer` |
+| Java package                | ✅ 全部 `cloud.muer`（运行时扫描 0 旧命名空间源码引用） |
+| Maven group                 | ✅ `cloud.muer` |
 | Maven modules               | ✅ 全部 `muer-*`（reactor 12 模块），遗留旧模块空壳目录已清除 |
 | Starter artifact            | ✅ `muer-spring-boot-starter`（依赖链指向 muer-autoconfigure） |
 | Spring properties           | ✅ 运行时前缀 `muer:`（`MuerProperties`）；demo seeder opt-in 对齐 `muer.example.*` |
-| Docs                        | ✅ 活跃文档源码路径 `io/github/muer`、`MuerProperties`；迁移/历史文档（superpowers/MIGRATION.md）保留旧名标 Legacy |
-| Admin Console OpenAPI path  | ✅ `iam-admin-web` `api:generate` 读取 `muer-management-web/src/main/resources/openapi/iam.yaml` |
+| Docs                        | ✅ 活跃文档源码路径 `cloud/muer`、`MuerProperties`；迁移/历史文档（superpowers/MIGRATION.md）保留旧名标 Legacy |
+| Admin Console OpenAPI path  | ✅ `muer-admin-web` `api:generate` 读取 `muer-management-web/src/main/resources/openapi/iam.yaml` |
 
 ## 4. Compatibility Kept
 
@@ -57,7 +57,7 @@ Apache License 2.0:  ✅ 已选定
 LICENSE:             ✅ 仓库根官方 Apache-2.0 全文（未改写正文、无自定义限制）
 POM metadata:        ✅ root pom <licenses> Apache-2.0；developer name 归一为 "Muer maintainer"
 README:              ✅ 底部 "## License / Apache License 2.0"
-Docs:                ✅ iam-docs resources/contributing 增加许可证说明
+Docs:                ✅ muer-docs resources/contributing 增加许可证说明
 ```
 
 ## 6. Legacy Scan
@@ -89,12 +89,12 @@ legacy organization ids:   保留严格校验并通过（CI "Forbidden-identifie
 
 ## 8. Remote CI
 
-> 注：`codex/**` 仅触发 `verify.yml`；`admin-web.yml`（Verify IAM Admin Console）与 `docs.yml`（Verify IAM Documentation）触发条件为 `main/release/feature`，故本轮分支 push 只跑 Verify IAM Starter，文档/前端 CI 在合并 main 时校验。
+> 注：`codex/**` 仅触发 `verify.yml`；`admin-web.yml`（Verify Muer Admin Console）与 `docs.yml`（Verify Muer Documentation）触发条件为 `main/release/feature`，故本轮分支 push 只跑 Verify Muer Starter，文档/前端 CI 在合并 main 时校验。
 
 ```text
-Verify IAM Starter
+Verify Muer Starter
 Run ID:  34018573029
-Result:  success（verify / Verify IAM Management API / Independent Consumer acceptance / Docker+Testcontainers consumer showcase 全 success）
+Result:  success（verify / Verify Muer Management API / Independent Consumer acceptance / Docker+Testcontainers consumer showcase 全 success）
 ```
 
 ## 9. Findings
@@ -103,7 +103,7 @@ Result:  success（verify / Verify IAM Management API / Independent Consumer acc
 P0: 无（无阻断性正确性/安全问题；全模块本地+远端测试绿）
 P1: 无（LICENSE P1 已 Resolved）
 P2: 活跃参考文档的配置示例前缀仍展示旧品牌前缀，运行时前缀已是 muer:；
-    iam-docs/src 与 docs/ 中少量此类文档示例待最终 README/Docs 产品化阶段统一（不影响编译/测试/扫描）。
+    muer-docs/src 与 docs/ 中少量此类文档示例待最终 README/Docs 产品化阶段统一（不影响编译/测试/扫描）。
     另：admin-web/docs CI 合并 main 前无法在本分支远端复验（触发条件限制，非回归）。
 P3: 遗留 ~10 个历史 docs/superpowers 设计文档保留旧命名空间作档案，符合 Legacy 标注策略。
 ```

@@ -27,6 +27,6 @@ Optional<IamPrincipal> authenticate(LoginRequest request);
 
 ## 源码参考
 
-- `IdentityAuthenticator`：<https://github.com/wbh123/iam/blob/main/muer-authentication/src/main/java/io/github/muer/authentication/IdentityAuthenticator.java>
-- `IamPrincipal`：<https://github.com/wbh123/iam/blob/main/muer-core/src/main/java/io/github/muer/core/model/IamPrincipal.java>
-- 演示适配器：<https://github.com/wbh123/iam/blob/main/muer-example/src/main/java/io/github/muer/example/>
+- `IdentityAuthenticator`：<https://github.com/wbh123/Muer-IAM-Framework/blob/main/muer-authentication/src/main/java/cloud/muer/authentication/IdentityAuthenticator.java>
+- `IamPrincipal`：<https://github.com/wbh123/Muer-IAM-Framework/blob/main/muer-core/src/main/java/cloud/muer/core/model/IamPrincipal.java>
+- 演示适配器：<https://github.com/wbh123/Muer-IAM-Framework/blob/main/muer-example/src/main/java/cloud/muer/example/>

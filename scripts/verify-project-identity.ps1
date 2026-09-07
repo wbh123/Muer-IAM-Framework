@@ -25,6 +25,8 @@ $groupId = Get-MetadataValue -Content $metadata -Key 'groupId'
 $version = Get-MetadataValue -Content $metadata -Key 'version'
 $displayName = Get-MetadataValue -Content $metadata -Key 'displayName'
 $basePackage = Get-MetadataValue -Content $metadata -Key 'basePackage'
+$website = Get-MetadataValue -Content $metadata -Key 'website'
+$repositoryName = Get-MetadataValue -Content $metadata -Key 'repositoryName'
 $rootArtifact = Get-MetadataValue -Content $metadata -Key 'rootArtifact'
 $starterArtifact = Get-MetadataValue -Content $metadata -Key 'starterArtifact'
 
@@ -41,6 +43,13 @@ if ($rootPom.project.version -ne $version) {
 }
 if ($rootPom.project.name -ne $displayName) {
     throw "Root POM name '$($rootPom.project.name)' does not match '$displayName'."
+}
+if ($rootPom.project.url -ne $website) {
+    throw "Root POM website '$($rootPom.project.url)' does not match '$website'."
+}
+$scmUrl = [string]$rootPom.project.scm.url
+if ($scmUrl -ne "https://github.com/$repositoryName") {
+    throw "Root POM SCM URL '$scmUrl' does not match repository '$repositoryName'."
 }
 
 $moduleNames = @($rootPom.project.modules.module)

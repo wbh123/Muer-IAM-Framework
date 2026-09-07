@@ -1,9 +1,9 @@
-package io.github.muer.persistence.mapper;
+package cloud.muer.persistence.mapper;
 
-import io.github.muer.audit.AuditRecord;
-import io.github.muer.audit.AuditSubjectLink;
-import io.github.muer.persistence.AuditEventRow;
-import io.github.muer.persistence.AuditSubjectLinkRow;
+import cloud.muer.audit.AuditRecord;
+import cloud.muer.audit.AuditSubjectLink;
+import cloud.muer.persistence.AuditEventRow;
+import cloud.muer.persistence.AuditSubjectLinkRow;
 import org.apache.ibatis.annotations.Param;
 
 import java.time.Instant;

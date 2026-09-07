@@ -11,7 +11,7 @@ sidebar:
 
 ## IamPrincipal 是什么
 
-`IamPrincipal` 是一个 Java `record`，组件顺序固定如下（源码 [IamPrincipal.java](https://github.com/wbh123/iam/blob/main/muer-core/src/main/java/io/github/muer/core/model/IamPrincipal.java)）：
+`IamPrincipal` 是一个 Java `record`，组件顺序固定如下（源码 [IamPrincipal.java](https://github.com/wbh123/Muer-IAM-Framework/blob/main/muer-core/src/main/java/cloud/muer/core/model/IamPrincipal.java)）：
 
 ```
 userId, identityId, identityDomain, activeProfileId(Long),
@@ -24,7 +24,7 @@ templateVersionId(Long), clientType, authorizationVersion
 | `identityId` / `identityDomain` | 身份标识与身份域（用于跨域校验） |
 | `activeProfileId` | 当前激活的 Profile（可空） |
 | `templateVersionId` | 激活 Profile 对应的模板版本（可空） |
-| `clientType` | 登录客户端类型，须匹配 `iam.client-types` |
+| `clientType` | 登录客户端类型，须匹配 `muer.client-types` |
 | `authorizationVersion` | 授权版本号，用于缓存一致性 |
 
 ## 校验规则（真实）

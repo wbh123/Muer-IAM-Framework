@@ -1,4 +1,4 @@
-package io.github.muer.persistence;
+package cloud.muer.persistence;
 
 import java.util.Map;
 import java.util.stream.Collectors;

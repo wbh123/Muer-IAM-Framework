@@ -1,4 +1,4 @@
-package io.github.muer.authorization;
+package cloud.muer.authorization;
 
 public interface AuthorizationVersionRepository {
     long currentVersion(long userId);

@@ -11,7 +11,7 @@ hero:
     - text: 查看文档
       link: /concepts/identity-principal/
     - text: GitHub
-      link: https://github.com/wbh123/iam
+      link: https://github.com/wbh123/Muer-IAM-Framework
       icon: external
 template: splash
 ---

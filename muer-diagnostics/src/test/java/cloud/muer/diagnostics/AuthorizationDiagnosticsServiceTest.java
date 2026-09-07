@@ -1,11 +1,11 @@
-package io.github.muer.diagnostics;
+package cloud.muer.diagnostics;
 
-import io.github.muer.authorization.AuthorizationRequest;
-import io.github.muer.authorization.DefaultAuthorizationEngine;
-import io.github.muer.core.model.IamPrincipal;
-import io.github.muer.core.model.ResourceDescriptor;
-import io.github.muer.core.model.ResourceScope;
-import io.github.muer.core.model.ScopeAccess;
+import cloud.muer.authorization.AuthorizationRequest;
+import cloud.muer.authorization.DefaultAuthorizationEngine;
+import cloud.muer.core.model.IamPrincipal;
+import cloud.muer.core.model.ResourceDescriptor;
+import cloud.muer.core.model.ResourceScope;
+import cloud.muer.core.model.ScopeAccess;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

@@ -109,7 +109,7 @@ revocation.
 IP, user agent, login/last-seen/logout/revocation/expiry state. `LoginEvent`
 records successful and failed attempts without credentials or raw tokens.
 Session touch is Redis-throttled and updates MySQL only at
-`iam.session.touch-interval`.
+`muer.session.touch-interval`.
 
 Authorization-affecting changes (identity, profile, template-permission or
 scope) increment `authorizationVersion`; principal resolution rejects a token
@@ -150,7 +150,7 @@ server. Diagnostics call the runtime engine and project its exact decision.
 ## Starter configuration and Spring Security integration
 
 ```yaml
-iam:
+muer:
   enabled: true
   schema:
     enabled: true

@@ -1,4 +1,4 @@
-package io.github.muer.autoconfigure.observability;
+package cloud.muer.autoconfigure.observability;
 
 import org.springframework.boot.health.contributor.Health;
 import org.springframework.boot.health.contributor.HealthIndicator;

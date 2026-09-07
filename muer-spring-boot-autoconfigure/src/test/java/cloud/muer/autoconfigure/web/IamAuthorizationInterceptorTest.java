@@ -1,11 +1,11 @@
-package io.github.muer.autoconfigure.web;
+package cloud.muer.autoconfigure.web;
 
-import io.github.muer.authorization.AuthorizationDecision;
-import io.github.muer.authorization.AuthorizationEngine;
-import io.github.muer.authorization.AuthorizationRequest;
-import io.github.muer.core.model.IamPrincipal;
-import io.github.muer.core.model.ResourceDescriptor;
-import io.github.muer.core.model.ScopeAccess;
+import cloud.muer.authorization.AuthorizationDecision;
+import cloud.muer.authorization.AuthorizationEngine;
+import cloud.muer.authorization.AuthorizationRequest;
+import cloud.muer.core.model.IamPrincipal;
+import cloud.muer.core.model.ResourceDescriptor;
+import cloud.muer.core.model.ScopeAccess;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;

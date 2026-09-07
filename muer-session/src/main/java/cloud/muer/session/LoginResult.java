@@ -1,4 +1,4 @@
-package io.github.muer.session;
+package cloud.muer.session;
 
 public enum LoginResult {
     SUCCESS,

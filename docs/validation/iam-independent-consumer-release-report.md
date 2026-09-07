@@ -4,7 +4,7 @@
 
 - Branch: `codex/release-readiness`
 - Candidate commit: `32cdef46632c4e1441c4a9c81020e77fbbc7b696`
-- Intended artifact: `io.github.muer:muer-spring-boot-starter`
+- Intended artifact: `cloud.muer:muer-spring-boot-starter`
 - Recommendation: ready for release review; retain the branch until an
   explicit merge or release decision.
 
@@ -32,7 +32,7 @@ bash scripts/verify-consumer-public-api.sh
 
 ## Remote CI evidence
 
-GitHub Actions [run 33722777356](https://github.com/wbh123/iam/actions/runs/33722777356)
+GitHub Actions [run 33722777356](https://github.com/wbh123/Muer-IAM-Framework/actions/runs/33722777356)
 completed successfully for the candidate commit on `codex/release-readiness`.
 All required jobs passed: `verify`, `Docker/Testcontainers consumer showcase`,
 and `Independent Consumer acceptance`. The latter completed its Docker

@@ -6,7 +6,7 @@ A consuming Spring Boot application declares one IAM production dependency:
 
 ```xml
 <dependency>
-    <groupId>io.github.muer</groupId>
+    <groupId>cloud.muer</groupId>
     <artifactId>muer-spring-boot-starter</artifactId>
     <version>0.1.0-SNAPSHOT</version>
 </dependency>
@@ -57,7 +57,7 @@ spring:
       port: 6379
       password: ${IAM_REDIS_PASSWORD:}
 
-iam:
+muer:
   enabled: true
   schema:
     enabled: true

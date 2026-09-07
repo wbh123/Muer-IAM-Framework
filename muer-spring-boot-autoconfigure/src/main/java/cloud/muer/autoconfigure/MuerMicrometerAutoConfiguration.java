@@ -1,7 +1,7 @@
-package io.github.muer.autoconfigure;
+package cloud.muer.autoconfigure;
 
-import io.github.muer.autoconfigure.observability.MicrometerMuerMetrics;
-import io.github.muer.core.metrics.MuerMetrics;
+import cloud.muer.autoconfigure.observability.MicrometerMuerMetrics;
+import cloud.muer.core.metrics.MuerMetrics;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;

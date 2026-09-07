@@ -13,7 +13,7 @@ sidebar:
 
 - **Shadow Mode（影子模式）**：IAM 参与授权评估但不拦截请求，只记录决策，用于与旧系统对比验证。
 - **Data Projection（数据投影）**：把宿主现有的用户/身份投影进 IAM，而不是迁移数据库。
-- **Rollback（回滚）**：通过撤销 IAM 下发的 Session、关闭 `iam.enabled` 回到旧路径。
+- **Rollback（回滚）**：通过撤销 IAM 下发的 Session、关闭 `muer.enabled` 回到旧路径。
 
 ## 推荐路线
 
@@ -23,5 +23,5 @@ sidebar:
 
 ## 源码参考
 
-- `IdentityAuthenticator`：<https://github.com/wbh123/iam/blob/main/muer-authentication/src/main/java/io/github/muer/authentication/IdentityAuthenticator.java>
-- `MuerProperties`：<https://github.com/wbh123/iam/blob/main/muer-spring-boot-autoconfigure/src/main/java/io/github/muer/autoconfigure/MuerProperties.java>
+- `IdentityAuthenticator`：<https://github.com/wbh123/Muer-IAM-Framework/blob/main/muer-authentication/src/main/java/cloud/muer/authentication/IdentityAuthenticator.java>
+- `MuerProperties`：<https://github.com/wbh123/Muer-IAM-Framework/blob/main/muer-spring-boot-autoconfigure/src/main/java/cloud/muer/autoconfigure/MuerProperties.java>

@@ -1,4 +1,4 @@
-package io.github.muer.example;
+package cloud.muer.example;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -7,7 +7,7 @@ import java.util.Set;
 
 /**
  * Shared identifiers and permission codes for the explicit opt-in
- * IAM Admin Console development demo. The demo account never exists in
+ * Muer Admin Console development demo. The demo account never exists in
  * production: both the seed and the authenticator entry are guarded by
  * {@code dev} profile + {@code muer.example.seed-admin=true}.
  */
@@ -25,7 +25,7 @@ final class AdminDemoSeedConstants {
 
     static final long PERMISSION_ID_BASE = 900L;
 
-    /** Canonical IAM Admin Console permission codes (must match the Java sources). */
+    /** Canonical Muer Admin Console permission codes (must match the Java sources). */
     static final Map<String, String> ADMIN_PERMISSIONS = orderedPermissions();
 
     private AdminDemoSeedConstants() {

@@ -1,12 +1,12 @@
-package io.github.muer.example;
+package cloud.muer.example;
 
-import io.github.muer.core.model.IamPrincipal;
+import cloud.muer.core.model.IamPrincipal;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 /**
- * Supplies the IAM Admin Console demo identity to the {@link ExampleIdentityAdapter}.
+ * Supplies the Muer Admin Console demo identity to the {@link ExampleIdentityAdapter}.
  * Exists only when the dev profile and {@code muer.example.seed-admin=true} are both
  * active, so the demo account can never authenticate in a production-like setup.
  */

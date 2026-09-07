@@ -1,6 +1,6 @@
-package io.github.muer.persistence;
+package cloud.muer.persistence;
 
-import io.github.muer.core.model.OverviewMetrics;
+import cloud.muer.core.model.OverviewMetrics;
 
 public record OverviewRow(long totalUsers, long enabledUsers, long activeSessions,
                           long activeProfiles, long templateVersions, long auditEventsToday) {

@@ -53,5 +53,5 @@ QuickStart 中 Alice 的 Editor Profile ID 为 `402`。
 
 ## 源码
 
-- `AuthorizationProfileSwitchService`：<https://github.com/wbh123/iam/tree/main/muer-authentication/src/main/java/io/github/muer/authentication>
+- `AuthorizationProfileSwitchService`：<https://github.com/wbh123/Muer-IAM-Framework/tree/main/muer-authentication/src/main/java/cloud/muer/authentication>
 - `AuthenticationResult`：同上目录

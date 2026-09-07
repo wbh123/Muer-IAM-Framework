@@ -21,5 +21,5 @@ sidebar:
 
 ## 源码参考
 
-- 仓库根：<https://github.com/wbh123/iam>
-- autoconfigure：<https://github.com/wbh123/iam/blob/main/muer-spring-boot-autoconfigure/src/main/java/io/github/muer/autoconfigure/>
+- 仓库根：<https://github.com/wbh123/Muer-IAM-Framework>
+- autoconfigure：<https://github.com/wbh123/Muer-IAM-Framework/blob/main/muer-spring-boot-autoconfigure/src/main/java/cloud/muer/autoconfigure/>

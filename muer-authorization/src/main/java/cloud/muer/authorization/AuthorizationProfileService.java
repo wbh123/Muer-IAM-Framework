@@ -1,7 +1,7 @@
-package io.github.muer.authorization;
+package cloud.muer.authorization;
 
-import io.github.muer.core.model.ResourceScope;
-import io.github.muer.core.model.IamPrincipal;
+import cloud.muer.core.model.ResourceScope;
+import cloud.muer.core.model.IamPrincipal;
 
 import java.time.Clock;
 import java.util.List;

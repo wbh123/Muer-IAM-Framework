@@ -1,6 +1,6 @@
 ---
 title: 基础配置
-description: 配置 MySQL、Redis 与 `iam.*`，让 IAM Starter 在手动部署或现有基础设施中正常启动。
+description: 配置 MySQL、Redis 与 `muer.*`，让 Muer Starter 在手动部署或现有基础设施中正常启动。
 sidebar:
   order: 3
 ---
@@ -8,7 +8,7 @@ sidebar:
 IAM 的运行配置分成两部分：
 
 1. Spring Boot 管理的基础设施连接：`spring.datasource`、`spring.data.redis`；
-2. IAM 自己的行为配置：`iam.*`。
+2. Muer 自己的行为配置：`muer.*`。
 
 Docker、物理机、云数据库或 Kubernetes 最终都落到这两组配置上。
 
@@ -24,7 +24,7 @@ spring:
 
 如果数据库位于远端，把 `127.0.0.1` 换成实际内网地址或域名。
 
-IAM 默认使用宿主应用的 `DataSource`。`iam.schema.enabled=true` 时，Starter 会自动执行 IAM Flyway migration。
+IAM 默认使用宿主应用的 `DataSource`。`muer.schema.enabled=true` 时，Starter 会自动执行 IAM Flyway migration。
 
 ## 2. Redis 连接
 
@@ -49,24 +49,24 @@ spring:
       password: ${IAM_REDIS_PASSWORD}
 ```
 
-Redis 不需要手工初始化 Key。IAM 使用 `iam.token.redis-prefix` 隔离自己的 Token 索引。
+Redis 不需要手工初始化 Key。IAM 使用 `muer.token.redis-prefix` 隔离自己的 Token 索引。
 
 ## 3. IAM 配置项
 
-`MuerProperties` 使用前缀 `iam`：
+`MuerProperties` 使用前缀 `muer`：
 
 | 属性 | 类型 | 默认 | 约束 |
 | --- | --- | --- | --- |
-| `iam.enabled` | boolean | `true` | — |
-| `iam.token.ttl` | Duration | `8h` | 必须为正 |
-| `iam.token.redis-prefix` | String | `iam` | 非空 |
-| `iam.session.enabled` | boolean | `true` | 属性已暴露 |
-| `iam.session.touch-interval` | Duration | `10m` | — |
-| `iam.schema.enabled` | boolean | `true` | — |
-| `iam.schema.history-table` | String | `iam_flyway_schema_history` | 非空 |
-| `iam.audit.enabled` | boolean | `true` | 属性已暴露 |
-| `iam.diagnostics.enabled` | boolean | `true` | 属性已暴露 |
-| `iam.client-types` | List<String> | `[WEB]` | 至少一个非空值，登录时精确匹配 |
+| `muer.enabled` | boolean | `true` | — |
+| `muer.token.ttl` | Duration | `8h` | 必须为正 |
+| `muer.token.redis-prefix` | String | `iam` | 非空 |
+| `muer.session.enabled` | boolean | `true` | 属性已暴露 |
+| `muer.session.touch-interval` | Duration | `10m` | — |
+| `muer.schema.enabled` | boolean | `true` | — |
+| `muer.schema.history-table` | String | `iam_flyway_schema_history` | 非空 |
+| `muer.audit.enabled` | boolean | `true` | 属性已暴露 |
+| `muer.diagnostics.enabled` | boolean | `true` | 属性已暴露 |
+| `muer.client-types` | List<String> | `[WEB]` | 至少一个非空值，登录时精确匹配 |
 
 ## 4. 推荐起步配置
 
@@ -82,7 +82,7 @@ spring:
       port: 6379
       password: ${IAM_REDIS_PASSWORD:}
 
-iam:
+muer:
   enabled: true
   token:
     ttl: 8h
@@ -104,7 +104,7 @@ iam:
 例如：
 
 ```yaml
-iam:
+muer:
   token:
     redis-prefix: order-service:iam
 ```
@@ -112,7 +112,7 @@ iam:
 另一个应用可以使用：
 
 ```yaml
-iam:
+muer:
   token:
     redis-prefix: hr-service:iam
 ```
@@ -124,7 +124,7 @@ iam:
 默认推荐：
 
 ```yaml
-iam:
+muer:
   schema:
     enabled: true
     history-table: iam_flyway_schema_history
@@ -133,7 +133,7 @@ iam:
 只有当你明确由外部发布流程管理同一套 IAM migration 时才关闭：
 
 ```yaml
-iam:
+muer:
   schema:
     enabled: false
 ```

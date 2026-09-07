@@ -1,17 +1,33 @@
-# Muer 0.1.x 命名空间迁移
+# Muer 0.1.0 命名空间迁移
 
-本次发布为 breaking change。Java 包、Maven 坐标和 Spring 配置必须一次性迁移：
+`0.1.0` 尚未发布稳定 Maven Artifact，因此这是从历史 IAM 身份到最终 Muer 身份的最后一次 breaking cutover。稳定版只承诺最终 `cloud.muer`，不提供旧 Maven 坐标的兼容别名。
 
-| 旧值 | 新值 |
+## 三段迁移路径
+
+1. 历史 IAM namespace：`io.github.iamstarter` 与 `iam-spring-boot-starter`；
+2. 过渡 Muer namespace：`io.github.muer` 与 `muer-*` artifacts；
+3. 最终 Muer namespace：`cloud.muer` 与 `muer-*` artifacts。
+
+## 最终技术身份
+
+| 类别 | 最终值 |
 | --- | --- |
-| `io.github.iamstarter` | `io.github.muer` |
-| `io.github.iamstarter:iam-spring-boot-starter` | `io.github.muer:muer-spring-boot-starter` |
-| `iam.enabled` | `muer.enabled` |
-| `iam.client-types` | `muer.client-types` |
-| `iam.session.*` | `muer.session.*` |
-| `iam.audit.*` | `muer.audit.*` |
-| `iam.diagnostics.*` | `muer.diagnostics.*` |
+| Java package root | `cloud.muer` |
+| Maven group | `cloud.muer` |
+| Starter | `cloud.muer:muer-spring-boot-starter:0.1.0` |
+| Spring prefix | `muer.*` |
+| Website | `https://muer.cloud` |
+| Repository | `wbh123/Muer-IAM-Framework` |
 
-认证、授权、客户端类型限制、Profile、会话撤销隔离和诊断权限边界没有变化。既有数据库表、Flyway 迁移路径、历史表与 Redis 物理键继续保留，避免引入生产数据迁移。
+迁移 Java 包、Maven 坐标、自动配置导入、活动文档和示例配置；Spring 属性使用 `muer.*`，例如 `muer.enabled`、`muer.token.ttl` 和 `muer.session.enabled`。
 
-当前源码仓库仍为 `wbh123/iam`。创建并迁移到 `muer/muer.github.io` 后，将 Pages 构建环境改为 `SITE_URL=https://muer.github.io` 和 `BASE_PATH=/`。
+## 保持不变的运行时契约
+
+以下是 IAM 领域或存储兼容性，而不是品牌 namespace，不要重命名：
+
+- HTTP API：`/iam/**`；
+- 数据库表与历史表：`iam_*`；
+- 权限码：`iam.admin.*`；
+- Redis 默认物理 value：`iam`（配置键仍为 `muer.token.redis-prefix`）。
+
+回滚通过 Git revert 完成，不涉及数据库 rename migration。正式发布前只需恢复上一提交并重新验证，不创建 `v0.1.0` tag、GitHub Release 或 Maven 发布。

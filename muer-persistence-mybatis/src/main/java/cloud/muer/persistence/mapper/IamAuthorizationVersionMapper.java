@@ -1,4 +1,4 @@
-package io.github.muer.persistence.mapper;
+package cloud.muer.persistence.mapper;
 
 import org.apache.ibatis.annotations.Param;
 

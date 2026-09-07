@@ -1,9 +1,9 @@
-package io.github.muer.persistence;
+package cloud.muer.persistence;
 
-import io.github.muer.authorization.AuthorizationScopeMutation;
-import io.github.muer.core.model.ResourceScope;
-import io.github.muer.persistence.mapper.IamAuthorizationProfileMapper;
-import io.github.muer.persistence.mapper.IamAuthorizationVersionMapper;
+import cloud.muer.authorization.AuthorizationScopeMutation;
+import cloud.muer.core.model.ResourceScope;
+import cloud.muer.persistence.mapper.IamAuthorizationProfileMapper;
+import cloud.muer.persistence.mapper.IamAuthorizationVersionMapper;
 import org.apache.ibatis.session.SqlSessionFactory;
 
 import java.util.List;

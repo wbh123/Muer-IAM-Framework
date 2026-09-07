@@ -1,4 +1,4 @@
-package io.github.muer.example;
+package cloud.muer.example;
 
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

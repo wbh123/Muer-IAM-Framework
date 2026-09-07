@@ -1,6 +1,6 @@
-package io.github.muer.authorization;
+package cloud.muer.authorization;
 
-import io.github.muer.core.model.IamPrincipal;
+import cloud.muer.core.model.IamPrincipal;
 
 public interface AuthorizationEngine {
     AuthorizationDecision decide(IamPrincipal principal, AuthorizationRequest request);

@@ -5,7 +5,7 @@
 ## 技术栈与环境
 
 - 文档站：Astro 7.3.1 + @astrojs/starlight 0.42.0；
-- 内容源目录：`iam-docs/src/content/docs/<group>/<slug>.md`；
+- 内容源目录：`muer-docs/src/content/docs/<group>/<slug>.md`；
 - 内容文件使用 **Markdown（.md）**；
 - 每页必须有 frontmatter：
 
@@ -204,16 +204,16 @@ Optional<ResourceDescriptor> resolve(HttpServletRequest request, HandlerMethod h
 
 | 属性 | 类型 | 默认 | 约束 |
 | --- | --- | --- | --- |
-| iam.enabled | boolean | true | — |
-| iam.token.ttl | Duration | 8h | 必须为正 |
-| iam.token.redis-prefix | String | iam | 非空 |
-| iam.session.enabled | boolean | true | 属性已暴露 |
-| iam.session.touch-interval | Duration | 10m | — |
-| iam.schema.enabled | boolean | true | — |
-| iam.schema.history-table | String | iam_flyway_schema_history | 非空 |
-| iam.audit.enabled | boolean | true | 属性已暴露 |
-| iam.diagnostics.enabled | boolean | true | 属性已暴露 |
-| iam.client-types | List<String> | [WEB] | 至少一个非空值；登录 clientType 精确匹配 |
+| muer.enabled | boolean | true | — |
+| muer.token.ttl | Duration | 8h | 必须为正 |
+| muer.token.redis-prefix | String | iam | 非空 |
+| muer.session.enabled | boolean | true | 属性已暴露 |
+| muer.session.touch-interval | Duration | 10m | — |
+| muer.schema.enabled | boolean | true | — |
+| muer.schema.history-table | String | iam_flyway_schema_history | 非空 |
+| muer.audit.enabled | boolean | true | 属性已暴露 |
+| muer.diagnostics.enabled | boolean | true | 属性已暴露 |
+| muer.client-types | List<String> | [WEB] | 至少一个非空值；登录 clientType 精确匹配 |
 
 注意：audit/diagnostics/session 的 enabled 当前自动配置并未全部据此条件化 Bean。
 
@@ -222,8 +222,8 @@ Optional<ResourceDescriptor> resolve(HttpServletRequest request, HandlerMethod h
 - MySQL 地址、账号、密码使用 Spring Boot `spring.datasource.*`；
 - Redis 地址、端口、密码使用 Spring Boot `spring.data.redis.*`；
 - IAM 不额外定义第二套 MySQL / Redis 地址属性；
-- 默认 `iam.schema.enabled=true` 时使用宿主 DataSource 自动运行 IAM Flyway migration；
-- Redis 无需预建 Key；多应用共享 Redis 时建议设置独立 `iam.token.redis-prefix`。
+- 默认 `muer.schema.enabled=true` 时使用宿主 DataSource 自动运行 IAM Flyway migration；
+- Redis 无需预建 Key；多应用共享 Redis 时建议设置独立 `muer.token.redis-prefix`。
 
 ### HTTP 端点
 
@@ -275,7 +275,7 @@ Resolver 把文档映射成 `ResourceDescriptor("DOCUMENT", id, parentPath=["PRO
 
 ### 源码对照表
 
-GitHub blob 基址：`https://github.com/wbh123/iam/blob/main/`
+GitHub blob 基址：`https://github.com/wbh123/Muer-IAM-Framework/blob/main/`
 
 - IamPrincipal: `muer-core/src/main/java/io/github/iamstarter/core/model/IamPrincipal.java`
 - ScopeAccess: `muer-core/src/main/java/io/github/iamstarter/core/model/ScopeAccess.java`

@@ -1,7 +1,7 @@
-package io.github.muer.authorization;
+package cloud.muer.authorization;
 
-import io.github.muer.core.model.ResourceDescriptor;
-import io.github.muer.core.model.ScopeAccess;
+import cloud.muer.core.model.ResourceDescriptor;
+import cloud.muer.core.model.ScopeAccess;
 
 import java.util.Objects;
 

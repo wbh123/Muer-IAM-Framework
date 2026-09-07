@@ -63,5 +63,5 @@ decisionCode = PERMISSION_DENIED
 
 ## 源码
 
-- `AuthorizationDecision` / `AuthorizationDecisionStep`：<https://github.com/wbh123/iam/tree/main/muer-authorization/src/main/java/io/github/muer/authorization>
+- `AuthorizationDecision` / `AuthorizationDecisionStep`：<https://github.com/wbh123/Muer-IAM-Framework/tree/main/muer-authorization/src/main/java/cloud/muer/authorization>
 - `DefaultAuthorizationEngine`：同上目录

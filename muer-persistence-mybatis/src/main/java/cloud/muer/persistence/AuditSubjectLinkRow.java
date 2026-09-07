@@ -1,7 +1,7 @@
-package io.github.muer.persistence;
+package cloud.muer.persistence;
 
-import io.github.muer.audit.AuditSubjectLink;
-import io.github.muer.audit.AuditSubjectRelation;
+import cloud.muer.audit.AuditSubjectLink;
+import cloud.muer.audit.AuditSubjectRelation;
 
 /**
  * Flat projection of one audit subject link including its parent audit log id.

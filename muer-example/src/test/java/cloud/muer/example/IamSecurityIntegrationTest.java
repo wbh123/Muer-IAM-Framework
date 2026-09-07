@@ -1,4 +1,4 @@
-package io.github.muer.example;
+package cloud.muer.example;
 
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;

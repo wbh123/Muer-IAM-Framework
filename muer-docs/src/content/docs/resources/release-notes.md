@@ -9,7 +9,7 @@ sidebar:
 
 **0.1.0-SNAPSHOT（Release Candidate）**，尚未发布到 Maven Central，也未作为正式 `0.1.0` 发布。
 
-0.1.0 首发范围已经确定为：**Starter + Management API + IAM Admin Console + 文档站**。Admin Console 属于首发能力，但仍是可选客户端，Starter 本身不依赖前端。
+0.1.0 首发范围已经确定为：**Starter + Management API + Muer Admin Console + 文档站**。Admin Console 属于首发能力，但仍是可选客户端，Starter 本身不依赖前端。
 
 ## 包含能力
 

@@ -1,7 +1,7 @@
-package io.github.muer.persistence.mapper;
+package cloud.muer.persistence.mapper;
 
-import io.github.muer.authorization.PermissionTemplateVersion;
-import io.github.muer.persistence.PermissionTemplateVersionRow;
+import cloud.muer.authorization.PermissionTemplateVersion;
+import cloud.muer.persistence.PermissionTemplateVersionRow;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;

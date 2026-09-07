@@ -1,10 +1,10 @@
-package io.github.muer.authorization;
+package cloud.muer.authorization;
 
-import io.github.muer.core.model.IamPrincipal;
-import io.github.muer.core.model.ResourceScope;
-import io.github.muer.core.port.ResourceHierarchyProvider;
-import io.github.muer.core.metrics.MuerMetrics;
-import io.github.muer.core.metrics.NoOpMuerMetrics;
+import cloud.muer.core.model.IamPrincipal;
+import cloud.muer.core.model.ResourceScope;
+import cloud.muer.core.port.ResourceHierarchyProvider;
+import cloud.muer.core.metrics.MuerMetrics;
+import cloud.muer.core.metrics.NoOpMuerMetrics;
 
 import java.time.Clock;
 import java.time.Instant;

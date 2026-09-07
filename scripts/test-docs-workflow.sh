@@ -49,7 +49,7 @@ require_content 'type-checks site' "$docs_workflow" 'npm[[:space:]]+run[[:space:
 require_content 'builds static site' "$docs_workflow" 'npm[[:space:]]+run[[:space:]]+build'
 
 # The Astro 7 toolchain requires Node >= 22.12; CI must use Node 22 so the
-# local and remote toolchains stay aligned with iam-docs/package.json engines.
+# local and remote toolchains stay aligned with muer-docs/package.json engines.
 require_content 'Node 22 in docs CI' "$docs_workflow" 'node-version:[[:space:]]*22'
 
 # Pages deployment is limited to main; pull requests only build in docs.yml.

@@ -1,10 +1,10 @@
-package io.github.muer.example;
+package cloud.muer.example;
 
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
-import io.github.muer.authentication.AuthenticationService;
-import io.github.muer.session.SessionRepository;
-import io.github.muer.web.dto.AuthorizationEvaluationRequest;
+import cloud.muer.authentication.AuthenticationService;
+import cloud.muer.session.SessionRepository;
+import cloud.muer.web.dto.AuthorizationEvaluationRequest;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

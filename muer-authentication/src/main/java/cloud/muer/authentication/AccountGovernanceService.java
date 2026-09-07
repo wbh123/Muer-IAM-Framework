@@ -1,11 +1,11 @@
-package io.github.muer.authentication;
+package cloud.muer.authentication;
 
-import io.github.muer.authorization.AuthorizationVersionService;
-import io.github.muer.core.model.IamUser;
-import io.github.muer.core.model.Identity;
-import io.github.muer.core.port.IamUserRepository;
-import io.github.muer.core.port.IdentityRepository;
-import io.github.muer.core.port.UserQueryRepository;
+import cloud.muer.authorization.AuthorizationVersionService;
+import cloud.muer.core.model.IamUser;
+import cloud.muer.core.model.Identity;
+import cloud.muer.core.port.IamUserRepository;
+import cloud.muer.core.port.IdentityRepository;
+import cloud.muer.core.port.UserQueryRepository;
 
 import java.util.List;
 import java.util.Objects;

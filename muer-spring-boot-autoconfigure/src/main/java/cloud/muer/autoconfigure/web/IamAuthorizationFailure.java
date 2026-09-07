@@ -1,4 +1,4 @@
-package io.github.muer.autoconfigure.web;
+package cloud.muer.autoconfigure.web;
 
 /** Stable failure categories emitted by declarative MVC IAM authorization. */
 public enum IamAuthorizationFailure {

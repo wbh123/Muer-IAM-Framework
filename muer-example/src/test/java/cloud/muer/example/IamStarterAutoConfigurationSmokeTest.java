@@ -1,14 +1,14 @@
-package io.github.muer.example;
+package cloud.muer.example;
 
-import io.github.muer.authentication.AuthenticationService;
-import io.github.muer.authentication.LoginRequest;
-import io.github.muer.authorization.AuthorizationEngine;
-import io.github.muer.authorization.AuthorizationProfileRepository;
-import io.github.muer.authorization.AuthorizationVersionRepository;
-import io.github.muer.authorization.PermissionTemplateVersionRepository;
-import io.github.muer.core.port.ResourceHierarchyProvider;
-import io.github.muer.session.SessionRepository;
-import io.github.muer.session.TokenStore;
+import cloud.muer.authentication.AuthenticationService;
+import cloud.muer.authentication.LoginRequest;
+import cloud.muer.authorization.AuthorizationEngine;
+import cloud.muer.authorization.AuthorizationProfileRepository;
+import cloud.muer.authorization.AuthorizationVersionRepository;
+import cloud.muer.authorization.PermissionTemplateVersionRepository;
+import cloud.muer.core.port.ResourceHierarchyProvider;
+import cloud.muer.session.SessionRepository;
+import cloud.muer.session.TokenStore;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;

@@ -1,6 +1,6 @@
-package io.github.muer.autoconfigure;
+package cloud.muer.autoconfigure;
 
-import io.github.muer.autoconfigure.observability.MuerHealthIndicator;
+import cloud.muer.autoconfigure.observability.MuerHealthIndicator;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;

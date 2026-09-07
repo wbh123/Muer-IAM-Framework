@@ -15,7 +15,7 @@ export default defineConfig({
       description:
         'A lightweight identity and access management framework for modern applications.',
       editLink: {
-        baseUrl: 'https://github.com/wbh123/Muer-IAM-Framework/edit/main/iam-docs',
+        baseUrl: 'https://github.com/wbh123/Muer-IAM-Framework/edit/main/muer-docs',
       },
       components: {},
       sidebar: [

@@ -15,7 +15,7 @@ IAM 以「一个 Starter 依赖 + 宿主提供少量 SPI」的方式嵌入现有
 
 ```xml
 <dependency>
-    <groupId>io.github.muer</groupId>
+    <groupId>cloud.muer</groupId>
     <artifactId>muer-spring-boot-starter</artifactId>
     <version>0.1.0-SNAPSHOT</version>
 </dependency>
@@ -61,9 +61,9 @@ Starter 不会替你持有用户与业务资源。根据使用能力注册 Sprin
 
 示例实现：
 
-- [ExampleIdentityAdapter.java](https://github.com/wbh123/iam/blob/main/muer-example/src/main/java/io/github/muer/example/ExampleIdentityAdapter.java)
-- [ExampleResourceHierarchyAdapter.java](https://github.com/wbh123/iam/blob/main/muer-example/src/main/java/io/github/muer/example/ExampleResourceHierarchyAdapter.java)
-- [ExampleDocumentResourceResolver.java](https://github.com/wbh123/iam/blob/main/muer-example/src/main/java/io/github/muer/example/ExampleDocumentResourceResolver.java)
+- [ExampleIdentityAdapter.java](https://github.com/wbh123/Muer-IAM-Framework/blob/main/muer-example/src/main/java/cloud/muer/example/ExampleIdentityAdapter.java)
+- [ExampleResourceHierarchyAdapter.java](https://github.com/wbh123/Muer-IAM-Framework/blob/main/muer-example/src/main/java/cloud/muer/example/ExampleResourceHierarchyAdapter.java)
+- [ExampleDocumentResourceResolver.java](https://github.com/wbh123/Muer-IAM-Framework/blob/main/muer-example/src/main/java/cloud/muer/example/ExampleDocumentResourceResolver.java)
 
 ## 不需要做什么
 
@@ -75,7 +75,7 @@ Starter 不会替你持有用户与业务资源。根据使用能力注册 Sprin
 - 为 Redis 预创建 Key；
 - 默认手工创建 IAM 数据表。
 
-如果 `iam.schema.enabled=true`，Starter 会自动执行 IAM Flyway migration。
+如果 `muer.schema.enabled=true`，Starter 会自动执行 IAM Flyway migration。
 
 ## 下一步
 

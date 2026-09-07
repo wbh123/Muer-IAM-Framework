@@ -1,4 +1,4 @@
-package io.github.muer.autoconfigure.observability;
+package cloud.muer.autoconfigure.observability;
 
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.Test;

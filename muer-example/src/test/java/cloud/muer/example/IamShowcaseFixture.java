@@ -1,4 +1,4 @@
-package io.github.muer.example;
+package cloud.muer.example;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 

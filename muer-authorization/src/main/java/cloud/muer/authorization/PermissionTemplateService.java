@@ -1,4 +1,4 @@
-package io.github.muer.authorization;
+package cloud.muer.authorization;
 
 import java.util.LinkedHashSet;
 import java.util.Objects;

@@ -1,6 +1,6 @@
-# IAM Admin Console 部署与验收指南
+# Muer Admin Console 部署与验收指南
 
-`iam-admin-web` 是 IAM 0.1.0 的**可选**管理控制台。它不要求 Docker，产物是纯静态
+`muer-admin-web` 是 IAM 0.1.0 的**可选**管理控制台。它不要求 Docker，产物是纯静态
 `dist/`，可以交给 Nginx / Apache / CDN，也可以由 Spring Boot 静态托管。
 
 ```
@@ -15,7 +15,7 @@
 要求 Node.js 22+，包管理 npm。
 
 ```bash
-cd iam-admin-web
+cd muer-admin-web
 
 npm ci
 npm run api:generate
@@ -48,7 +48,7 @@ server {
     ssl_certificate_key /etc/letsencrypt/live/iam.example.com/privkey.pem;
     ssl_protocols       TLSv1.2 TLSv1.3;
 
-    root /srv/iam-admin-web/dist;
+    root /srv/muer-admin-web/dist;
     index index.html;
 
     location / {
@@ -122,7 +122,7 @@ IAM_EXAMPLE_REDIS_PORT=6379
 启动 `IamExampleApplication` 后，再启动前端：
 
 ```bash
-cd iam-admin-web
+cd muer-admin-web
 npm ci
 npm run api:generate
 npm run dev

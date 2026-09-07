@@ -1,4 +1,4 @@
-io.github.muer.autoconfigure.MuerMicrometerAutoConfiguration
-io.github.muer.autoconfigure.MuerObservabilityAutoConfiguration
-io.github.muer.autoconfigure.MuerHealthAutoConfiguration
-io.github.muer.autoconfigure.MuerAutoConfiguration
+cloud.muer.autoconfigure.MuerMicrometerAutoConfiguration
+cloud.muer.autoconfigure.MuerObservabilityAutoConfiguration
+cloud.muer.autoconfigure.MuerHealthAutoConfiguration
+cloud.muer.autoconfigure.MuerAutoConfiguration

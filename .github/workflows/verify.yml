@@ -1,4 +1,4 @@
-name: Verify IAM Starter
+name: Verify Muer Starter
 
 on:
   push:
@@ -56,7 +56,7 @@ jobs:
         run: mvn -B -pl muer-spring-boot-starter -am package -DskipTests
 
   management-verify:
-    name: Verify IAM Management API
+    name: Verify Muer Management API
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

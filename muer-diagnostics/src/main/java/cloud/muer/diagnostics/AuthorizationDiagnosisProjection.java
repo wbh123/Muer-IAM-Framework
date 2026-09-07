@@ -1,7 +1,7 @@
-package io.github.muer.diagnostics;
+package cloud.muer.diagnostics;
 
-import io.github.muer.authorization.AuthorizationDecision;
-import io.github.muer.authorization.AuthorizationDecisionStep;
+import cloud.muer.authorization.AuthorizationDecision;
+import cloud.muer.authorization.AuthorizationDecisionStep;
 
 import java.util.List;
 

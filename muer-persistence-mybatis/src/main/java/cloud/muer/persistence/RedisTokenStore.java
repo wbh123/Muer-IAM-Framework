@@ -1,7 +1,7 @@
-package io.github.muer.persistence;
+package cloud.muer.persistence;
 
-import io.github.muer.session.TokenRecord;
-import io.github.muer.session.TokenStore;
+import cloud.muer.session.TokenRecord;
+import cloud.muer.session.TokenStore;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 

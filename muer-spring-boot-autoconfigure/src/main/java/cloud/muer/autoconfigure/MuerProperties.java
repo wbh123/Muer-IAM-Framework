@@ -1,4 +1,4 @@
-package io.github.muer.autoconfigure;
+package cloud.muer.autoconfigure;
 
 import jakarta.annotation.PostConstruct;
 import org.springframework.boot.context.properties.ConfigurationProperties;

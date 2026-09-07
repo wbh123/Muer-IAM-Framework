@@ -1,7 +1,7 @@
-package io.github.muer.autoconfigure;
+package cloud.muer.autoconfigure;
 
-import io.github.muer.core.metrics.MuerMetrics;
-import io.github.muer.core.metrics.NoOpMuerMetrics;
+import cloud.muer.core.metrics.MuerMetrics;
+import cloud.muer.core.metrics.NoOpMuerMetrics;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;

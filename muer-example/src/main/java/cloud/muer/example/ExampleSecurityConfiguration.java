@@ -1,6 +1,6 @@
-package io.github.muer.example;
+package cloud.muer.example;
 
-import io.github.muer.autoconfigure.IamBearerTokenFilter;
+import cloud.muer.autoconfigure.IamBearerTokenFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;

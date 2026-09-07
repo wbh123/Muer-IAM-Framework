@@ -1,4 +1,4 @@
-package io.github.muer.example;
+package cloud.muer.example;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;

@@ -11,7 +11,7 @@ sidebar:
 
 ## 关键概念
 
-- 配置开关：`iam.audit.enabled`（默认 `true`，属性已暴露）。
+- 配置开关：`muer.audit.enabled`（默认 `true`，属性已暴露）。
 - 审计覆盖的关键动作：登录成功/失败、会话创建与吊销、Profile 切换、授权允许/拒绝决策。
 - 与诊断不同：审计面向「事件留痕与合规」，诊断面向「实时排查决策原因」。
 - 审计事件与 `AuthSession`、`AuthorizationDecision` 关联，可按 `sessionId`/`userId` 检索。
@@ -21,7 +21,7 @@ sidebar:
 配置开启审计（application.yml）：
 
 ```yaml
-iam:
+muer:
   audit:
     enabled: true
 ```
@@ -36,7 +36,7 @@ iam:
 
 ## 源码
 
-- 配置 `MuerProperties`：https://github.com/wbh123/iam/blob/main/muer-spring-boot-autoconfigure/src/main/java/io/github/muer/autoconfigure/
-- Session 模型：https://github.com/wbh123/iam/blob/main/muer-session/src/main/java/io/github/muer/session/
+- 配置 `MuerProperties`：https://github.com/wbh123/Muer-IAM-Framework/blob/main/muer-spring-boot-autoconfigure/src/main/java/cloud/muer/autoconfigure/
+- Session 模型：https://github.com/wbh123/Muer-IAM-Framework/blob/main/muer-session/src/main/java/cloud/muer/session/
 
 当前版本：`0.1.0-SNAPSHOT`（Release Candidate），尚未发布。

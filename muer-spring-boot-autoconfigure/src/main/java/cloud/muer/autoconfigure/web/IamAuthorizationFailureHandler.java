@@ -1,4 +1,4 @@
-package io.github.muer.autoconfigure.web;
+package cloud.muer.autoconfigure.web;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

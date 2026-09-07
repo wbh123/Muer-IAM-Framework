@@ -1,12 +1,12 @@
-package io.github.muer.persistence;
+package cloud.muer.persistence;
 
-import io.github.muer.authorization.PermissionSummary;
-import io.github.muer.authorization.PermissionSummaryPage;
-import io.github.muer.authorization.PermissionTemplate;
-import io.github.muer.authorization.PermissionTemplateQueryRepository;
-import io.github.muer.authorization.PermissionTemplateVersion;
-import io.github.muer.authorization.TemplateVersionStatus;
-import io.github.muer.persistence.mapper.IamPermissionTemplateQueryMapper;
+import cloud.muer.authorization.PermissionSummary;
+import cloud.muer.authorization.PermissionSummaryPage;
+import cloud.muer.authorization.PermissionTemplate;
+import cloud.muer.authorization.PermissionTemplateQueryRepository;
+import cloud.muer.authorization.PermissionTemplateVersion;
+import cloud.muer.authorization.TemplateVersionStatus;
+import cloud.muer.persistence.mapper.IamPermissionTemplateQueryMapper;
 import org.apache.ibatis.session.SqlSessionFactory;
 
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package io.github.muer.autoconfigure;
+package cloud.muer.autoconfigure;
 
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.configuration.FluentConfiguration;

@@ -1,9 +1,9 @@
-package io.github.muer.example;
+package cloud.muer.example;
 
-import io.github.muer.core.model.ResourceDescriptor;
-import io.github.muer.core.model.ResourceScope;
-import io.github.muer.core.model.ScopeAccess;
-import io.github.muer.authentication.LoginRequest;
+import cloud.muer.core.model.ResourceDescriptor;
+import cloud.muer.core.model.ResourceScope;
+import cloud.muer.core.model.ScopeAccess;
+import cloud.muer.authentication.LoginRequest;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

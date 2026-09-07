@@ -1,6 +1,6 @@
-package io.github.muer.persistence.mapper;
+package cloud.muer.persistence.mapper;
 
-import io.github.muer.session.AuthSession;
+import cloud.muer.session.AuthSession;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;

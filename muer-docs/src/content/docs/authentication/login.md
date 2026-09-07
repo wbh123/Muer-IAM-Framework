@@ -54,6 +54,6 @@ Authorization: Bearer <accessToken>
 
 ## 源码
 
-- `LoginRequest`：<https://github.com/wbh123/iam/blob/main/muer-authentication/src/main/java/io/github/muer/authentication/LoginRequest.java>
-- `IdentityAuthenticator`：<https://github.com/wbh123/iam/blob/main/muer-authentication/src/main/java/io/github/muer/authentication/IdentityAuthenticator.java>
-- OpenAPI：<https://github.com/wbh123/iam/blob/main/muer-management-web/src/main/resources/openapi/iam.yaml>
+- `LoginRequest`：<https://github.com/wbh123/Muer-IAM-Framework/blob/main/muer-authentication/src/main/java/cloud/muer/authentication/LoginRequest.java>
+- `IdentityAuthenticator`：<https://github.com/wbh123/Muer-IAM-Framework/blob/main/muer-authentication/src/main/java/cloud/muer/authentication/IdentityAuthenticator.java>
+- OpenAPI：<https://github.com/wbh123/Muer-IAM-Framework/blob/main/muer-management-web/src/main/resources/openapi/iam.yaml>

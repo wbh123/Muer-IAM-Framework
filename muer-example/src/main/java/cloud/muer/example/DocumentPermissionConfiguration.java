@@ -1,7 +1,7 @@
-package io.github.muer.example;
+package cloud.muer.example;
 
-import io.github.muer.authorization.PermissionDefinition;
-import io.github.muer.authorization.PermissionDefinitionProvider;
+import cloud.muer.authorization.PermissionDefinition;
+import cloud.muer.authorization.PermissionDefinitionProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

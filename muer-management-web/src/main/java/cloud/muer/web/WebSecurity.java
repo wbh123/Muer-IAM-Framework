@@ -1,10 +1,10 @@
-package io.github.muer.web;
+package cloud.muer.web;
 
-import io.github.muer.authorization.AuthorizationEngine;
-import io.github.muer.authorization.AuthorizationRequest;
-import io.github.muer.core.model.IamPrincipal;
-import io.github.muer.core.model.ResourceDescriptor;
-import io.github.muer.core.model.ScopeAccess;
+import cloud.muer.authorization.AuthorizationEngine;
+import cloud.muer.authorization.AuthorizationRequest;
+import cloud.muer.core.model.IamPrincipal;
+import cloud.muer.core.model.ResourceDescriptor;
+import cloud.muer.core.model.ScopeAccess;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.List;

@@ -70,7 +70,7 @@ GRANT ALL PRIVILEGES ON iam_host.* TO 'iam_app'@'localhost';
 默认不需要。
 
 ```yaml
-iam:
+muer:
   schema:
     enabled: true
 ```
@@ -84,7 +84,7 @@ iam_flyway_schema_history
 如果你的组织要求所有数据库变更必须由 DBA 或发布平台执行，可以先由部署系统应用同一套 migration，然后配置：
 
 ```yaml
-iam:
+muer:
   schema:
     enabled: false
 ```
@@ -115,7 +115,7 @@ port 6379
 多个应用共享同一个 Redis 时，给每个应用设置独立前缀，例如：
 
 ```yaml
-iam:
+muer:
   token:
     redis-prefix: order-service:iam
 ```
@@ -164,7 +164,7 @@ spring:
 推荐从下面这组配置开始：
 
 ```yaml
-iam:
+muer:
   enabled: true
   token:
     ttl: 8h
@@ -195,7 +195,7 @@ spring:
       port: 6379
       password: ${IAM_REDIS_PASSWORD:}
 
-iam:
+muer:
   enabled: true
   token:
     ttl: 8h
@@ -217,7 +217,7 @@ iam:
 1. Spring Boot 应用启动成功；
 2. MySQL 没有连接错误；
 3. Redis 没有连接错误；
-4. `iam.schema.enabled=true` 时 Flyway migration 成功；
+4. `muer.schema.enabled=true` 时 Flyway migration 成功；
 5. 合法宿主账号能够调用 `POST /iam/auth/login` 得到 `200`；
 6. 使用返回 Token 调用 `GET /iam/auth/me` 得到 `200`。
 
@@ -240,7 +240,7 @@ examples/quickstart/docker-compose.yml
 - 数据库与 Redis 使用私网；
 - 凭据通过环境变量、Secret Manager 或配置中心提供；
 - 不把演示账号、演示密码和 `QuickStartDemoSeeder` 带入生产；
-- 为不同应用设置不同 `iam.token.redis-prefix`；
+- 为不同应用设置不同 `muer.token.redis-prefix`；
 - 保留 IAM Flyway 历史表；
 - 变更 IAM schema 前先备份数据库；
 - 反向代理环境继续阅读[反向代理](/operations/reverse-proxy/)；

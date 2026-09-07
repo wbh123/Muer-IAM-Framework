@@ -1,8 +1,8 @@
-package io.github.muer.autoconfigure.web;
+package cloud.muer.autoconfigure.web;
 
-import io.github.muer.authorization.AuthorizationEngine;
-import io.github.muer.authorization.AuthorizationRequest;
-import io.github.muer.core.model.IamPrincipal;
+import cloud.muer.authorization.AuthorizationEngine;
+import cloud.muer.authorization.AuthorizationRequest;
+import cloud.muer.core.model.IamPrincipal;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.lang.Nullable;

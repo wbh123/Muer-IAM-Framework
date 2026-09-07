@@ -1,6 +1,6 @@
-package io.github.muer.authentication;
+package cloud.muer.authentication;
 
-import io.github.muer.core.model.IamPrincipal;
+import cloud.muer.core.model.IamPrincipal;
 
 import java.util.Optional;
 

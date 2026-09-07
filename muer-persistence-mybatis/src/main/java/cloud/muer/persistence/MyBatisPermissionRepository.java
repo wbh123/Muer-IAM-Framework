@@ -1,8 +1,8 @@
-package io.github.muer.persistence;
+package cloud.muer.persistence;
 
-import io.github.muer.authorization.PermissionDefinition;
-import io.github.muer.authorization.PermissionRepository;
-import io.github.muer.persistence.mapper.IamPermissionMapper;
+import cloud.muer.authorization.PermissionDefinition;
+import cloud.muer.authorization.PermissionRepository;
+import cloud.muer.persistence.mapper.IamPermissionMapper;
 import org.apache.ibatis.session.SqlSessionFactory;
 
 import java.util.Objects;

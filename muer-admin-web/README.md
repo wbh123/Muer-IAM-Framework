@@ -1,4 +1,4 @@
-# iam-admin-web — IAM Admin Console
+# muer-admin-web — Muer Admin Console
 
 可选的 IAM 管理控制台（Vue 3 + TypeScript + Vite + Pinia + Vue Router + Element Plus）。
 

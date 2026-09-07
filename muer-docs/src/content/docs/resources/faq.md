@@ -12,10 +12,10 @@ sidebar:
 IAM 没有 Role 概念。权限单位是 `permissionCode`（如 `document:read`）。`AuthorizationProfile` 通过 `PermissionTemplateVersion` 聚合一组 permission，并用 `ResourceScope` 限定资源范围；"角色"由宿主在 `IdentityAuthenticator` 中自行映射。
 
 ### 为什么要 Redis？
-Token 与 session 以 `TokenRecord(sessionId, principal, expiresAt)` 存于 Redis（`iam.token.redis-prefix` 默认 `iam`），支持分布式、快速失效与集中撤销（revoke）。
+Token 与 session 以 `TokenRecord(sessionId, principal, expiresAt)` 存于 Redis（`muer.token.redis-prefix` 默认 `iam`），支持分布式、快速失效与集中撤销（revoke）。
 
 ### 为什么要 MySQL？
-持久化 principal/permission/template/profile/scope，以及审计与 Flyway schema 历史（`iam.schema.history-table` 默认 `iam_flyway_schema_history`）。
+持久化 principal/permission/template/profile/scope，以及审计与 Flyway schema 历史（`muer.schema.history-table` 默认 `iam_flyway_schema_history`）。
 
 ### 什么是 Profile？
 `AuthorizationProfile`：`(profileId, userId, profileName, templateVersionId, clientTypes, enabled, revoked, scopes...)`，把一个用户的某套权限模板+资源范围绑定为可切换的身份视图。
@@ -45,4 +45,4 @@ resolver 返回 empty → 404 `IAM_RESOURCE_NOT_FOUND`（`RESOURCE_NOT_FOUND`）
 `POST /iam/authorization/diagnostics` 返回 `AuthorizationDecision`（含 `steps`：`code/passed/reason`），据此区分 `SCOPE_DENIED`/`PERMISSION_DENIED` 等。
 
 ### IAM 会不会接管宿主所有 Spring Security？
-不会。`iam.enabled=false` 可整体关闭；IAM 仅通过自身拦截器与 Bearer 过滤器参与，不替换宿主其它 Security 配置。
+不会。`muer.enabled=false` 可整体关闭；IAM 仅通过自身拦截器与 Bearer 过滤器参与，不替换宿主其它 Security 配置。

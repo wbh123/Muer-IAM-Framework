@@ -185,4 +185,4 @@ Profile Switch、Session Revoke 与 Diagnostics 可以在业务确实需要时�
 
 ## 源码参考
 
-- OpenAPI：<https://github.com/wbh123/iam/blob/main/muer-management-web/src/main/resources/openapi/iam.yaml>
+- OpenAPI：<https://github.com/wbh123/Muer-IAM-Framework/blob/main/muer-management-web/src/main/resources/openapi/iam.yaml>

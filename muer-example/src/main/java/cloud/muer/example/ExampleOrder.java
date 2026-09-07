@@ -1,4 +1,4 @@
-package io.github.muer.example;
+package cloud.muer.example;
 
 public record ExampleOrder(String orderId, String departmentId, String status) {
     ExampleOrder approve() {

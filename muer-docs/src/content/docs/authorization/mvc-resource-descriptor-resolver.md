@@ -41,4 +41,4 @@ ResourceDescriptor(
 
 ## 源码
 
-<https://github.com/wbh123/iam/blob/main/muer-spring-boot-autoconfigure/src/main/java/io/github/muer/autoconfigure/web/MvcResourceDescriptorResolver.java>
+<https://github.com/wbh123/Muer-IAM-Framework/blob/main/muer-spring-boot-autoconfigure/src/main/java/cloud/muer/autoconfigure/web/MvcResourceDescriptorResolver.java>

@@ -1,4 +1,4 @@
-package io.github.muer.example;
+package cloud.muer.example;
 
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -11,11 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringJoiner;
 
-import static io.github.muer.example.AdminDemoSeedConstants.ADMIN_PERMISSIONS;
-import static io.github.muer.example.AdminDemoSeedConstants.PERMISSION_ID_BASE;
+import static cloud.muer.example.AdminDemoSeedConstants.ADMIN_PERMISSIONS;
+import static cloud.muer.example.AdminDemoSeedConstants.PERMISSION_ID_BASE;
 
 /**
- * Creates the explicit opt-in IAM Admin Console demo administrator for the
+ * Creates the explicit opt-in Muer Admin Console demo administrator for the
  * example application (admin-demo / demo-pass). It runs only when the dev
  * profile AND {@code muer.example.seed-admin=true} are active; production and
  * ordinary dev never create the account. No default admin/password is ever
@@ -91,7 +91,7 @@ final class AdminConsoleDemoSeeder implements ApplicationRunner {
     private void seedTemplateAndVersion() {
         jdbc.update("""
                 INSERT INTO iam_permission_template (id, template_key, display_name, description)
-                VALUES (?, 'iam-admin', 'IAM Admin Console', 'IAM Admin Console template (dev demo)')
+                VALUES (?, 'iam-admin', 'Muer Admin Console', 'Muer Admin Console template (dev demo)')
                 """, AdminDemoSeedConstants.TEMPLATE_ID);
         jdbc.update("""
                 INSERT INTO iam_permission_template_version
@@ -125,7 +125,7 @@ final class AdminConsoleDemoSeeder implements ApplicationRunner {
                 INSERT INTO iam_authorization_profile
                     (id, user_id, template_version_id, profile_key, display_name,
                      client_types, enabled, default_profile, revoked_at)
-                VALUES (?, ?, ?, 'admin-console', 'IAM Admin Console (dev demo)',
+                VALUES (?, ?, ?, 'admin-console', 'Muer Admin Console (dev demo)',
                         '["WEB"]', TRUE, TRUE, NULL)
                 """, AdminDemoSeedConstants.PROFILE_ID, AdminDemoSeedConstants.USER_ID,
                 AdminDemoSeedConstants.TEMPLATE_VERSION_ID);

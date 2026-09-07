@@ -47,7 +47,7 @@ async function submit() {
 <template>
   <div class="login-page">
     <el-card class="login-card">
-      <h1 class="login-title">IAM Admin Console</h1>
+      <h1 class="login-title">Muer Admin Console</h1>
       <el-form ref="formRef" :model="form" :rules="rules" label-position="top" @keyup.enter="submit">
         <el-form-item label="用户名" prop="username">
           <el-input v-model="form.username" autocomplete="username" />

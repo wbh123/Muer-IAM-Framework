@@ -1,8 +1,8 @@
-package io.github.muer.diagnostics;
+package cloud.muer.diagnostics;
 
-import io.github.muer.authorization.AuthorizationEngine;
-import io.github.muer.authorization.AuthorizationRequest;
-import io.github.muer.core.model.IamPrincipal;
+import cloud.muer.authorization.AuthorizationEngine;
+import cloud.muer.authorization.AuthorizationRequest;
+import cloud.muer.core.model.IamPrincipal;
 
 import java.util.Objects;
 

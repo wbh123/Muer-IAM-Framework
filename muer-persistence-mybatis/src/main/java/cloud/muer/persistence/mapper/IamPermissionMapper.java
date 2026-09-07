@@ -1,6 +1,6 @@
-package io.github.muer.persistence.mapper;
+package cloud.muer.persistence.mapper;
 
-import io.github.muer.authorization.PermissionDefinition;
+import cloud.muer.authorization.PermissionDefinition;
 import org.apache.ibatis.annotations.Param;
 
 public interface IamPermissionMapper {

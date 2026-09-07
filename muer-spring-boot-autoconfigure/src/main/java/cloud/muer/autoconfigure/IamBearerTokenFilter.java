@@ -1,6 +1,6 @@
-package io.github.muer.autoconfigure;
+package cloud.muer.autoconfigure;
 
-import io.github.muer.authentication.AuthenticationService;
+import cloud.muer.authentication.AuthenticationService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

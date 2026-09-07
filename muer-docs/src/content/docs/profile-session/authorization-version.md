@@ -29,7 +29,7 @@ Alice 默认 principal：
 
 ## 源码
 
-- `IamPrincipal`：https://github.com/wbh123/iam/blob/main/muer-core/src/main/java/io/github/muer/core/model/IamPrincipal.java
-- `PermissionTemplateVersion`：https://github.com/wbh123/iam/blob/main/muer-authorization/src/main/java/io/github/muer/authorization/
+- `IamPrincipal`：https://github.com/wbh123/Muer-IAM-Framework/blob/main/muer-core/src/main/java/cloud/muer/core/model/IamPrincipal.java
+- `PermissionTemplateVersion`：https://github.com/wbh123/Muer-IAM-Framework/blob/main/muer-authorization/src/main/java/cloud/muer/authorization/
 
 当前版本：`0.1.0-SNAPSHOT`（Release Candidate），尚未发布。

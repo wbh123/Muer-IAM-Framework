@@ -74,7 +74,7 @@ spring:
 ## IAM Token 配置
 
 ```yaml
-iam:
+muer:
   token:
     ttl: 8h
     redis-prefix: my-app:iam
@@ -85,8 +85,8 @@ iam:
 
 其中：
 
-- `iam.token.ttl`：Token 有效期，默认 `8h`；
-- `iam.token.redis-prefix`：IAM Key 前缀，默认 `iam`。
+- `muer.token.ttl`：Token 有效期，默认 `8h`；
+- `muer.token.redis-prefix`：IAM Key 前缀，默认 `iam`。
 
 ## 多应用共享 Redis
 
@@ -94,14 +94,14 @@ iam:
 
 ```yaml
 # 订单系统
-iam:
+muer:
   token:
     redis-prefix: order-service:iam
 ```
 
 ```yaml
 # 人力资源系统
-iam:
+muer:
   token:
     redis-prefix: hr-service:iam
 ```
@@ -130,7 +130,7 @@ Redis 是 Token 索引层。Redis 数据被清空后，已有不透明 Token 可
 
 ## 源码参考
 
-- `TokenRecord` / `AuthSession`：<https://github.com/wbh123/iam/tree/main/muer-session/src/main/java/io/github/muer/session>
-- `IamBearerTokenFilter`：<https://github.com/wbh123/iam/tree/main/muer-spring-boot-autoconfigure/src/main/java/io/github/muer/autoconfigure>
+- `TokenRecord` / `AuthSession`：<https://github.com/wbh123/Muer-IAM-Framework/tree/main/muer-session/src/main/java/cloud/muer/session>
+- `IamBearerTokenFilter`：<https://github.com/wbh123/Muer-IAM-Framework/tree/main/muer-spring-boot-autoconfigure/src/main/java/cloud/muer/autoconfigure>
 
 下一步：阅读[MySQL 存储](/operations/mysql/)和[手动部署](/getting-started/manual-deployment/)。

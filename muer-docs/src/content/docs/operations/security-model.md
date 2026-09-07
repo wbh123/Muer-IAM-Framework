@@ -15,7 +15,7 @@ sidebar:
 - **持久化权威**：MySQL 为真相来源，Redis 仅索引（见 [MySQL](/operations/mysql/) / [Redis](/operations/redis/)）。
 - **Profile 隔离**：切换 Profile 创建新会话，旧会话独立，缩小单点泄露影响面（见 [Profile 切换](/profile-session/profile-switch/)）。
 - **会话吊销**：可按 `sessionId` 精确失效，互不影响（见 [会话吊销](/profile-session/session-revoke/)）。
-- **clientType 绑定**：`IamPrincipal.clientType` 用于 `CLIENT_TYPE_MISMATCH` 校验，登录 `clientType` 须精确匹配 `iam.client-types`（默认 `[WEB]`）。
+- **clientType 绑定**：`IamPrincipal.clientType` 用于 `CLIENT_TYPE_MISMATCH` 校验，登录 `clientType` 须精确匹配 `muer.client-types`（默认 `[WEB]`）。
 
 ## 真实示例
 
@@ -29,7 +29,7 @@ sidebar:
 
 ## 源码
 
-- `IamPrincipal`：https://github.com/wbh123/iam/blob/main/muer-core/src/main/java/io/github/muer/core/model/IamPrincipal.java
-- `IamBearerTokenFilter`：https://github.com/wbh123/iam/blob/main/muer-spring-boot-autoconfigure/src/main/java/io/github/muer/autoconfigure/
+- `IamPrincipal`：https://github.com/wbh123/Muer-IAM-Framework/blob/main/muer-core/src/main/java/cloud/muer/core/model/IamPrincipal.java
+- `IamBearerTokenFilter`：https://github.com/wbh123/Muer-IAM-Framework/blob/main/muer-spring-boot-autoconfigure/src/main/java/cloud/muer/autoconfigure/
 
 当前版本：`0.1.0-SNAPSHOT`（Release Candidate），尚未发布。

@@ -1,4 +1,4 @@
-package io.github.muer.session;
+package cloud.muer.session;
 
 import java.util.List;
 import java.util.Optional;

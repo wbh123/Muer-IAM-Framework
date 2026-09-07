@@ -37,7 +37,7 @@ MySQL 和 Redis 可以来自本机安装、局域网服务器、云服务或容�
 
 ```xml
 <dependency>
-    <groupId>io.github.muer</groupId>
+    <groupId>cloud.muer</groupId>
     <artifactId>muer-spring-boot-starter</artifactId>
     <version>0.1.0-SNAPSHOT</version>
 </dependency>
@@ -305,7 +305,7 @@ Profile Switch 不会修改原 Reader Token，因此：
 
 接入 Muer 后，一般不需要再自己编写一套权限管理后端：
 
-- 直接使用随 0.1.0 提供的 IAM Admin Console；或
+- 直接使用随 0.1.0 提供的 Muer Admin Console；或
 - 如果企业已有统一后台，调用 Muer Management API 集成自己的页面。
 
 不要直接操作 `iam_*` 表。业务 Permission 由开发者通过 Provider 声明，管理员负责把它们配置进 Template、Profile 和 Scope。

@@ -31,7 +31,7 @@ sidebar:
 
 ## 源码
 
-- `IamAuthorizationInterceptor`：https://github.com/wbh123/iam/blob/main/muer-spring-boot-autoconfigure/src/main/java/io/github/muer/autoconfigure/web/
-- `AuthorizationEngine`：https://github.com/wbh123/iam/blob/main/muer-authorization/src/main/java/io/github/muer/authorization/
+- `IamAuthorizationInterceptor`：https://github.com/wbh123/Muer-IAM-Framework/blob/main/muer-spring-boot-autoconfigure/src/main/java/cloud/muer/autoconfigure/web/
+- `AuthorizationEngine`：https://github.com/wbh123/Muer-IAM-Framework/blob/main/muer-authorization/src/main/java/cloud/muer/authorization/
 
 当前版本：`0.1.0-SNAPSHOT`（Release Candidate），尚未发布。

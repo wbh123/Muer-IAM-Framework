@@ -1,8 +1,8 @@
-package io.github.muer.persistence;
+package cloud.muer.persistence;
 
-import io.github.muer.core.model.Identity;
-import io.github.muer.core.port.IdentityRepository;
-import io.github.muer.persistence.mapper.IamIdentityMapper;
+import cloud.muer.core.model.Identity;
+import cloud.muer.core.port.IdentityRepository;
+import cloud.muer.persistence.mapper.IamIdentityMapper;
 import org.apache.ibatis.session.SqlSessionFactory;
 
 import java.util.List;

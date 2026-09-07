@@ -1,7 +1,7 @@
-package io.github.muer.session;
+package cloud.muer.session;
 
-import io.github.muer.core.metrics.MuerMetrics;
-import io.github.muer.core.metrics.NoOpMuerMetrics;
+import cloud.muer.core.metrics.MuerMetrics;
+import cloud.muer.core.metrics.NoOpMuerMetrics;
 
 import java.time.Clock;
 import java.time.Instant;

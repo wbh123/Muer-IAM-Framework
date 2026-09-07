@@ -35,5 +35,5 @@ sidebar:
 
 ## 源码参考
 
-- 入口总览：<https://github.com/wbh123/iam/blob/main/muer-core/src/main/java/io/github/muer/core/model/>
-- `AuthorizationEngine`：<https://github.com/wbh123/iam/blob/main/muer-authorization/src/main/java/io/github/muer/authorization/AuthorizationEngine.java>
+- 入口总览：<https://github.com/wbh123/Muer-IAM-Framework/blob/main/muer-core/src/main/java/cloud/muer/core/model/>
+- `AuthorizationEngine`：<https://github.com/wbh123/Muer-IAM-Framework/blob/main/muer-authorization/src/main/java/cloud/muer/authorization/AuthorizationEngine.java>

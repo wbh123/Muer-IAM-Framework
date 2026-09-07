@@ -30,7 +30,7 @@ revokeReason
 
 常用生命周期方法包括 `revoked()`、`revoke(at, reason)` 和 `touch(at)`。
 
-`iam.session.touch-interval` 默认 `10m`，用于控制活跃时间更新频率。
+`muer.session.touch-interval` 默认 `10m`，用于控制活跃时间更新频率。
 
 ## 查询当前 Session
 
@@ -68,5 +68,5 @@ revokeReason
 
 ## 源码
 
-- `AuthSession` / `TokenRecord`：<https://github.com/wbh123/iam/tree/main/muer-session/src/main/java/io/github/muer/session>
-- `MuerProperties`：<https://github.com/wbh123/iam/tree/main/muer-spring-boot-autoconfigure/src/main/java/io/github/muer/autoconfigure>
+- `AuthSession` / `TokenRecord`：<https://github.com/wbh123/Muer-IAM-Framework/tree/main/muer-session/src/main/java/cloud/muer/session>
+- `MuerProperties`：<https://github.com/wbh123/Muer-IAM-Framework/tree/main/muer-spring-boot-autoconfigure/src/main/java/cloud/muer/autoconfigure>

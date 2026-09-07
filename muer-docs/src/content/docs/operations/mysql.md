@@ -55,7 +55,7 @@ spring:
 默认：
 
 ```yaml
-iam:
+muer:
   schema:
     enabled: true
     history-table: iam_flyway_schema_history
@@ -80,7 +80,7 @@ IAM 使用独立历史表 `iam_flyway_schema_history`，避免和宿主应用自
 3. 再关闭 Starter 自动迁移：
 
 ```yaml
-iam:
+muer:
   schema:
     enabled: false
 ```
@@ -106,8 +106,8 @@ IAM 默认复用宿主 Spring Boot 的 `DataSource`。因此 IAM 表可以和宿
 
 ## 源码参考
 
-- `MuerProperties`：<https://github.com/wbh123/iam/blob/main/muer-spring-boot-autoconfigure/src/main/java/io/github/muer/autoconfigure/>
-- IAM migration：<https://github.com/wbh123/iam/tree/main/muer-persistence-mybatis/src/main/resources/db/iam/migration>
-- Session 模型：<https://github.com/wbh123/iam/tree/main/muer-session/src/main/java/io/github/muer/session>
+- `MuerProperties`：<https://github.com/wbh123/Muer-IAM-Framework/blob/main/muer-spring-boot-autoconfigure/src/main/java/cloud/muer/autoconfigure/>
+- IAM migration：<https://github.com/wbh123/Muer-IAM-Framework/tree/main/muer-persistence-mybatis/src/main/resources/db/iam/migration>
+- Session 模型：<https://github.com/wbh123/Muer-IAM-Framework/tree/main/muer-session/src/main/java/cloud/muer/session>
 
 下一步：阅读[Redis 存储](/operations/redis/)和[手动部署](/getting-started/manual-deployment/)。

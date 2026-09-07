@@ -1,15 +1,15 @@
-package io.github.muer.web;
+package cloud.muer.web;
 
-import io.github.muer.authorization.AuthorizationEngine;
-import io.github.muer.authorization.AuthorizationProfile;
-import io.github.muer.authorization.AuthorizationProfileQueryRepository;
-import io.github.muer.authorization.AuthorizationProfileRepository;
-import io.github.muer.authorization.AuthorizationProfileService;
-import io.github.muer.core.port.UserQueryRepository;
-import io.github.muer.web.api.ManagementProfilesApi;
-import io.github.muer.web.dto.AuthorizationProfileResponse;
-import io.github.muer.web.dto.ProfileListResponse;
-import io.github.muer.web.dto.ResourceScope;
+import cloud.muer.authorization.AuthorizationEngine;
+import cloud.muer.authorization.AuthorizationProfile;
+import cloud.muer.authorization.AuthorizationProfileQueryRepository;
+import cloud.muer.authorization.AuthorizationProfileRepository;
+import cloud.muer.authorization.AuthorizationProfileService;
+import cloud.muer.core.port.UserQueryRepository;
+import cloud.muer.web.api.ManagementProfilesApi;
+import cloud.muer.web.dto.AuthorizationProfileResponse;
+import cloud.muer.web.dto.ProfileListResponse;
+import cloud.muer.web.dto.ResourceScope;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,8 +19,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.NoSuchElementException;
 
-import static io.github.muer.web.WebSecurity.allowedRead;
-import static io.github.muer.web.WebSecurity.currentPrincipal;
+import static cloud.muer.web.WebSecurity.allowedRead;
+import static cloud.muer.web.WebSecurity.currentPrincipal;
 
 @RestController
 public class IamManagementProfilesController implements ManagementProfilesApi {
@@ -118,7 +118,7 @@ public class IamManagementProfilesController implements ManagementProfilesApi {
         return response;
     }
 
-    private static ResourceScope toScope(io.github.muer.core.model.ResourceScope scope) {
+    private static ResourceScope toScope(cloud.muer.core.model.ResourceScope scope) {
         return new ResourceScope(scope.scopeType(), scope.scopeRefId(),
                 ResourceScope.AccessModeEnum.fromValue(scope.accessMode().name()));
     }

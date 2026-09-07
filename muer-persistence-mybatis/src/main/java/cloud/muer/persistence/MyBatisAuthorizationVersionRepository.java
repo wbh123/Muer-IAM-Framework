@@ -1,7 +1,7 @@
-package io.github.muer.persistence;
+package cloud.muer.persistence;
 
-import io.github.muer.authorization.AuthorizationVersionRepository;
-import io.github.muer.persistence.mapper.IamAuthorizationVersionMapper;
+import cloud.muer.authorization.AuthorizationVersionRepository;
+import cloud.muer.persistence.mapper.IamAuthorizationVersionMapper;
 import org.apache.ibatis.session.SqlSessionFactory;
 
 import java.util.NoSuchElementException;

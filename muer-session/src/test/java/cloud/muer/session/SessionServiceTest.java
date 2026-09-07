@@ -1,6 +1,6 @@
-package io.github.muer.session;
+package cloud.muer.session;
 
-import io.github.muer.core.metrics.MuerMetrics;
+import cloud.muer.core.metrics.MuerMetrics;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;

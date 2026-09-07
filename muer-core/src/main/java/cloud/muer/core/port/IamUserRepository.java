@@ -1,6 +1,6 @@
-package io.github.muer.core.port;
+package cloud.muer.core.port;
 
-import io.github.muer.core.model.IamUser;
+import cloud.muer.core.model.IamUser;
 
 import java.util.List;
 import java.util.Optional;

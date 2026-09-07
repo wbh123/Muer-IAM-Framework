@@ -1,5 +1,5 @@
 {
-  "name": "iam-admin-web",
+  "name": "muer-admin-web",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -14,7 +14,7 @@
     "api:generate": "openapi-generator-cli generate -i ../muer-management-web/src/main/resources/openapi/iam.yaml -g typescript-axios -o src/api/generated --additional-properties=supportsES6=true,withInterfaces=true,useSingleRequestParameter=true --skip-validate-spec",
     "test": "vitest run",
     "test:watch": "vitest",
-    "lint": "echo 'lint: no linter configured for iam-admin-web 0.1.0'"
+    "lint": "echo 'lint: no linter configured for muer-admin-web 0.1.0'"
   },
   "dependencies": {
     "axios": "^1.7.9",

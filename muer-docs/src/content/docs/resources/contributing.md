@@ -7,7 +7,7 @@ sidebar:
 
 ## 代码仓库
 
-IAM 源码位于 GitHub：<https://github.com/wbh123/iam>（分支 `main`）。
+IAM 源码位于 GitHub：<https://github.com/wbh123/Muer-IAM-Framework>（分支 `main`）。
 
 ## 模块约定
 
@@ -35,4 +35,4 @@ IAM 源码位于 GitHub：<https://github.com/wbh123/iam>（分支 `main`）。
 
 ## 许可证
 
-Muer 采用 [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0.txt) 授权，仓库根目录的 [`LICENSE`](https://github.com/wbh123/iam/blob/main/LICENSE) 为许可证全文。
+Muer 采用 [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0.txt) 授权，仓库根目录的 [`LICENSE`](https://github.com/wbh123/Muer-IAM-Framework/blob/main/LICENSE) 为许可证全文。

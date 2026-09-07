@@ -1,4 +1,4 @@
-package io.github.muer.session;
+package cloud.muer.session;
 
 import java.time.Duration;
 import java.util.Optional;

@@ -1,7 +1,7 @@
-package io.github.muer.autoconfigure;
+package cloud.muer.autoconfigure;
 
-import io.github.muer.authorization.PermissionDefinitionProvider;
-import io.github.muer.authorization.PermissionRegistrationService;
+import cloud.muer.authorization.PermissionDefinitionProvider;
+import cloud.muer.authorization.PermissionRegistrationService;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;

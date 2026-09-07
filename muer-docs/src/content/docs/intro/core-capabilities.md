@@ -11,7 +11,7 @@ IAM 的能力分为几大块。理解这些能力对应到源码里的哪些类�
 
 宿主通过实现 `IdentityAuthenticator` 提供登录凭据校验；IAM 负责：
 
-- 校验登录请求携带的 `clientType` 是否在 `iam.client-types` 白名单内（在 IAM 层先拦截，不复制到宿主 adapter）；
+- 校验登录请求携带的 `clientType` 是否在 `muer.client-types` 白名单内（在 IAM 层先拦截，不复制到宿主 adapter）；
 - 调用宿主 adapter 拿到 `IamPrincipal`；
 - 签发**不透明 Token** 与持久化 Session。
 

@@ -1,6 +1,6 @@
 ---
 title: 安装与部署
-description: IAM Admin Console 的本地构建、后端要求与 Nginx 部署指引。
+description: Muer Admin Console 的本地构建、后端要求与 Nginx 部署指引。
 sidebar:
   order: 2
 ---
@@ -8,7 +8,7 @@ sidebar:
 ## 构建
 
 ```bash
-cd iam-admin-web
+cd muer-admin-web
 npm ci
 npm run api:generate   # 契约单一来源：muer-management-web/.../openapi/iam.yaml
 npm run type-check

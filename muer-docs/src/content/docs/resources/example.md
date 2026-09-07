@@ -34,4 +34,4 @@ alice 默认（401）只能读 project 101 内文档；`POST`（需 WRITE）被�
 
 ## 源码参考
 
-- 演示：<https://github.com/wbh123/iam/blob/main/muer-example/src/main/java/io/github/muer/example/>
+- 演示：<https://github.com/wbh123/Muer-IAM-Framework/blob/main/muer-example/src/main/java/cloud/muer/example/>

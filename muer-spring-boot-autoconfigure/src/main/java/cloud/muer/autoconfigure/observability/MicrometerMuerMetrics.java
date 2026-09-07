@@ -1,6 +1,6 @@
-package io.github.muer.autoconfigure.observability;
+package cloud.muer.autoconfigure.observability;
 
-import io.github.muer.core.metrics.MuerMetrics;
+import cloud.muer.core.metrics.MuerMetrics;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 

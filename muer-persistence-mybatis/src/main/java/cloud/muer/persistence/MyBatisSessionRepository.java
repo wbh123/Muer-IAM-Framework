@@ -1,8 +1,8 @@
-package io.github.muer.persistence;
+package cloud.muer.persistence;
 
-import io.github.muer.persistence.mapper.IamSessionMapper;
-import io.github.muer.session.AuthSession;
-import io.github.muer.session.SessionRepository;
+import cloud.muer.persistence.mapper.IamSessionMapper;
+import cloud.muer.session.AuthSession;
+import cloud.muer.session.SessionRepository;
 import org.apache.ibatis.session.SqlSessionFactory;
 
 import java.util.List;
