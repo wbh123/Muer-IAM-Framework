@@ -19,6 +19,7 @@ import cloud.muer.authorization.AuthorizationProfileService;
 import cloud.muer.authorization.AuthorizationScopeMutation;
 import cloud.muer.authorization.AuthorizationVersionService;
 import cloud.muer.authorization.PermissionTemplateService;
+import cloud.muer.authorization.MuerAdministrationBootstrapService;
 import cloud.muer.authorization.PermissionRegistrationService;
 import cloud.muer.authorization.PermissionRepository;
 import cloud.muer.core.port.ResourceHierarchyProvider;
@@ -396,6 +397,18 @@ public class MuerAutoConfiguration {
     PermissionTemplateLifecycleService iamPermissionTemplateLifecycleService(
             PermissionTemplateCommandRepository commands, PermissionTemplateVersionRepository versions) {
         return new PermissionTemplateLifecycleService(commands, versions);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnBean({IamUserRepository.class, PermissionTemplateQueryRepository.class,
+            PermissionTemplateLifecycleService.class, AuthorizationProfileRepository.class,
+            AuthorizationProfileService.class})
+    MuerAdministrationBootstrapService muerAdministrationBootstrapService(
+            IamUserRepository users, PermissionTemplateQueryRepository queries,
+            PermissionTemplateLifecycleService templates, AuthorizationProfileRepository profiles,
+            AuthorizationProfileService profileService) {
+        return new MuerAdministrationBootstrapService(users, queries, templates, profiles, profileService);
     }
 
     @Bean
