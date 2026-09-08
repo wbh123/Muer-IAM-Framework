@@ -179,4 +179,4 @@ P0                      0
 P1                      0
 ```
 
-使用从 [Quick Start](QUICK_START.md) 开始；完整消费边界见 [Public API Reference](PUBLIC_API.md)，管理控制台部署见 [Muer Admin Console Deployment](IAM_ADMIN_CONSOLE_DEPLOYMENT.md)。
+使用从 [Quick Start](QUICK_START.md) 开始；完整消费边界见 [Public API Reference](PUBLIC_API.md)，管理控制台部署见 [Muer Admin Console Deployment](https://muer.cloud/management/deploy/)。

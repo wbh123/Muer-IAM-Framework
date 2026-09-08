@@ -63,7 +63,7 @@ require_root '0.1.0 release-notes link' 'docs/RELEASE_NOTES_0\.1\.0\.md'
 require_file 'quick-start document' 'docs/QUICK_START.md'
 require_file 'public API document' 'docs/PUBLIC_API.md'
 require_file 'release notes document' 'docs/RELEASE_NOTES_0.1.0.md'
-require_file 'release validation report' 'docs/validation/iam-0.1.0-release-report.md'
+require_file 'release validation report' 'docs/validation/muer-0.1.0-release-report.md'
 
 while IFS= read -r source_path; do
   if [[ ! -f "$repository_root/$source_path" ]]; then
