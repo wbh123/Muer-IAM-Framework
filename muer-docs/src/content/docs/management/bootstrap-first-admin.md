@@ -19,9 +19,28 @@ Muer 的 Management API 自身受 `iam.admin.*` 权限保护。全新数据库�
 调用前必须满足：
 
 1. 宿主应用已经创建真实用户，并能取得正数 `userId`；
-2. Muer Schema 已就绪；
-3. 应用已经注册 `iam.admin.*` Permission；
-4. `clientTypes` 与宿主允许的客户端类型一致。
+2. 该用户已经通过 `AccountGovernanceService.saveUser(...)` 同步到 Muer User Projection；
+3. Muer Schema 已就绪；
+4. 应用已经注册 `iam.admin.*` Permission；
+5. `clientTypes` 与宿主允许的客户端类型一致。
+
+:::caution[Host User 不等于 Muer User Projection]
+宿主业务库里存在 `user.id=1001`，不代表 `IamUserRepository` 已能找到 `1001`。Bootstrap 不创建宿主用户，也不自动投影用户；目标 `userId` 不存在于 Muer User Projection 时会立即失败。
+:::
+
+使用当前正式治理入口建立投影：
+
+```java
+import cloud.muer.authentication.AccountGovernanceService;
+
+accountGovernanceService.saveUser(
+    existingHostUserId,
+    hostUsername,
+    hostUserType,
+    true);
+```
+
+`AccountGovernanceService` 是 Muer 的真实公共 Service。宿主仍负责决定何时同步，以及用户名、类型和启用状态来自哪里。
 
 ## 最小调用
 
@@ -29,6 +48,7 @@ Muer 的 Management API 自身受 `iam.admin.*` 权限保护。全新数据库�
 
 ```java
 import cloud.muer.authorization.AdministrationBootstrapRequest;
+import cloud.muer.authorization.AdministrationBootstrapResult;
 import cloud.muer.authorization.MuerAdministrationBootstrapService;
 
 import java.util.Set;
@@ -41,8 +61,8 @@ public final class MuerFirstAdministratorProvisioner {
         this.bootstrapService = bootstrapService;
     }
 
-    public void provision(long existingHostUserId) {
-        bootstrapService.bootstrapFirstAdministrator(
+    public AdministrationBootstrapResult provision(long existingHostUserId) {
+        return bootstrapService.bootstrapFirstAdministrator(
             new AdministrationBootstrapRequest(
                 existingHostUserId,
                 Set.of("WEB")));
@@ -57,7 +77,8 @@ Service 会：
 3. 确保稳定业务 Key `muer-administrator` 对应的 Template 存在；
 4. 创建并发布包含这些权限的 Version；
 5. 为目标用户创建 `muer-administrator` Profile；
-6. 返回 Template、Version 与 Profile ID。
+6. 为 Profile 授予已有管理根 Scope：`IAM_ADMIN / * / READ` 与 `IAM_ADMIN / * / WRITE`；
+7. 返回 Template、Version 与 Profile ID。
 
 相同请求可重复执行，不会重复创建 Template、Version 或 Profile。若稳定 Key 已存在但名称、描述、启用状态、权限集合或目标用户 Profile 语义不一致，调用会 fail-fast，不覆盖既有数据。
 
@@ -74,10 +95,44 @@ Service 会：
 - 绕过宿主用户与认证体系；
 - 用固定数据库 ID 覆盖既有数据。
 
-Bootstrap 只建立 Muer 授权投影。用户名、密码、MFA、账号生命周期与身份审计仍由宿主系统负责。
+Bootstrap 只建立 Muer 授权投影。用户名、密码、MFA、账号生命周期与身份审计仍由宿主系统负责。宿主的 `ResourceHierarchyProvider` 应保留现有管理根语义：`IAM_ADMIN / *` 覆盖 `/iam/admin/**` 使用的 `IAM_*` Management Resource，但不覆盖宿主业务资源。
 
 ## 完成后
 
-让该宿主用户通过正常 `IdentityAuthenticator` 登录，取得带管理员 Profile 的 Principal，再访问 Admin Console。之后可使用受保护的 Management API / Console 创建其他 Template、Version 和 Profile。
+Bootstrap 返回的 `AdministrationBootstrapResult` 包含 `profileId()` 与 `templateVersionId()`。宿主必须把这两个值保存到自己的用户授权映射，后续认证时投影到 Principal：
+
+```java
+AdministrationBootstrapResult result = provision(existingHostUserId);
+
+// 将 result.profileId() 与 result.templateVersionId()
+// 保存到宿主已有的用户授权映射中。
+
+IdentityAuthenticator authenticator = request -> hostAccounts
+    .verify(request.username(), request.password())
+    .map(account -> new IamPrincipal(
+        account.id(),
+        account.identityId(),
+        account.identityDomain(),
+        account.muerProfileId(),        // result.profileId()
+        account.muerTemplateVersionId(),// result.templateVersionId()
+        request.clientType(),
+        account.authorizationVersion()));
+```
+
+上例中的 `hostAccounts` 与 `account.muerProfileId()` 是宿主自己的适配层，不是新增的 Muer API。Bootstrap 不会偷偷修改宿主认证数据。只有 `IdentityAuthenticator` 返回正确的 `activeProfileId` 与 `templateVersionId`，新 Token 才会使用管理员授权。
+
+完整链路：
+
+```text
+Host User
+  → AccountGovernanceService.saveUser(...) → Muer User Projection
+  → MuerAdministrationBootstrapService
+  → Admin Profile + PUBLISHED Version + IAM_ADMIN/* Scopes
+  → 宿主保存 profileId/templateVersionId 映射
+  → IdentityAuthenticator → IamPrincipal
+  → IAM_* Management Resource → AuthorizationEngine → ALLOW
+```
+
+之后可通过受保护的 Management API / Console 创建其他 Template、Version 和 Profile。
 
 Bootstrap 保持幂等，因此不要求执行后删除代码；但触发条件必须受宿主控制，不能由匿名网络请求驱动。

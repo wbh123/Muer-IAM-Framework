@@ -1,8 +1,11 @@
 package cloud.muer.authorization;
 
+import cloud.muer.core.model.ResourceScope;
+import cloud.muer.core.model.ScopeAccess;
 import cloud.muer.core.port.IamUserRepository;
 
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -15,6 +18,9 @@ public final class MuerAdministrationBootstrapService {
     public static final String PROFILE_NAME = "muer-administrator";
     private static final String TEMPLATE_NAME = "Muer Administrator";
     private static final String TEMPLATE_DESCRIPTION = "Muer framework administration permissions";
+    private static final List<ResourceScope> ADMINISTRATION_SCOPES = List.of(
+            new ResourceScope("IAM_ADMIN", "*", ScopeAccess.READ),
+            new ResourceScope("IAM_ADMIN", "*", ScopeAccess.WRITE));
 
     private final IamUserRepository users;
     private final PermissionTemplateQueryRepository queries;
@@ -51,10 +57,15 @@ public final class MuerAdministrationBootstrapService {
             if (existing.templateVersionId() != version.versionId() || !existing.clientTypes().equals(request.clientTypes())) {
                 throw new IllegalStateException("existing administrator profile conflicts with bootstrap request");
             }
+            if (existing.scopes().isEmpty()) {
+                profileService.replaceScopes(existing.profileId(), ADMINISTRATION_SCOPES);
+            } else if (!Set.copyOf(existing.scopes()).equals(Set.copyOf(ADMINISTRATION_SCOPES))) {
+                throw new IllegalStateException("existing administrator profile conflicts with management root scopes");
+            }
             return new AdministrationBootstrapResult(template.templateId(), version.versionId(), existing.profileId(), created);
         }
         var profile = profileService.create(new AuthorizationProfile(1L, request.userId(), PROFILE_NAME,
-                version.versionId(), request.clientTypes(), true, false, null, null, java.util.List.of()));
+                version.versionId(), request.clientTypes(), true, false, null, null, ADMINISTRATION_SCOPES));
         return new AdministrationBootstrapResult(template.templateId(), version.versionId(), profile.profileId(), true);
     }
 

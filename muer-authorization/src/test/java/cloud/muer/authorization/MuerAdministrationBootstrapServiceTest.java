@@ -1,6 +1,8 @@
 package cloud.muer.authorization;
 
 import cloud.muer.core.model.IamUser;
+import cloud.muer.core.model.ResourceScope;
+import cloud.muer.core.model.ScopeAccess;
 import cloud.muer.core.port.IamUserRepository;
 import org.junit.jupiter.api.Test;
 
@@ -29,6 +31,10 @@ class MuerAdministrationBootstrapServiceTest {
         assertEquals(TemplateVersionStatus.PUBLISHED, fixture.versions.require(first.templateVersionId()).status());
         assertEquals(Set.of("iam.admin.user.read", "iam.admin.template.write"),
                 fixture.versions.require(first.templateVersionId()).permissions());
+        assertEquals(Set.of(
+                        new ResourceScope("IAM_ADMIN", "*", ScopeAccess.READ),
+                        new ResourceScope("IAM_ADMIN", "*", ScopeAccess.WRITE)),
+                Set.copyOf(fixture.profiles.require(first.profileId()).scopes()));
     }
 
     @Test
@@ -52,6 +58,21 @@ class MuerAdministrationBootstrapServiceTest {
         assertEquals(2, fixture.profiles.values.size());
         assertEquals(first.profileId(), fixture.profiles.findByUserId(7L).getFirst().profileId());
         assertEquals(second.profileId(), fixture.profiles.findByUserId(8L).getFirst().profileId());
+    }
+
+    @Test
+    void repeated_bootstrap_repairs_the_previous_empty_management_scope_projection() {
+        var fixture = new Fixture();
+        var first = fixture.service.bootstrapFirstAdministrator(new AdministrationBootstrapRequest(7L, Set.of("WEB")));
+        var profile = fixture.profiles.require(first.profileId());
+        fixture.profiles.save(profile.withScopes(List.of()));
+
+        fixture.service.bootstrapFirstAdministrator(new AdministrationBootstrapRequest(7L, Set.of("WEB")));
+
+        assertEquals(Set.of(
+                        new ResourceScope("IAM_ADMIN", "*", ScopeAccess.READ),
+                        new ResourceScope("IAM_ADMIN", "*", ScopeAccess.WRITE)),
+                Set.copyOf(fixture.profiles.require(first.profileId()).scopes()));
     }
 
     private static final class Fixture {
@@ -83,7 +104,7 @@ class MuerAdministrationBootstrapServiceTest {
         public AuthorizationProfile require(long id) { return values.get(id); }
         public List<AuthorizationProfile> findByUserId(long id) { return values.values().stream().filter(p -> p.userId() == id).toList(); }
         public void save(AuthorizationProfile profile) { values.put(profile.profileId(), profile); }
-        public AuthorizationProfile create(AuthorizationProfile profile) { var created = new AuthorizationProfile(next++, profile.userId(), profile.profileName(), profile.templateVersionId(), profile.clientTypes(), profile.enabled(), profile.revoked(), null, null, List.of()); values.put(created.profileId(), created); return created; }
+        public AuthorizationProfile create(AuthorizationProfile profile) { var created = new AuthorizationProfile(next++, profile.userId(), profile.profileName(), profile.templateVersionId(), profile.clientTypes(), profile.enabled(), profile.revoked(), null, null, profile.scopes()); values.put(created.profileId(), created); return created; }
     }
     private static final class VersionNumbers implements AuthorizationVersionRepository { public long currentVersion(long id) { return 0; } public long increment(long id) { return 1; } }
     private record Queries(Templates templates, Versions versions) implements PermissionTemplateQueryRepository {

@@ -102,9 +102,108 @@ mvn -f examples/quickstart/pom.xml spring-boot:run
 
 ## 6. Alice 登录
 
-账号是 `alice / demo-pass`，客户端类型是 `WEB`。
+使用 Postman、Apifox、IDE HTTP Client 或命令行调用：
 
-### Bash
+```text
+接口
+POST /iam/auth/login
+
+Content-Type
+application/json
+```
+
+```json
+{
+  "username": "alice",
+  "password": "demo-pass",
+  "clientType": "WEB"
+}
+```
+
+预期 `200 OK`，响应包含不透明 `accessToken`。后续请求都使用：
+
+```text
+Authorization: Bearer <accessToken>
+```
+
+## 7. 验证允许结果：200
+
+```text
+接口
+GET /api/documents/1001
+
+Authorization
+Bearer <accessToken>
+```
+
+预期 `200`。Alice 的 Reader Profile 包含 `document:read`，Scope 覆盖 `PROJECT / 101 / READ`。
+
+## 8. 验证拒绝结果：403
+
+```text
+接口
+POST /api/documents/1001
+
+Authorization
+Bearer <accessToken>
+
+Content-Type
+application/json
+```
+
+```json
+{
+  "status": "PUBLISHED"
+}
+```
+
+预期 `403 Forbidden`，因为 Reader 没有 `document:update`。
+
+再调用：
+
+```text
+接口
+GET /api/documents/2001
+
+Authorization
+Bearer <accessToken>
+```
+
+预期 `403 Forbidden`。Alice 有读取 Permission，但 Document 2001 属于 Project 202，超出 Project 101 Scope。
+
+## 9. 用 Diagnostics 解释 403
+
+Diagnostics 只分析当前已认证 Principal，不允许指定其他用户或 Profile。
+
+```text
+接口
+POST /iam/authorization/diagnostics
+
+Authorization
+Bearer <accessToken>
+
+Content-Type
+application/json
+```
+
+```json
+{
+  "permissionCode": "document:update",
+  "domain": "EXAMPLE",
+  "clientType": "WEB",
+  "resourceType": "PROJECT",
+  "resourceId": "101",
+  "scopeAccess": "WRITE"
+}
+```
+
+响应中的 `allowed=false`、`decisionCode` 和 `steps` 会指出拒绝发生在哪一层。
+
+同一个 Token 还可以调用 `GET /iam/auth/me` 查看当前 Principal；进阶验证可通过 `POST /iam/authorization/profiles/{profileId}/switch` 切换 Profile，并通过 `POST /iam/sessions/{sessionId}/revoke` 撤销当前用户自己的 Session。完整语义见 [HTTP API](/reference/http-api/)。
+
+### 可选：命令行调用示例
+
+如果你习惯命令行，可以用一条 curl 登录；其他请求只需复用返回的 Token：
 
 ```bash
 curl -sS http://localhost:8080/iam/auth/login \
@@ -112,98 +211,7 @@ curl -sS http://localhost:8080/iam/auth/login \
   -d '{"username":"alice","password":"demo-pass","clientType":"WEB"}'
 ```
 
-### PowerShell
-
-```powershell
-$login = Invoke-RestMethod -Method Post \
-  -Uri 'http://localhost:8080/iam/auth/login' \
-  -ContentType 'application/json' \
-  -Body '{"username":"alice","password":"demo-pass","clientType":"WEB"}'
-$login
-```
-
-响应包含不透明 `accessToken`。把它保存为当前终端变量：
-
-```bash
-TOKEN='<paste-access-token>'
-```
-
-```powershell
-$token = $login.accessToken
-$headers = @{ Authorization = "Bearer $token" }
-```
-
-## 7. 验证允许结果：200
-
-### Bash
-
-```bash
-curl -i http://localhost:8080/api/documents/1001 \
-  -H "Authorization: Bearer $TOKEN"
-```
-
-### PowerShell
-
-```powershell
-Invoke-WebRequest 'http://localhost:8080/api/documents/1001' -Headers $headers
-```
-
-预期 `200`。Alice 的 Reader Profile 包含 `document:read`，Scope 覆盖 `PROJECT / 101 / READ`。
-
-## 8. 验证拒绝结果：403
-
-### Bash
-
-```bash
-curl -i -X POST http://localhost:8080/api/documents/1001 \
-  -H "Authorization: Bearer $TOKEN" \
-  -H 'Content-Type: application/json' \
-  -d '{"status":"PUBLISHED"}'
-
-curl -i http://localhost:8080/api/documents/2001 \
-  -H "Authorization: Bearer $TOKEN"
-```
-
-### PowerShell
-
-```powershell
-try {
-  Invoke-WebRequest -Method Post -Uri 'http://localhost:8080/api/documents/1001' \
-    -Headers $headers -ContentType 'application/json' -Body '{"status":"PUBLISHED"}'
-} catch { $_.Exception.Response.StatusCode.value__ }
-
-try {
-  Invoke-WebRequest 'http://localhost:8080/api/documents/2001' -Headers $headers
-} catch { $_.Exception.Response.StatusCode.value__ }
-```
-
-两个请求都应返回 `403`：前者缺少 `document:update`，后者超出 Project 101 Scope。
-
-## 9. 用 Diagnostics 解释 403
-
-Diagnostics 只分析当前已认证 Principal，不允许指定其他用户或 Profile。
-
-### Bash
-
-```bash
-curl -sS http://localhost:8080/iam/authorization/diagnostics \
-  -H "Authorization: Bearer $TOKEN" \
-  -H 'Content-Type: application/json' \
-  -d '{"permissionCode":"document:update","domain":"EXAMPLE","clientType":"WEB","resourceType":"PROJECT","resourceId":"101","scopeAccess":"WRITE"}'
-```
-
-### PowerShell
-
-```powershell
-Invoke-RestMethod -Method Post \
-  -Uri 'http://localhost:8080/iam/authorization/diagnostics' \
-  -Headers $headers -ContentType 'application/json' \
-  -Body '{"permissionCode":"document:update","domain":"EXAMPLE","clientType":"WEB","resourceType":"PROJECT","resourceId":"101","scopeAccess":"WRITE"}'
-```
-
-响应中的 `allowed=false`、`decisionCode` 和 `steps` 会指出拒绝发生在哪一层。
-
-同一个 Token 还可以调用 `GET /iam/auth/me` 查看当前 Principal；进阶验证可通过 `POST /iam/authorization/profiles/{profileId}/switch` 切换 Profile，并通过 `POST /iam/sessions/{sessionId}/revoke` 撤销当前用户自己的 Session。完整语义见 [HTTP API](/reference/http-api/)。
+PowerShell 可使用 `Invoke-RestMethod` 调用相同 Method、URL 和 JSON 请求体。命令行只是可选工具，不是理解授权流程的前提。
 
 ## 10. 配置边界
 
