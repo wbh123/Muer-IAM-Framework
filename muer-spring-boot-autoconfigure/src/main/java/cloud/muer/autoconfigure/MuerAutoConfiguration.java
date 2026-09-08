@@ -517,8 +517,9 @@ public class MuerAutoConfiguration {
             AuthorizationEngine authorization,
             AuthorizationProfileQueryRepository query,
             AuthorizationProfileRepository profiles,
-            UserQueryRepository users) {
-        return new IamManagementProfilesController(authorization, query, profiles, users);
+            UserQueryRepository users,
+            AuthorizationProfileService profileService) {
+        return new IamManagementProfilesController(authorization, query, profiles, users, profileService);
     }
 
     @Bean

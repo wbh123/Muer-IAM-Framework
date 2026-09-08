@@ -8,6 +8,7 @@ import cloud.muer.authorization.AuthorizationProfileService;
 import cloud.muer.core.port.UserQueryRepository;
 import cloud.muer.web.api.ManagementProfilesApi;
 import cloud.muer.web.dto.AuthorizationProfileResponse;
+import cloud.muer.web.dto.AuthorizationProfileCreateRequest;
 import cloud.muer.web.dto.ProfileListResponse;
 import cloud.muer.web.dto.ResourceScope;
 import org.springframework.http.HttpStatus;
@@ -20,26 +21,64 @@ import java.util.Objects;
 import java.util.NoSuchElementException;
 
 import static cloud.muer.web.WebSecurity.allowedRead;
+import static cloud.muer.web.WebSecurity.allowed;
 import static cloud.muer.web.WebSecurity.currentPrincipal;
 
 @RestController
 public class IamManagementProfilesController implements ManagementProfilesApi {
     private static final String PROFILE_READ = "iam.admin.profile.read";
+    private static final String PROFILE_WRITE = "iam.admin.profile.write";
     private static final String SCOPE_READ = "iam.admin.scope.read";
 
     private final AuthorizationEngine authorization;
     private final AuthorizationProfileQueryRepository query;
     private final AuthorizationProfileRepository profiles;
     private final UserQueryRepository users;
+    private final AuthorizationProfileService profileService;
 
     public IamManagementProfilesController(AuthorizationEngine authorization,
                                            AuthorizationProfileQueryRepository query,
                                            AuthorizationProfileRepository profiles,
                                            UserQueryRepository users) {
+        this(authorization, query, profiles, users, null);
+    }
+
+    public IamManagementProfilesController(AuthorizationEngine authorization,
+                                           AuthorizationProfileQueryRepository query,
+                                           AuthorizationProfileRepository profiles,
+                                           UserQueryRepository users,
+                                           AuthorizationProfileService profileService) {
         this.authorization = Objects.requireNonNull(authorization, "authorization must not be null");
         this.query = Objects.requireNonNull(query, "query must not be null");
         this.profiles = Objects.requireNonNull(profiles, "profiles must not be null");
         this.users = Objects.requireNonNull(users, "users must not be null");
+        this.profileService = profileService;
+    }
+
+    @Override
+    public ResponseEntity<AuthorizationProfileResponse> createAuthorizationProfile(
+            AuthorizationProfileCreateRequest request) {
+        var principal = currentPrincipal();
+        if (principal == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        if (!allowed(authorization, principal, PROFILE_WRITE,
+                "IAM_AUTHORIZATION_PROFILE_COLLECTION", "profiles", cloud.muer.core.model.ScopeAccess.WRITE)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        if (profileService == null || request == null) return ResponseEntity.badRequest().build();
+        if (users.findById(request.getUserId()).isEmpty()) return ResponseEntity.notFound().build();
+        try {
+            var scopes = request.getScopes().stream().map(scope -> new cloud.muer.core.model.ResourceScope(
+                    scope.getScopeType(), scope.getScopeRefId(),
+                    cloud.muer.core.model.ScopeAccess.valueOf(scope.getAccessMode().getValue()))).toList();
+            var created = profileService.create(new AuthorizationProfile(1L, request.getUserId(),
+                    request.getProfileName(), request.getTemplateVersionId(),
+                    java.util.Set.copyOf(request.getClientTypes()), request.getEnabled(), request.getRevoked(),
+                    request.getValidFrom() == null ? null : request.getValidFrom().toInstant(),
+                    request.getValidUntil() == null ? null : request.getValidUntil().toInstant(), scopes));
+            return ResponseEntity.status(HttpStatus.CREATED).body(toResponse(created));
+        } catch (IllegalArgumentException | UnsupportedOperationException exception) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @Override

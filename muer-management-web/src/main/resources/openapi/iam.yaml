@@ -654,6 +654,24 @@ paths:
               schema: {$ref: '#/components/schemas/ProfileListResponse'}
         '401': {description: Authentication required}
         '403': {description: Administration permission denied}
+    post:
+      tags: [Management Profiles]
+      operationId: createAuthorizationProfile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/AuthorizationProfileCreateRequest'}
+      responses:
+        '201':
+          description: Profile created against a published template version
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/AuthorizationProfileResponse'}
+        '400': {description: Invalid profile data or unpublished template version}
+        '401': {description: Authentication required}
+        '403': {description: Administration permission denied}
+        '404': {description: User not found}
   /iam/admin/users/{userId}/profiles:
     get:
       tags: [Management Profiles]
@@ -950,6 +968,19 @@ components:
     AuthorizationProfileRequest:
       allOf:
         - {$ref: '#/components/schemas/AuthorizationProfileResponse'}
+    AuthorizationProfileCreateRequest:
+      type: object
+      required: [userId, profileName, templateVersionId, clientTypes, enabled, revoked, scopes]
+      properties:
+        userId: {type: integer, format: int64, minimum: 1}
+        profileName: {type: string, minLength: 1, maxLength: 191}
+        templateVersionId: {type: integer, format: int64, minimum: 1}
+        clientTypes: {type: array, minItems: 1, uniqueItems: true, items: {type: string, minLength: 1, maxLength: 64}}
+        enabled: {type: boolean}
+        revoked: {type: boolean}
+        validFrom: {type: string, format: date-time, nullable: true}
+        validUntil: {type: string, format: date-time, nullable: true}
+        scopes: {type: array, items: {$ref: '#/components/schemas/ResourceScope'}}
     PermissionTemplateVersionRequest:
       type: object
       required: [templateId, versionNumber, status, permissions]
