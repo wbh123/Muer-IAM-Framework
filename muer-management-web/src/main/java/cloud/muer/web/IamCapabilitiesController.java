@@ -55,9 +55,7 @@ public class IamCapabilitiesController implements CapabilitiesApi {
 
         var principalResponse = new PrincipalResponse(
                 principal.userId(), principal.identityId(), principal.identityDomain(),
-                principal.clientType(), principal.authorizationVersion())
-                .activeProfileId(activeProfileId)
-                .templateVersionId(templateVersionId);
+                activeProfileId, templateVersionId, principal.clientType(), principal.authorizationVersion());
         var scopeResponses = scopes.stream()
                 .map(scope -> new cloud.muer.web.dto.ResourceScope(
                         scope.scopeType(), scope.scopeRefId(),

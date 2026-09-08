@@ -4,6 +4,7 @@ import cloud.muer.authorization.AuthorizationEngine;
 import cloud.muer.authorization.PermissionSummaryPage;
 import cloud.muer.authorization.PermissionTemplate;
 import cloud.muer.authorization.PermissionTemplateQueryRepository;
+import cloud.muer.authorization.PermissionTemplateLifecycleService;
 import cloud.muer.authorization.PermissionTemplateVersion;
 import cloud.muer.authorization.TemplateVersionStatus;
 import cloud.muer.web.api.ManagementPermissionsApi;
@@ -12,6 +13,8 @@ import cloud.muer.web.dto.PermissionListResponse;
 import cloud.muer.web.dto.PermissionTemplateListResponse;
 import cloud.muer.web.dto.PermissionTemplateSummary;
 import cloud.muer.web.dto.PermissionTemplateVersionResponse;
+import cloud.muer.web.dto.PermissionTemplateCreateRequest;
+import cloud.muer.web.dto.PermissionTemplateVersionCreateRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,20 +24,47 @@ import java.util.List;
 import java.util.Objects;
 
 import static cloud.muer.web.WebSecurity.allowedRead;
+import static cloud.muer.web.WebSecurity.allowed;
 import static cloud.muer.web.WebSecurity.currentPrincipal;
 
 @RestController
 public class IamManagementTemplatesController implements ManagementTemplatesApi, ManagementPermissionsApi {
     private static final String TEMPLATE_READ = "iam.admin.template.read";
+    private static final String TEMPLATE_WRITE = "iam.admin.template.write";
     private static final String PERMISSION_READ = "iam.admin.permission.read";
 
     private final AuthorizationEngine authorization;
     private final PermissionTemplateQueryRepository templates;
+    private final PermissionTemplateLifecycleService lifecycle;
 
     public IamManagementTemplatesController(AuthorizationEngine authorization,
                                             PermissionTemplateQueryRepository templates) {
+        this(authorization, templates, null);
+    }
+
+    public IamManagementTemplatesController(AuthorizationEngine authorization,
+                                            PermissionTemplateQueryRepository templates,
+                                            PermissionTemplateLifecycleService lifecycle) {
         this.authorization = Objects.requireNonNull(authorization, "authorization must not be null");
         this.templates = Objects.requireNonNull(templates, "templates must not be null");
+        this.lifecycle = lifecycle;
+    }
+
+    @Override
+    public ResponseEntity<PermissionTemplateSummary> createPermissionTemplate(PermissionTemplateCreateRequest request) {
+        var principal = currentPrincipal();
+        if (principal == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        if (!allowed(authorization, principal, TEMPLATE_WRITE,
+                "IAM_PERMISSION_TEMPLATE_COLLECTION", "templates", cloud.muer.core.model.ScopeAccess.WRITE)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        if (lifecycle == null || request == null) return ResponseEntity.badRequest().build();
+        try {
+            var created = lifecycle.createTemplate(request.getTemplateKey(), request.getName(), request.getDescription());
+            return ResponseEntity.status(HttpStatus.CREATED).body(templateSummary(created, templates));
+        } catch (IllegalArgumentException exception) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @Override
@@ -82,6 +112,26 @@ public class IamManagementTemplatesController implements ManagementTemplatesApi,
     }
 
     @Override
+    public ResponseEntity<PermissionTemplateVersionResponse> createPermissionTemplateVersion(
+            Long templateId, PermissionTemplateVersionCreateRequest request) {
+        var principal = currentPrincipal();
+        if (principal == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        if (!allowed(authorization, principal, TEMPLATE_WRITE, "IAM_PERMISSION_TEMPLATE", templateId.toString(),
+                cloud.muer.core.model.ScopeAccess.WRITE)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        if (lifecycle == null || request == null) return ResponseEntity.badRequest().build();
+        if (templates.findTemplate(templateId).isEmpty()) return ResponseEntity.notFound().build();
+        try {
+            return ResponseEntity.status(HttpStatus.CREATED).body(versionResponse(
+                    lifecycle.createDraftVersion(templateId, request.getPermissions() == null
+                            ? java.util.Set.of() : java.util.Set.copyOf(request.getPermissions()))));
+        } catch (IllegalArgumentException exception) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @Override
     public ResponseEntity<PermissionTemplateVersionResponse> getPermissionTemplateVersion(Long versionId) {
         var principal = currentPrincipal();
         if (principal == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -93,6 +143,24 @@ public class IamManagementTemplatesController implements ManagementTemplatesApi,
                 .map(IamManagementTemplatesController::versionResponse)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @Override
+    public ResponseEntity<PermissionTemplateVersionResponse> publishPermissionTemplateVersion(Long versionId) {
+        var principal = currentPrincipal();
+        if (principal == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        if (!allowed(authorization, principal, TEMPLATE_WRITE, "IAM_PERMISSION_TEMPLATE_VERSION", versionId.toString(),
+                cloud.muer.core.model.ScopeAccess.WRITE)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        if (lifecycle == null) return ResponseEntity.badRequest().build();
+        try {
+            return ResponseEntity.ok(versionResponse(lifecycle.publish(versionId)));
+        } catch (java.util.NoSuchElementException exception) {
+            return ResponseEntity.notFound().build();
+        } catch (IllegalStateException exception) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
     }
 
     @Override

@@ -114,8 +114,7 @@ public class IamAuthorizationController implements AuthorizationApi {
     private static cloud.muer.web.dto.PrincipalResponse toResponse(IamPrincipal principal) {
         return new cloud.muer.web.dto.PrincipalResponse(
                 principal.userId(), principal.identityId(), principal.identityDomain(),
-                principal.clientType(), principal.authorizationVersion())
-                .activeProfileId(principal.activeProfileId())
-                .templateVersionId(principal.templateVersionId());
+                principal.activeProfileId(), principal.templateVersionId(), principal.clientType(),
+                principal.authorizationVersion());
     }
 }

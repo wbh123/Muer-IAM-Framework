@@ -88,10 +88,10 @@ public class IamAuthenticationController implements AuthenticationApi {
                 principal.userId(),
                 principal.identityId(),
                 principal.identityDomain(),
+                principal.activeProfileId(),
+                principal.templateVersionId(),
                 principal.clientType(),
-                principal.authorizationVersion())
-                .activeProfileId(principal.activeProfileId())
-                .templateVersionId(principal.templateVersionId());
+                principal.authorizationVersion());
     }
 
     private static jakarta.servlet.http.HttpServletRequest currentServletRequest() {

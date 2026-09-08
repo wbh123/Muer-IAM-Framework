@@ -498,6 +498,23 @@ paths:
               schema: {$ref: '#/components/schemas/PermissionTemplateListResponse'}
         '401': {description: Authentication required}
         '403': {description: Administration permission denied}
+    post:
+      tags: [Management Templates]
+      operationId: createPermissionTemplate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/PermissionTemplateCreateRequest'}
+      responses:
+        '201':
+          description: Permission template created
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/PermissionTemplateSummary'}
+        '400': {description: Invalid template data}
+        '401': {description: Authentication required}
+        '403': {description: Administration permission denied}
   /iam/admin/templates/{templateId}:
     get:
       tags: [Management Templates]
@@ -536,6 +553,29 @@ paths:
         '401': {description: Authentication required}
         '403': {description: Administration permission denied}
         '404': {description: Permission template not found}
+    post:
+      tags: [Management Templates]
+      operationId: createPermissionTemplateVersion
+      parameters:
+        - name: templateId
+          in: path
+          required: true
+          schema: {type: integer, format: int64, minimum: 1}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/PermissionTemplateVersionCreateRequest'}
+      responses:
+        '201':
+          description: New draft version with a server-assigned version number
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/PermissionTemplateVersionResponse'}
+        '400': {description: Invalid version data}
+        '401': {description: Authentication required}
+        '403': {description: Administration permission denied}
+        '404': {description: Permission template not found}
   /iam/admin/template-versions/{versionId}:
     get:
       tags: [Management Templates]
@@ -554,6 +594,25 @@ paths:
         '401': {description: Authentication required}
         '403': {description: Administration permission denied}
         '404': {description: Template version not found}
+  /iam/admin/template-versions/{versionId}/publish:
+    post:
+      tags: [Management Templates]
+      operationId: publishPermissionTemplateVersion
+      parameters:
+        - name: versionId
+          in: path
+          required: true
+          schema: {type: integer, format: int64, minimum: 1}
+      responses:
+        '200':
+          description: Draft version published and made immutable
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/PermissionTemplateVersionResponse'}
+        '401': {description: Authentication required}
+        '403': {description: Administration permission denied}
+        '404': {description: Template version not found}
+        '409': {description: Version is not a draft}
   /iam/admin/profiles:
     get:
       tags: [Management Profiles]
@@ -972,6 +1031,17 @@ components:
         latestVersionId: {type: integer, format: int64, nullable: true}
         latestVersionNumber: {type: integer, nullable: true}
         latestVersionStatus: {type: string, enum: [DRAFT, PUBLISHED, RETIRED], nullable: true}
+    PermissionTemplateCreateRequest:
+      type: object
+      required: [templateKey, name]
+      properties:
+        templateKey: {type: string, minLength: 1, maxLength: 128}
+        name: {type: string, minLength: 1, maxLength: 255}
+        description: {type: string, maxLength: 2000, nullable: true}
+    PermissionTemplateVersionCreateRequest:
+      type: object
+      properties:
+        permissions: {type: array, uniqueItems: true, items: {type: string, minLength: 1, maxLength: 255}}
     PermissionTemplateListResponse:
       type: object
       required: [items]

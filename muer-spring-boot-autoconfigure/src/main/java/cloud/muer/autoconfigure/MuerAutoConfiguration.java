@@ -13,6 +13,8 @@ import cloud.muer.authorization.AuthorizationVersionRepository;
 import cloud.muer.authorization.DefaultAuthorizationEngine;
 import cloud.muer.authorization.PermissionTemplateQueryRepository;
 import cloud.muer.authorization.PermissionTemplateVersionRepository;
+import cloud.muer.authorization.PermissionTemplateCommandRepository;
+import cloud.muer.authorization.PermissionTemplateLifecycleService;
 import cloud.muer.authorization.AuthorizationProfileService;
 import cloud.muer.authorization.AuthorizationScopeMutation;
 import cloud.muer.authorization.AuthorizationVersionService;
@@ -53,6 +55,7 @@ import cloud.muer.persistence.MyBatisAuthorizationProfileRepository;
 import cloud.muer.persistence.MyBatisAuthorizationScopeMutation;
 import cloud.muer.persistence.MyBatisAuthorizationVersionRepository;
 import cloud.muer.persistence.MyBatisPermissionTemplateVersionRepository;
+import cloud.muer.persistence.MyBatisPermissionTemplateCommandRepository;
 import cloud.muer.persistence.MyBatisPermissionRepository;
 import cloud.muer.persistence.MyBatisSessionRepository;
 import cloud.muer.persistence.RedisTokenStore;
@@ -175,6 +178,12 @@ public class MuerAutoConfiguration {
     @ConditionalOnMissingBean(PermissionTemplateVersionRepository.class)
     PermissionTemplateVersionRepository iamPermissionTemplateVersionRepository(SqlSessionFactory sessions) {
         return new MyBatisPermissionTemplateVersionRepository(sessions);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(PermissionTemplateCommandRepository.class)
+    PermissionTemplateCommandRepository iamPermissionTemplateCommandRepository(SqlSessionFactory sessions) {
+        return new MyBatisPermissionTemplateCommandRepository(sessions);
     }
 
     @Bean
@@ -366,17 +375,25 @@ public class MuerAutoConfiguration {
     @ConditionalOnMissingBean
     AuthorizationProfileService iamAuthorizationProfileService(AuthorizationProfileRepository profiles,
                                                                 AuthorizationVersionService versions,
+                                                                PermissionTemplateVersionRepository templateVersions,
                                                                 ObjectProvider<AuthorizationScopeMutation> mutation) {
         var atomicMutation = mutation.getIfAvailable();
         return atomicMutation == null
-                ? new AuthorizationProfileService(profiles, versions)
-                : new AuthorizationProfileService(profiles, versions, atomicMutation);
+                ? new AuthorizationProfileService(profiles, versions, templateVersions, null)
+                : new AuthorizationProfileService(profiles, versions, templateVersions, atomicMutation);
     }
 
     @Bean
     @ConditionalOnMissingBean
     PermissionTemplateService iamPermissionTemplateService(PermissionTemplateVersionRepository templates) {
         return new PermissionTemplateService(templates);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    PermissionTemplateLifecycleService iamPermissionTemplateLifecycleService(
+            PermissionTemplateCommandRepository commands, PermissionTemplateVersionRepository versions) {
+        return new PermissionTemplateLifecycleService(commands, versions);
     }
 
     @Bean
@@ -487,8 +504,9 @@ public class MuerAutoConfiguration {
     @ConditionalOnBean({PermissionTemplateQueryRepository.class, AuthorizationEngine.class})
     IamManagementTemplatesController iamManagementTemplatesController(
             AuthorizationEngine authorization,
-            PermissionTemplateQueryRepository templates) {
-        return new IamManagementTemplatesController(authorization, templates);
+            PermissionTemplateQueryRepository templates,
+            PermissionTemplateLifecycleService lifecycle) {
+        return new IamManagementTemplatesController(authorization, templates, lifecycle);
     }
 
     @Bean

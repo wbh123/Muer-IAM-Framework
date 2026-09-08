@@ -16,4 +16,9 @@ public interface IamPermissionTemplateVersionMapper {
     int deletePermissionLinks(@Param("versionId") long versionId);
     int insertPermissionLink(@Param("versionId") long versionId,
                              @Param("permissionCode") String permissionCode);
+    int insertTemplate(@Param("templateKey") String templateKey, @Param("name") String name,
+                       @Param("description") String description, @Param("enabled") boolean enabled);
+    int nextVersionNumberForUpdate(@Param("templateId") long templateId);
+    int insertDraftVersion(@Param("templateId") long templateId, @Param("versionNumber") int versionNumber);
+    long lastInsertId();
 }

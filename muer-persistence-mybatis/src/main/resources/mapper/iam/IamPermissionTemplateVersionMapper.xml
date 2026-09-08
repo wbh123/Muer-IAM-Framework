@@ -60,4 +60,23 @@
         INSERT INTO iam_template_permission (template_version_id, permission_id)
         SELECT #{versionId}, id FROM iam_permission WHERE permission_code = #{permissionCode}
     </insert>
+
+    <insert id="insertTemplate">
+        INSERT INTO iam_permission_template (template_key, display_name, description, enabled)
+        VALUES (#{templateKey}, #{name}, #{description}, #{enabled})
+    </insert>
+
+    <select id="nextVersionNumberForUpdate" resultType="int">
+        SELECT COALESCE(MAX(version_number), 0) + 1
+        FROM iam_permission_template_version
+        WHERE template_id = #{templateId}
+        FOR UPDATE
+    </select>
+
+    <insert id="insertDraftVersion">
+        INSERT INTO iam_permission_template_version (template_id, version_number, status, published_at)
+        VALUES (#{templateId}, #{versionNumber}, 'DRAFT', NULL)
+    </insert>
+
+    <select id="lastInsertId" resultType="long">SELECT LAST_INSERT_ID()</select>
 </mapper>

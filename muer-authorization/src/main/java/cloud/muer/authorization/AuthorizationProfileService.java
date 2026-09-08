@@ -12,27 +12,37 @@ public final class AuthorizationProfileService {
     private final AuthorizationVersionService versions;
     private final Clock clock;
     private final AuthorizationScopeMutation scopeMutation;
+    private final PermissionTemplateVersionRepository templateVersions;
 
     public AuthorizationProfileService(AuthorizationProfileRepository profiles, AuthorizationVersionService versions) {
-        this(profiles, versions, Clock.systemUTC(), null);
+        this(profiles, versions, Clock.systemUTC(), null, null);
     }
 
     public AuthorizationProfileService(AuthorizationProfileRepository profiles, AuthorizationVersionService versions,
                                        Clock clock) {
-        this(profiles, versions, clock, null);
+        this(profiles, versions, clock, null, null);
     }
 
     public AuthorizationProfileService(AuthorizationProfileRepository profiles, AuthorizationVersionService versions,
                                        AuthorizationScopeMutation scopeMutation) {
-        this(profiles, versions, Clock.systemUTC(), Objects.requireNonNull(scopeMutation));
+        this(profiles, versions, Clock.systemUTC(), Objects.requireNonNull(scopeMutation), null);
+    }
+
+    /** Enables the invariant that a profile may only bind to a published template version. */
+    public AuthorizationProfileService(AuthorizationProfileRepository profiles, AuthorizationVersionService versions,
+                                       PermissionTemplateVersionRepository templateVersions,
+                                       AuthorizationScopeMutation scopeMutation) {
+        this(profiles, versions, Clock.systemUTC(), scopeMutation, templateVersions);
     }
 
     private AuthorizationProfileService(AuthorizationProfileRepository profiles, AuthorizationVersionService versions,
-                                        Clock clock, AuthorizationScopeMutation scopeMutation) {
+                                        Clock clock, AuthorizationScopeMutation scopeMutation,
+                                        PermissionTemplateVersionRepository templateVersions) {
         this.profiles = Objects.requireNonNull(profiles);
         this.versions = Objects.requireNonNull(versions);
         this.clock = Objects.requireNonNull(clock);
         this.scopeMutation = scopeMutation;
+        this.templateVersions = templateVersions;
     }
 
     public void replaceScopes(long profileId, List<ResourceScope> scopes) {
@@ -51,6 +61,7 @@ public final class AuthorizationProfileService {
         if (existing.userId() != replacement.userId()) {
             throw new IllegalArgumentException("authorization profile ownership cannot be changed");
         }
+        requirePublishedTemplateVersion(replacement.templateVersionId());
         profiles.save(replacement);
         versions.increment(replacement.userId());
     }
@@ -65,5 +76,12 @@ public final class AuthorizationProfileService {
                 .filter(profile -> profile.validFrom() == null || !profile.validFrom().isAfter(now))
                 .filter(profile -> profile.validUntil() == null || profile.validUntil().isAfter(now))
                 .toList();
+    }
+
+    private void requirePublishedTemplateVersion(long templateVersionId) {
+        if (templateVersions != null
+                && templateVersions.require(templateVersionId).status() != TemplateVersionStatus.PUBLISHED) {
+            throw new IllegalArgumentException("authorization profiles require a published template version");
+        }
     }
 }
