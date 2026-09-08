@@ -50,17 +50,35 @@ final class QuickStartAuthorizationSeeder {
     }
 
     private void clearProjection() {
-        // Re-running the app resets the demo projection to a known state. Only
-        // these local demo tables are touched; other IAM rows are left alone.
-        jdbc.update("DELETE FROM iam_authorization_scope");
-        jdbc.update("DELETE FROM iam_authorization_profile");
-        jdbc.update("DELETE FROM iam_template_permission");
-        jdbc.update("DELETE FROM iam_permission_template_version");
-        jdbc.update("DELETE FROM iam_permission_template");
-        jdbc.update("DELETE FROM iam_session");
-        jdbc.update("DELETE FROM iam_login_event");
-        jdbc.update("DELETE FROM iam_audit_log");
-        jdbc.update("DELETE FROM iam_audit_subject_link");
+        // Re-running resets only the fixed QuickStart projection. Sessions,
+        // login events, audits, and unrelated authorization rows are preserved.
+        assertDemoIdsAvailable();
+        jdbc.update("DELETE FROM iam_authorization_scope WHERE profile_id IN (401,402)");
+        jdbc.update("DELETE FROM iam_authorization_profile WHERE id IN (401,402)");
+        jdbc.update("DELETE FROM iam_template_permission WHERE template_version_id IN (301,302)");
+        jdbc.update("DELETE FROM iam_permission_template_version WHERE id IN (301,302)");
+        jdbc.update("DELETE FROM iam_permission_template WHERE id IN (201,202)");
+    }
+
+    private void assertDemoIdsAvailable() {
+        assertTemplateId(201, "quickstart-document-reader");
+        assertTemplateId(202, "quickstart-document-editor");
+        assertProfileId(401, "alice-reader-project-101");
+        assertProfileId(402, "alice-editor-project-101");
+    }
+
+    private void assertTemplateId(long id, String expectedKey) {
+        var keys = jdbc.query("SELECT template_key FROM iam_permission_template WHERE id=?", (rs, row) -> rs.getString(1), id);
+        if (!keys.isEmpty() && !expectedKey.equals(keys.getFirst())) {
+            throw new IllegalStateException("QuickStart demo template id " + id + " belongs to another template");
+        }
+    }
+
+    private void assertProfileId(long id, String expectedKey) {
+        var keys = jdbc.query("SELECT profile_key FROM iam_authorization_profile WHERE id=?", (rs, row) -> rs.getString(1), id);
+        if (!keys.isEmpty() && !expectedKey.equals(keys.getFirst())) {
+            throw new IllegalStateException("QuickStart demo profile id " + id + " belongs to another profile");
+        }
     }
 
     private void seedTemplatesAndVersions() {
