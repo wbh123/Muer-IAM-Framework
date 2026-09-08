@@ -11,7 +11,7 @@ IAM 以「一个 Starter 依赖 + 宿主提供少量 SPI」的方式嵌入现有
 
 ## 依赖坐标
 
-当前版本为 `0.1.0-SNAPSHOT`（Release Candidate），**尚未发布到 Maven Central**，只能从本地或内部仓库获取。
+业务应用通常只需要下面这一个聚合 Starter：
 
 ```xml
 <dependency>
@@ -21,7 +21,39 @@ IAM 以「一个 Starter 依赖 + 宿主提供少量 SPI」的方式嵌入现有
 </dependency>
 ```
 
-业务应用通常只需要这个聚合 Starter。
+## 三种使用情景
+
+当前 `0.1.0` 是 Release Candidate（`0.1.0-SNAPSHOT`），**尚未发布到 Maven Central**。按你的环境选择获取方式：
+
+| 情景 | 怎么做 |
+| --- | --- |
+| **0.1.0 RC（本机开发）** | 本地 `mvn install`，见下方「本地安装」 |
+| **企业内部使用** | 把构建产物上传到 Nexus / Artifactory，团队成员从内部仓库拉取 |
+| **未来 Maven Central 发布后** | 直接在上面的 `pom.xml` 里加依赖即可（当前不可用） |
+
+当前重点讲前两种。
+
+### 0.1.0 RC 本地安装
+
+从源码把框架安装到本机 Maven 仓库：
+
+```bash
+git clone https://github.com/wbh123/Muer-IAM-Framework.git
+cd Muer-IAM-Framework
+mvn clean install -DskipTests
+```
+
+这会安装到：
+
+```text
+~/.m2/repository/cloud/muer/muer-spring-boot-starter/0.1.0-SNAPSHOT/
+```
+
+> 正式 0.1.0 发布 Maven Central 后，这一步会被删除。
+
+### 企业内部仓库
+
+发布到内部 Nexus / Artifactory 后，开发者无需 clone 源码，只需在 `pom.xml` 声明坐标，并配置镜像仓库为内部地址即可。
 
 ## 运行前置条件
 
@@ -53,17 +85,43 @@ MySQL 和 Redis 可以是：
 
 ## 宿主必须提供的 SPI
 
-Starter 不会替你持有用户与业务资源。根据使用能力注册 Spring Bean：
+Starter 不会替你持有用户与业务资源。根据你使用的能力注册对应 Spring Bean：
 
-1. `IdentityAuthenticator`：校验宿主凭据并投影 `IamPrincipal`；
-2. `ResourceHierarchyProvider`：当使用资源 Scope 时，判断业务资源是否位于 Scope 内；
-3. `MvcResourceDescriptorResolver`：仅当 MVC 路由使用 `@RequirePermission` 时，把请求映射成 `ResourceDescriptor`。
+| Bean | 必需？ | 作用 |
+| --- | ---: | --- |
+| `IdentityAuthenticator` | 登录时必需 | 校验宿主凭据并投影 `IamPrincipal` |
+| `PermissionDefinitionProvider` | 推荐 | 用代码注册业务权限（`document:read` 等） |
+| `ResourceHierarchyProvider` | 用 Scope 时需要 | 判断业务资源是否位于 Scope 内 |
+| `MvcResourceDescriptorResolver` | MVC Scope 时需要 | 把 `@RequirePermission` 请求映射成 `ResourceDescriptor` |
 
 示例实现：
 
 - [ExampleIdentityAdapter.java](https://github.com/wbh123/Muer-IAM-Framework/blob/main/muer-example/src/main/java/cloud/muer/example/ExampleIdentityAdapter.java)
 - [ExampleResourceHierarchyAdapter.java](https://github.com/wbh123/Muer-IAM-Framework/blob/main/muer-example/src/main/java/cloud/muer/example/ExampleResourceHierarchyAdapter.java)
 - [ExampleDocumentResourceResolver.java](https://github.com/wbh123/Muer-IAM-Framework/blob/main/muer-example/src/main/java/cloud/muer/example/ExampleDocumentResourceResolver.java)
+
+## 最小接入模式
+
+**不要以为四个 Bean 一个都不能少。** 它们是分层可选的：
+
+```text
+只要登录
+  IdentityAuthenticator
+
+登录 + 业务权限
+  + PermissionDefinitionProvider
+
+资源级权限（Scope / @RequirePermission）
+  + ResourceHierarchyProvider
+  + MvcResourceDescriptorResolver
+
+完整治理
+  + Admin Console
+  + Audit
+  + Observability
+```
+
+想从最小链路起步，先只接 `IdentityAuthenticator`，跑通「添加 Starter → 登录 → `/iam/auth/me`」，再按需往上加。
 
 ## 不需要做什么
 
@@ -79,6 +137,6 @@ Starter 不会替你持有用户与业务资源。根据使用能力注册 Sprin
 
 ## 下一步
 
-- 想最快接入：阅读[快速开始](/getting-started/quick-start/)；
+- 想最快跑通一个真实接口：阅读[15 分钟快速开始](/getting-started/quick-start/)（可直接对照 [`examples/quickstart`](https://github.com/wbh123/Muer-IAM-Framework/tree/main/examples/quickstart)）；
 - 想不用 Docker 手动部署：阅读[手动部署](/getting-started/manual-deployment/)；
 - 查看完整参数：阅读[基础配置](/getting-started/configuration/)与[配置参考](/reference/configuration/)。
