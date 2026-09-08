@@ -23,6 +23,9 @@
 #      MUER_EXAMPLE_*; no stale IAM_EXAMPLE_* remains in active code/docs.
 #   6. Core Quick Start endpoints exist in the real OpenAPI contract
 #      (muer-management-web/src/main/resources/openapi/iam.yaml).
+#   7. The standalone examples/quickstart consumer exists, consumes only
+#      cloud.muer:muer-spring-boot-starter, is not part of the reactor, and
+#      uses only Muer public API (no internal/persistence/Mapper imports).
 set -euo pipefail
 
 repository_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -143,9 +146,13 @@ if grep -rEq 'IAM_EXAMPLE_' "$docs_content" 2>/dev/null; then
 else
   pass 'no stale IAM_EXAMPLE_ in active docs or example sources'
 fi
-grep -rq 'MUER_EXAMPLE_' "$docs_content/getting-started" 2>/dev/null \
-  && pass 'active docs reference MUER_EXAMPLE_* demonstration variables' \
-  || note_failure 'active docs should reference MUER_EXAMPLE_* demonstration variables'
+# Demonstration variables in active docs use the MUER_ prefix (either the
+# MUER_EXAMPLE_* showcase variables or the MUER_* quickstart variables).
+if grep -rqE 'MUER_(EXAMPLE_)?[A-Z_]+' "$docs_content/getting-started" 2>/dev/null; then
+  pass 'active docs reference MUER_* / MUER_EXAMPLE_* demonstration variables'
+else
+  note_failure 'active docs should reference MUER_* / MUER_EXAMPLE_* demonstration variables'
+fi
 
 # --- 6. Core Quick Start endpoints exist in the OpenAPI contract -------------
 printf 'HTTP endpoint contract\n'
@@ -171,6 +178,42 @@ if require_file 'quick-start.md exists' "$quick_start"; then
     '/iam/authorization/diagnostics' '/iam/sessions/'; do
     grep -Fq "$endpoint" "$quick_start" || note_failure "quick-start.md should reference $endpoint"
   done
+fi
+
+# --- 7. Quick Start consumer example exists and matches the docs ------------
+printf 'Quick Start consumer contract\n'
+qs_root="$repository_root/examples/quickstart"
+qs_pom="$qs_root/pom.xml"
+qs_main="$qs_root/src/main/java/com/example/muerquickstart"
+if require_file 'examples/quickstart/pom.xml exists' "$qs_pom"; then
+  grep -Eq '<groupId>cloud\.muer</groupId>' "$qs_pom" \
+    && grep -Eq '<artifactId>muer-spring-boot-starter</artifactId>' "$qs_pom" \
+    && pass 'quickstart pom consumes cloud.muer:muer-spring-boot-starter' \
+    || note_failure 'quickstart pom must consume cloud.muer:muer-spring-boot-starter'
+  grep -Eq '<artifactId>muer-quickstart</artifactId>' "$qs_pom" \
+    || note_failure 'quickstart pom artifactId is muer-quickstart'
+  # It must be a standalone consumer, not part of the muer reactor modules.
+  if grep -rEq 'muer-parent|<module>quickstart' "$qs_pom"; then
+    note_failure 'quickstart pom must not inherit muer-parent or be a reactor module'
+  else
+    pass 'quickstart is a standalone consumer (no muer-parent, not a reactor module)'
+  fi
+fi
+for f in \
+  "$qs_main/QuickStartApplication.java" \
+  "$qs_main/account/DemoIdentityAuthenticator.java" \
+  "$qs_main/account/DemoAccountService.java" \
+  "$qs_main/document/DocumentController.java" \
+  "$qs_main/document/DocumentResourceResolver.java" \
+  "$qs_main/security/MuerPermissionConfiguration.java" \
+  "$qs_main/security/DocumentResourceHierarchyProvider.java"; do
+  require_file "$(basename "$(dirname "$f")")/$(basename "$f") exists in examples/quickstart" "$f"
+done
+# No Muer internal / persistence / Mapper imports in the independent consumer.
+if grep -rEn 'cloud\.muer\.(persistence|.*\.internal)|\.mapper\.|Mapper' "$qs_root/src" 2>/dev/null; then
+  note_failure 'quickstart consumer imports internal Muer persistence/Mapper types'
+else
+  pass 'quickstart consumer uses only Muer public API (no persistence/internal/Mapper imports)'
 fi
 
 if [[ "$failures" -gt 0 ]]; then
