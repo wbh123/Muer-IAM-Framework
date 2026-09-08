@@ -37,14 +37,26 @@ Authorization: Bearer <accessToken>
 }
 ```
 
-成功响应包含：
+成功响应（HTTP `200`，`Content-Type: application/json`）的字段由 `LoginResponse` 定义：`accessToken`、`sessionId`、`expiresAt`、`principal` 均为必填；`principal.activeProfileId` 与 `principal.templateVersionId` 为可空字段——用户尚未绑定任何 Profile 时为空。下列仅为结构示例，Token 与时间戳是动态值：
 
-```text
-accessToken
-sessionId
-expiresAt
-principal
+```json
+{
+  "accessToken": "opaque-token-value-…",
+  "sessionId": "sess_8f3a9c2e6b1d4a07",
+  "expiresAt": "2026-09-08T15:50:00Z",
+  "principal": {
+    "userId": 101,
+    "identityId": "alice",
+    "identityDomain": "EXAMPLE",
+    "activeProfileId": 401,
+    "templateVersionId": 301,
+    "clientType": "WEB",
+    "authorizationVersion": 3
+  }
+}
 ```
+
+调用受保护接口时把 `accessToken` 放入 `Authorization: Bearer <accessToken>`。该 Token 是不透明字符串，不解析内容即可使用。
 
 ### 登出
 
@@ -65,6 +77,22 @@ principal
 | Auth | Bearer |
 | Success | `200`，返回当前 `IamPrincipal` |
 | Failure | `401` |
+
+返回体是 `PrincipalResponse`。它与 `LoginResponse.principal` 是同一结构：
+
+```json
+{
+  "userId": 101,
+  "identityId": "alice",
+  "identityDomain": "EXAMPLE",
+  "activeProfileId": 401,
+  "templateVersionId": 301,
+  "clientType": "WEB",
+  "authorizationVersion": 3
+}
+```
+
+`userId`、`identityId`、`identityDomain`、`clientType`、`authorizationVersion` 始终返回；`activeProfileId`、`templateVersionId` 在用户已绑定并激活授权 Profile 时返回整数值，否则为空。
 
 ## Session
 
@@ -111,6 +139,27 @@ principal
 | Auth | Bearer |
 | Success | `200`，返回当前用户可用 `AuthorizationProfile` 列表 |
 
+返回体是 `AuthorizationProfileResponse` 的 JSON 数组：
+
+```json
+[
+  {
+    "profileId": 401,
+    "userId": 101,
+    "profileName": "Project-101 Reader",
+    "templateVersionId": 301,
+    "clientTypes": ["WEB"],
+    "enabled": true,
+    "revoked": false,
+    "validFrom": null,
+    "validUntil": null,
+    "scopes": [
+      { "scopeType": "PROJECT", "scopeRefId": "101", "accessMode": "READ" }
+    ]
+  }
+]
+```
+
 ### 切换 Profile
 
 | 项目 | 内容 |
@@ -121,7 +170,26 @@ principal
 | Success | `200`，返回新的 `AuthenticationResult` |
 | Failure | `401` / `404` |
 
-成功结果包含新的 Token 和 Session；原 Token 不会被修改成新 Profile。
+成功响应（HTTP `200`）与 `LoginResponse` 同构：返回一份携带新激活 Profile 的 Token、Session 与 Principal。原 Token 不会被修改成新 Profile，因此旧 Token 继续以切换前的 Profile 生效：
+
+```json
+{
+  "accessToken": "opaque-token-after-switch-…",
+  "sessionId": "sess_c0b1a6f3e8d2a09c",
+  "expiresAt": "2026-09-08T16:00:00Z",
+  "principal": {
+    "userId": 101,
+    "identityId": "alice",
+    "identityDomain": "EXAMPLE",
+    "activeProfileId": 402,
+    "templateVersionId": 302,
+    "clientType": "WEB",
+    "authorizationVersion": 3
+  }
+}
+```
+
+若 `profileId` 不属于当前 Principal，返回 `404`。
 
 ### 授权诊断
 
@@ -131,6 +199,9 @@ principal
 | Path | `/iam/authorization/diagnostics` |
 | Auth | Bearer |
 | Success | `200`，返回真实 `AuthorizationDecision` |
+| Failure | `401` |
+
+该接口是当前已认证 Principal 的**只读自诊断**：只能评估自己，不能指定其他用户或 Profile，也不需要 `iam.admin.*` 权限。
 
 示例请求体：
 
@@ -145,6 +216,23 @@ principal
 }
 ```
 
+成功响应（HTTP `200`）返回 `AuthorizationDecisionResponse`：`allowed`、`decisionCode` 与已检查步骤 `steps`。例如 Reader 缺少 `document:update` 权限时，`DefaultAuthorizationEngine` 依次记录已通过的步骤，在权限校验处终止并返回 `PERMISSION_DENIED`：
+
+```json
+{
+  "allowed": false,
+  "decisionCode": "PERMISSION_DENIED",
+  "steps": [
+    { "code": "IDENTITY_DOMAIN", "passed": true, "reason": "domain matches" },
+    { "code": "CLIENT_TYPE", "passed": true, "reason": "client matches" },
+    { "code": "ACTIVE_PROFILE", "passed": true, "reason": "profile valid" },
+    { "code": "ATOMIC_PERMISSION", "passed": false, "reason": "permission missing" }
+  ]
+}
+```
+
+`steps[].code` 是引擎内部固定步骤标识（`IDENTITY_DOMAIN` / `CLIENT_TYPE` / `ACTIVE_PROFILE` / `ATOMIC_PERMISSION` / `RESOURCE_SCOPE`，及扩展策略的 `POLICY:<code>`）；`decisionCode` 才是对外稳定的拒绝码。具体取值与含义见[错误码](/reference/error-codes/)。
+
 ## MVC 业务接口的默认授权失败
 
 对于使用 `@RequirePermission` 的宿主 MVC 接口，默认语义为：
@@ -155,6 +243,21 @@ principal
 | `403` | `IAM_ACCESS_DENIED` | Permission / Scope 等授权条件不满足 |
 | `404` | `IAM_RESOURCE_NOT_FOUND` | 宿主 Resolver 确认业务资源不存在 |
 | `500` | `IAM_RESOURCE_RESOLUTION_UNAVAILABLE` | 接口需要资源解析，但宿主未提供可用 Resolver |
+
+失败响应由 `ProblemDetailIamAuthorizationFailureHandler` 写出，`Content-Type: application/problem+json`，体为 RFC 9457 `ProblemDetail` 并附 `code` 与 `path` 两个自定义字段。例如 Reader 访问需要 `document:update` 的接口：
+
+```json
+{
+  "type": "about:blank",
+  "title": "Forbidden",
+  "status": 403,
+  "detail": "The request could not be authorized.",
+  "code": "IAM_ACCESS_DENIED",
+  "path": "/api/documents/1001"
+}
+```
+
+其中 `detail` 是安全的通用文案（默认处理不泄露内部原因）；真正可用于程序判断的是 `code`。`title` 由 HTTP 状态决定。若需把 `code` 映射为业务错误体或补充本地化文案，见[自定义错误处理](/diagnostics/custom-error-handling/)。
 
 ## 管理端点
 
