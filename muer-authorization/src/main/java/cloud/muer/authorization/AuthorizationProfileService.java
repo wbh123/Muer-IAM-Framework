@@ -66,6 +66,15 @@ public final class AuthorizationProfileService {
         versions.increment(replacement.userId());
     }
 
+    /** Creates a profile only after its template version has been published. */
+    public AuthorizationProfile create(AuthorizationProfile profile) {
+        Objects.requireNonNull(profile, "profile must not be null");
+        requirePublishedTemplateVersion(profile.templateVersionId());
+        var created = profiles.create(profile);
+        versions.increment(created.userId());
+        return created;
+    }
+
     public List<AuthorizationProfile> availableFor(IamPrincipal principal) {
         Objects.requireNonNull(principal, "principal must not be null");
         var now = clock.instant();

@@ -20,6 +20,8 @@ public interface IamAuthorizationProfileMapper {
     List<ResourceScope> findScopes(@Param("profileId") long profileId);
     int exists(@Param("profileId") long profileId);
     int insert(@Param("profile") AuthorizationProfile profile, @Param("clientTypesJson") String clientTypesJson);
+    int insertGenerated(@Param("profile") AuthorizationProfile profile, @Param("clientTypesJson") String clientTypesJson);
+    long lastInsertId();
     int update(@Param("profile") AuthorizationProfile profile, @Param("clientTypesJson") String clientTypesJson);
     int deleteScopes(@Param("profileId") long profileId);
     int insertScope(@Param("profileId") long profileId, @Param("scope") ResourceScope scope);

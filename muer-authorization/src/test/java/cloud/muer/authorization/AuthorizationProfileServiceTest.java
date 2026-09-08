@@ -81,6 +81,21 @@ class AuthorizationProfileServiceTest {
     }
 
     @Test
+    void creating_profile_requires_a_published_template_and_increments_version() {
+        var profiles = new InMemoryProfiles();
+        var versions = new InMemoryVersions(Map.of(7L, 4L));
+        var templateVersions = new InMemoryTemplates(
+                new PermissionTemplateVersion(3L, 2L, 1, TemplateVersionStatus.PUBLISHED, Set.of()));
+        var service = new AuthorizationProfileService(profiles, new AuthorizationVersionService(versions),
+                templateVersions, null);
+
+        var created = service.create(profile(33L, 7L, Set.of("WEB"), true, false, null, null));
+
+        assertEquals(33L, created.profileId());
+        assertEquals(5L, versions.currentVersion(7L));
+    }
+
+    @Test
     void replacing_a_template_version_can_publish_a_draft_but_cannot_mutate_a_publication() {
         var repository = new InMemoryTemplates(
                 new PermissionTemplateVersion(9L, 2L, 1, TemplateVersionStatus.DRAFT, Set.of("asset.read")));
@@ -120,6 +135,10 @@ class AuthorizationProfileServiceTest {
         public void save(AuthorizationProfile profile) {
             profiles.removeIf(existing -> existing.profileId() == profile.profileId());
             profiles.add(profile);
+        }
+        public AuthorizationProfile create(AuthorizationProfile profile) {
+            save(profile);
+            return profile;
         }
         public List<AuthorizationProfile> findByUserId(long userId) {
             return profiles.stream().filter(profile -> profile.userId() == userId).toList();

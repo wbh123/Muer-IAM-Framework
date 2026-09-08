@@ -82,6 +82,18 @@
              #{profile.validUntil}, CASE WHEN #{profile.revoked} THEN CURRENT_TIMESTAMP(6) ELSE NULL END)
     </insert>
 
+    <insert id="insertGenerated">
+        INSERT INTO iam_authorization_profile
+            (user_id, template_version_id, profile_key, display_name, client_types,
+             enabled, valid_from, valid_until, revoked_at)
+        VALUES
+            (#{profile.userId}, #{profile.templateVersionId}, #{profile.profileName},
+             #{profile.profileName}, #{clientTypesJson}, #{profile.enabled}, #{profile.validFrom},
+             #{profile.validUntil}, CASE WHEN #{profile.revoked} THEN CURRENT_TIMESTAMP(6) ELSE NULL END)
+    </insert>
+
+    <select id="lastInsertId" resultType="long">SELECT LAST_INSERT_ID()</select>
+
     <update id="update">
         UPDATE iam_authorization_profile
         SET template_version_id = #{profile.templateVersionId},

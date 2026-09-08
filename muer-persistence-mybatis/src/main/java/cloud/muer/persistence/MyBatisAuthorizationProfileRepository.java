@@ -51,6 +51,21 @@ public final class MyBatisAuthorizationProfileRepository implements Authorizatio
         }
     }
 
+    @Override
+    public AuthorizationProfile create(AuthorizationProfile profile) {
+        Objects.requireNonNull(profile, "profile must not be null");
+        try (var session = sessions.openSession(false)) {
+            var mapper = session.getMapper(IamAuthorizationProfileMapper.class);
+            mapper.insertGenerated(profile, clientTypes.encode(profile.clientTypes()));
+            long profileId = mapper.lastInsertId();
+            for (var scope : profile.scopes()) mapper.insertScope(profileId, scope);
+            session.commit();
+            return new AuthorizationProfile(profileId, profile.userId(), profile.profileName(),
+                    profile.templateVersionId(), profile.clientTypes(), profile.enabled(), profile.revoked(),
+                    profile.validFrom(), profile.validUntil(), profile.scopes());
+        }
+    }
+
     private AuthorizationProfile toProfile(IamAuthorizationProfileMapper mapper, AuthorizationProfileRow row) {
         return new AuthorizationProfile(row.profileId(), row.userId(), row.profileName(), row.templateVersionId(),
                 clientTypes.decode(row.clientTypesJson()), row.enabled(), row.revokedAt() != null,
