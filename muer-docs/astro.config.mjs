@@ -31,7 +31,8 @@ export default defineConfig({
         {
           label: '开始使用',
           items: [
-            { label: '15 分钟快速开始', slug: 'getting-started/quick-start' },
+            { label: '10~15 分钟快速开始', slug: 'getting-started/quick-start' },
+            { label: '从零接入 Muer', slug: 'getting-started/from-zero-tutorial' },
             { label: '安装', slug: 'getting-started/installation' },
             { label: '基础配置', slug: 'getting-started/configuration' },
             { label: '定义权限', slug: 'getting-started/define-permissions' },

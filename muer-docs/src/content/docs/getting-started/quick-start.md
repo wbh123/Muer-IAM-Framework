@@ -1,5 +1,5 @@
 ---
-title: 15 分钟快速开始
+title: 10~15 分钟快速开始
 description: 从零创建一个 Spring Boot 应用，接上 Muer，做一个受权限保护的 Document 业务接口，并跑通 200 / 403 与授权诊断。
 sidebar:
   order: 1
@@ -7,7 +7,7 @@ sidebar:
 
 这篇教程不是“能力总览”，而是一套你可以从头照做的**完整业务案例**。它和仓库里的可运行工程
 [`examples/quickstart`](https://github.com/wbh123/Muer-IAM-Framework/tree/main/examples/quickstart)
-一一对应：文档里写的每一段代码，就是这个工程里的真实代码。照着做大约需要 15 分钟，前提是你本机已经装好 Java 21、Maven 和 Docker（Docker 只用于可选地拉起本地 MySQL / Redis）。
+一一对应：文档里写的每一段代码，就是这个工程里的真实代码。照着做大约需要 10~15 分钟，前提是你本机已经装好 Java 21 和 Maven，并准备好 MySQL / Redis；Docker 仅在本机没有这些基础设施时作为可选启动方式。
 
 ## 0. 你最终会得到什么
 

@@ -22,8 +22,8 @@ templateVersionId(Long), clientType, authorizationVersion
 | --- | --- |
 | `userId` | 宿主侧用户标识 |
 | `identityId` / `identityDomain` | 身份标识与身份域（用于跨域校验） |
-| `activeProfileId` | 当前激活的 Profile（可空） |
-| `templateVersionId` | 激活 Profile 对应的模板版本（可空） |
+| `activeProfileId` | 当前激活的 Profile，必须为正数 |
+| `templateVersionId` | 激活 Profile 对应的模板版本，必须为正数 |
 | `clientType` | 登录客户端类型，须匹配 `muer.client-types` |
 | `authorizationVersion` | 授权版本号，用于缓存一致性 |
 
@@ -31,7 +31,7 @@ templateVersionId(Long), clientType, authorizationVersion
 
 - `userId > 0`；
 - `identityId` / `identityDomain` / `clientType` 非空；
-- `activeProfileId` / `templateVersionId` 若非空则必须 `> 0`；
+- `activeProfileId` / `templateVersionId` 必须存在且 `> 0`；
 - `authorizationVersion >= 0`。
 
 ## 示例：登录返回的 principal

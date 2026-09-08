@@ -106,15 +106,15 @@ IdentityAuthenticator identityAuthenticator(UserDirectory users) {
 
 你的用户表除了“能不能登录”，还需要能回答“这个用户当前激活哪个 Profile / 模板版本 / 授权版本”——这正是把旧系统 Role 或“默认权限”投影进 Muer 的关键。
 
-## 六、首次用户没有 Profile 怎么办
+## 六、首次用户如何完成授权 Provisioning
 
-这是最常见的困惑：`IamPrincipal` 要求 `activeProfileId` 与 `templateVersionId` 为正，但新用户第一次登录时还没有 Profile。
+`IamPrincipal` 要求 `activeProfileId` 与 `templateVersionId` 始终为正数。新用户不能带着空 Profile 进入登录流程，宿主应在账号首次允许登录前完成授权 Provisioning。
 
 回答分三件事：
 
 - **Profile 什么时候创建**：Profile（档案）通常由管理员或自助流程创建，用来决定“这个身份默认拥有哪些权限、能访问哪些资源”。它不是登录时随手造的。
 - **IdentityAuthenticator 要不要自己建 Profile**：不要。它的职责是**投影当前存在的授权关系**，而不是在登录路径里并发建 Profile。登录里做写操作会引入竞态与副作用。
-- **生产第一批用户怎么 Provision（预置）**：主流做法是在账号开通流程里，为该用户创建一个指向某 `PUBLISHED` 模板版本 + 默认 Scope 的 Profile，并把 `profileId/templateVersionId` 落到你的用户投影数据上。之后登录时 `IdentityAuthenticator` 只需读取这层关系。
+- **生产第一批用户怎么 Provision（预置）**：通过 [Permission Management](/getting-started/permission-management/) 或受控的 Bootstrap / Management API，为该用户创建一个指向某 `PUBLISHED` 模板版本 + 默认 Scope 的 Profile，并把 `profileId/templateVersionId` 落到你的用户投影数据上。之后登录时 `IdentityAuthenticator` 只需读取这层关系。
 
 推荐的关系链：
 
