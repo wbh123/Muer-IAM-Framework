@@ -27,6 +27,8 @@ function signedIn(session: Partial<StoredSession> = {}) {
       userId: 1,
       identityId: 'identity-1',
       identityDomain: 'D',
+      activeProfileId: 1,
+      templateVersionId: 2,
       clientType: 'WEB',
       authorizationVersion: 1,
     },

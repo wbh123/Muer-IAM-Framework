@@ -35,6 +35,8 @@ describe('UsersView', () => {
         userId: 1,
         identityId: 'i',
         identityDomain: 'D',
+        activeProfileId: 1,
+        templateVersionId: 2,
         clientType: 'WEB',
         authorizationVersion: 1,
       } as never,
