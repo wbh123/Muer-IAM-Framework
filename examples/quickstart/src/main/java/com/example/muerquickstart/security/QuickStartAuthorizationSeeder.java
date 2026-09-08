@@ -65,6 +65,10 @@ final class QuickStartAuthorizationSeeder {
         assertTemplateId(202, "quickstart-document-editor");
         assertProfileId(401, "alice-reader-project-101");
         assertProfileId(402, "alice-editor-project-101");
+        assertTemplateKey("quickstart-document-reader", 201);
+        assertTemplateKey("quickstart-document-editor", 202);
+        assertProfileKey("alice-reader-project-101", 401);
+        assertProfileKey("alice-editor-project-101", 402);
     }
 
     private void assertTemplateId(long id, String expectedKey) {
@@ -78,6 +82,24 @@ final class QuickStartAuthorizationSeeder {
         var keys = jdbc.query("SELECT profile_key FROM iam_authorization_profile WHERE id=?", (rs, row) -> rs.getString(1), id);
         if (!keys.isEmpty() && !expectedKey.equals(keys.getFirst())) {
             throw new IllegalStateException("QuickStart demo profile id " + id + " belongs to another profile");
+        }
+    }
+
+    private void assertTemplateKey(String templateKey, long expectedId) {
+        var ids = jdbc.query("SELECT id FROM iam_permission_template WHERE template_key=?",
+                (rs, row) -> rs.getLong(1), templateKey);
+        if (!ids.isEmpty() && ids.getFirst() != expectedId) {
+            throw new IllegalStateException("QuickStart demo template key " + templateKey
+                    + " belongs to another template");
+        }
+    }
+
+    private void assertProfileKey(String profileKey, long expectedId) {
+        var ids = jdbc.query("SELECT id FROM iam_authorization_profile WHERE profile_key=?",
+                (rs, row) -> rs.getLong(1), profileKey);
+        if (!ids.isEmpty() && ids.getFirst() != expectedId) {
+            throw new IllegalStateException("QuickStart demo profile key " + profileKey
+                    + " belongs to another profile");
         }
     }
 
