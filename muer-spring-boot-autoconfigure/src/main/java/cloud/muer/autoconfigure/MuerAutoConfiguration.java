@@ -182,6 +182,7 @@ public class MuerAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(PermissionTemplateCommandRepository.class)
+    @ConditionalOnBean(SqlSessionFactory.class)
     PermissionTemplateCommandRepository iamPermissionTemplateCommandRepository(SqlSessionFactory sessions) {
         return new MyBatisPermissionTemplateCommandRepository(sessions);
     }
@@ -391,6 +392,7 @@ public class MuerAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
+    @ConditionalOnBean({PermissionTemplateCommandRepository.class, PermissionTemplateVersionRepository.class})
     PermissionTemplateLifecycleService iamPermissionTemplateLifecycleService(
             PermissionTemplateCommandRepository commands, PermissionTemplateVersionRepository versions) {
         return new PermissionTemplateLifecycleService(commands, versions);
@@ -501,7 +503,8 @@ public class MuerAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    @ConditionalOnBean({PermissionTemplateQueryRepository.class, AuthorizationEngine.class})
+    @ConditionalOnBean({PermissionTemplateQueryRepository.class, AuthorizationEngine.class,
+            PermissionTemplateLifecycleService.class})
     IamManagementTemplatesController iamManagementTemplatesController(
             AuthorizationEngine authorization,
             PermissionTemplateQueryRepository templates,
@@ -512,7 +515,7 @@ public class MuerAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     @ConditionalOnBean({AuthorizationProfileQueryRepository.class, UserQueryRepository.class,
-            AuthorizationProfileRepository.class, AuthorizationEngine.class})
+            AuthorizationProfileRepository.class, AuthorizationEngine.class, AuthorizationProfileService.class})
     IamManagementProfilesController iamManagementProfilesController(
             AuthorizationEngine authorization,
             AuthorizationProfileQueryRepository query,

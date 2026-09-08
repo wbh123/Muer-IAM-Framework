@@ -4,6 +4,8 @@ import cloud.muer.authorization.AuthorizationEngine;
 import cloud.muer.authorization.AuthorizationProfileRepository;
 import cloud.muer.authorization.AuthorizationVersionRepository;
 import cloud.muer.authorization.PermissionTemplateVersionRepository;
+import cloud.muer.authorization.PermissionTemplateCommandRepository;
+import cloud.muer.authorization.PermissionTemplateLifecycleService;
 import cloud.muer.authentication.AuthenticationService;
 import cloud.muer.authentication.IdentityAuthenticator;
 import cloud.muer.authentication.LoginRequest;
@@ -23,6 +25,7 @@ import cloud.muer.web.IamSessionController;
 import cloud.muer.persistence.MyBatisAuthorizationProfileRepository;
 import cloud.muer.persistence.MyBatisAuthorizationVersionRepository;
 import cloud.muer.persistence.MyBatisPermissionTemplateVersionRepository;
+import cloud.muer.persistence.MyBatisPermissionTemplateCommandRepository;
 import cloud.muer.persistence.MyBatisSessionRepository;
 import cloud.muer.persistence.RedisTokenStore;
 import cloud.muer.autoconfigure.web.IamAuthorizationInterceptor;
@@ -91,6 +94,15 @@ class MuerAutoConfigurationTest {
                     assertEquals(Duration.ofMinutes(3), properties.getSession().getTouchInterval());
                     assertEquals(java.util.List.of("WEB", "MOBILE"), properties.getClientTypes());
                 });
+    }
+
+    @Test
+    void core_only_context_does_not_create_persistence_bound_template_lifecycle() {
+        contextRunner.run(context -> {
+            assertTrue(context.isRunning());
+            assertFalse(context.containsBean("iamPermissionTemplateCommandRepository"));
+            assertFalse(context.containsBean("iamPermissionTemplateLifecycleService"));
+        });
     }
 
     @Test
@@ -183,11 +195,24 @@ class MuerAutoConfigurationTest {
                             context.getBean(AuthorizationVersionRepository.class).getClass());
                     assertEquals(MyBatisPermissionTemplateVersionRepository.class,
                             context.getBean(PermissionTemplateVersionRepository.class).getClass());
+                    assertEquals(MyBatisPermissionTemplateCommandRepository.class,
+                            context.getBean(PermissionTemplateCommandRepository.class).getClass());
+                    assertNotNull(context.getBean(PermissionTemplateLifecycleService.class));
                     assertEquals(MyBatisSessionRepository.class,
                             context.getBean(SessionRepository.class).getClass());
                     assertEquals(RedisTokenStore.class, context.getBean(TokenStore.class).getClass());
                     assertNotNull(context.getBean(IamAuthenticationController.class));
                 });
+    }
+
+    @Test
+    void host_template_command_repository_suppresses_the_default() {
+        new ApplicationContextRunner()
+                .withUserConfiguration(InfrastructureConfiguration.class, CustomTemplateCommandConfiguration.class)
+                .withConfiguration(org.springframework.boot.autoconfigure.AutoConfigurations.of(MuerAutoConfiguration.class))
+                .withPropertyValues("muer.schema.enabled=false")
+                .run(context -> assertEquals(context.getBean("customTemplateCommandRepository"),
+                        context.getBean(PermissionTemplateCommandRepository.class)));
     }
 
     @Test
@@ -315,6 +340,14 @@ class MuerAutoConfigurationTest {
         @Bean
         IamAuthorizationFailureHandler customFailureHandler() {
             return (request, response, status, failure) -> response.setStatus(status);
+        }
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    static class CustomTemplateCommandConfiguration {
+        @Bean
+        PermissionTemplateCommandRepository customTemplateCommandRepository() {
+            return mock(PermissionTemplateCommandRepository.class);
         }
     }
 }
