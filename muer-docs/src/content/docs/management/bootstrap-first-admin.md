@@ -14,6 +14,27 @@ Muer 的 Management API 自身受 `iam.admin.*` 权限保护。全新数据库�
 
 `MuerAdministrationBootstrapService` 用于打破这一次性的引导闭环。它是 Java Service，不是公开 HTTP 接口，也不会创建宿主账号或凭据。
 
+### Bootstrap 前后的状态
+
+直观地看，Bootstrap 只“补齐”授权投影相关的部分，不碰你的宿主账号：
+
+```text
+执行前                                  执行后
+
+Host User 1001              ✅          Admin Template               ✅
+  （你已有的宿主用户）                    └── 稳定 Key：muer-administrator
+                                          │
+Muer User Projection 1001   ✅          已发布 Template Version      ✅
+  （已通过 saveUser 投影）                 └── iam.admin.* 权限
+                                          │
+Admin Template              ❌          Admin Profile               ✅
+Admin Profile               ❌           ├── userId = 1001（宿主用户）
+                                         ├── IAM_ADMIN/*  READ
+                                         └── IAM_ADMIN/*  WRITE
+```
+
+也就是说：**Bootstrap 之前缺的是“管理员授权投影”，不是“用户”**。执行后，`result` 里带回 `profileId` 与 `templateVersionId`，宿主保存后，下次该用户登录就会以管理员 Profile 进入系统。
+
 ## 前置条件
 
 调用前必须满足：
@@ -42,6 +63,8 @@ accountGovernanceService.saveUser(
 
 `AccountGovernanceService` 是 Muer 的真实公共 Service。宿主仍负责决定何时同步，以及用户名、类型和启用状态来自哪里。
 
+> **saveUser 不是新建一个登录账号。** 它把宿主**已有**的用户投影到 Muer 的 User Projection，使之后的 Profile、Session、Audit 能稳定引用同一个 `userId`。Muer 并不因此维护第二套“能登录”的账号系统——登录仍走宿主身份源（见[身份认证器](/authentication/identity-authenticator/)）。
+
 ## 最小调用
 
 从受控的部署初始化器、迁移后任务或其他仅由宿主触发的 Java 流程调用：
@@ -64,11 +87,13 @@ public final class MuerFirstAdministratorProvisioner {
     public AdministrationBootstrapResult provision(long existingHostUserId) {
         return bootstrapService.bootstrapFirstAdministrator(
             new AdministrationBootstrapRequest(
-                existingHostUserId,
-                Set.of("WEB")));
+                existingHostUserId,   // 已经进入 Muer User Projection 的宿主用户 ID
+                Set.of("WEB")));      // 该管理员允许使用的客户端类型
     }
 }
 ```
+
+`existingHostUserId` 必须是你**已经在第 2 步用 `saveUser` 投影过**的那个正数 `userId`；`Set.of("WEB")` 声明这个管理员 Profile 允许哪些 `clientType` 登录（要与 `muer.client-types` 及其登录方式一致）。
 
 Service 会：
 
@@ -138,3 +163,31 @@ Host User
 之后可通过受保护的 Management API / Console 创建其他 Template、Version 和 Profile。
 
 Bootstrap 保持幂等，因此不要求执行后删除代码；但触发条件必须受宿主控制，不能由匿名网络请求驱动。
+
+## 完成检查
+
+```text
+□ 调用前已把宿主 userId 通过 AccountGovernanceService.saveUser 投影（不是只存在于宿主库）
+□ bootstrapFirstAdministrator(...) 返回，未抛“用户不存在”类异常
+□ 结果里 profileId() 与 templateVersionId() 均为正数，且已保存到宿主的用户授权映射
+□ 同一请求再调一次也不重复建 Template / Version / Profile（幂等）
+□ 用该账号 + 新 Token 能访问一个受 iam.admin.* 保护的 Management API（200）
+□ 生产环境未开启 Quick Start Demo Seeder，也未暴露匿名 /bootstrap HTTP 端点
+```
+
+## 常见错误
+
+| 现象 | 原因与修法 |
+| --- | --- |
+| 调用即失败：目标用户不在 User Projection | 宿主库里没有这个 `userId` 并不够，先 `saveUser` 投影它。见上“Host User ≠ Muer User Projection”。 |
+| 把 Bootstrap 当“建账号”用 | 它不是。登录账号与密码由宿主身份源负责；Bootstrap 只建 Muer 授权投影。 |
+| 管理请求仍 403 | 新 Token 必须由返回正确 `activeProfileId/templateVersionId` 的 `IdentityAuthenticator` 签发；检查是否保存并投影了 Bootstrap 返回的两个 ID。 |
+| 想把 Bootstrap 暴露成匿名 HTTP 端点 | 禁止。触发条件必须由宿主受控流程驱动，不能匿名网络调用。 |
+| 想给更多管理员建 Profile | 用同一个 Bootstrap Service 对不同 `userId` 各调一次，或之后走 Management API / Console。 |
+
+## 下一步
+
+- [第一次使用 Admin Console](/management/first-admin-tutorial/)——有了第一个管理员之后，如何在界面里管理模板/Profile/Scope。
+- [身份认证器](/authentication/identity-authenticator/)——如何把 Bootstrap 结果投影进 `IamPrincipal`。
+- [权限管理](/getting-started/permission-management/)——管理员 Profile 与普通用户 Profile 的关系。
+

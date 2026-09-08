@@ -60,16 +60,20 @@ POST /iam/auth/login
 
 ## 四、最小实现
 
-一个只验证密码、返回固定投影的最小示例（演示用，不要照抄到生产）：
+一个只验证密码、返回固定投影的最小示例（演示用，不要照抄到生产）。
+
+:::note[下面的 `AccountGateway` 是宿主自己的接口]
+`AccountGateway` / `Account` **不是 Muer API**，只是示例里假设你已有的账号查询层。真正要替换成的是你项目里现成的用户服务 / 仓储 / DAO。完整且可直接运行的示例见[从零接入 → 实现 IdentityAuthenticator](/getting-started/from-zero-tutorial/) 里的 `DemoAccountService`，它属于 `examples/quickstart`。
+:::
 
 ```java
 @Bean
-IdentityAuthenticator identityAuthenticator(AccountGateway accounts) {
+IdentityAuthenticator identityAuthenticator(AccountGateway accounts) { // AccountGateway = 宿主示例接口
     return request -> {
         if (!"demo-pass".equals(request.password())) {
             return Optional.empty();
         }
-        Account account = accounts.findByUsername(request.username()).orElse(null);
+        Account account = accounts.findByUsername(request.username()).orElse(null); // 宿主账号查询
         if (account == null) {
             return Optional.empty();
         }
@@ -87,20 +91,24 @@ IdentityAuthenticator identityAuthenticator(AccountGateway accounts) {
 
 ## 五、真实 UserService 接入
 
-生产里不要自己做明文密码校验。让 `IdentityAuthenticator` 委托给你的既有登录服务 / Spring Security 的 `UserDetailsService` / LDAP：
+生产里不要自己做明文密码校验。让 `IdentityAuthenticator` 委托给你的既有登录服务 / Spring Security 的 `UserDetailsService` / LDAP。
+
+:::note[`UserDirectory` 同样是宿主示例接口]
+下面的 `UserDirectory` 不是 Muer API，它代表“你已有的登录校验入口”（例如 `UserDetailsService`、LDAP 客户端、或你自己的 `userService.verify(...)`）。它需要能回答两个问题：账号密码对不对、该用户当前激活哪个 Profile / 模板版本 / 授权版本。
+:::
 
 ```java
 @Bean
-IdentityAuthenticator identityAuthenticator(UserDirectory users) {
+IdentityAuthenticator identityAuthenticator(UserDirectory users) { // UserDirectory = 宿主示例接口
     return request -> users.verify(request.username(), request.password())
             .map(user -> new IamPrincipal(
-                    user.id(),
-                    user.login(),
-                    user.domain(),
-                    user.activeProfileId(),
-                    user.templateVersionId(),
-                    request.clientType(),
-                    user.authorizationVersion()));
+                    user.id(),                 // userId
+                    user.login(),              // identityId
+                    user.domain(),             // identityDomain
+                    user.activeProfileId(),    // activeProfileId（已预置的 Profile）
+                    user.templateVersionId(),  // templateVersionId
+                    request.clientType(),      // clientType（来自 LoginRequest）
+                    user.authorizationVersion())); // authorizationVersion
 }
 ```
 
@@ -128,11 +136,31 @@ IdentityAuthenticator identityAuthenticator(UserDirectory users) {
 
 如果某用户确实“还没有任何 Profile”，通常意味着他登录后也没有任何业务权限——请让投影逻辑返回 `Optional.empty()`（拒绝登录）或让其得到一个“只有基础能力、无业务权限”的 Profile，取决于你的业务约定。别让登录代码替用户“现场发明”权限。
 
-## 七、登录失败怎么排查
+## 完成检查
 
-- 登录直接 401：先确认 `IdentityAuthenticator` 被调用、凭据校验是否通过、`clientType` 是否在 `muer.client-types` 允许列表内精确匹配。
-- 构造 `IamPrincipal` 抛异常：通常是某个字段非法（如 `userId<=0` 或空字符串），应用日志会标明是哪个字段。
-- 更多启动 / 登录 / 403 排查见[排障](/operations/troubleshooting/)。
+接入后逐项核对（用 Quick Start 的 `alice / demo-pass / WEB` 或你自己的测试账号）：
+
+```text
+□ 应用能启动，且无 IdentityAuthenticator / 配置相关报错
+□ POST /iam/auth/login 会真正进入宿主 UserService/DemoAccountService（打断点或看日志确认）
+□ 正确凭据返回 200 并拿到 token
+□ 错误密码 / 不存在用户返回 401（不创建 Session）
+□ GET /iam/auth/me（或 /me）能看到正确的 userId / identityId / identityDomain
+□ 返回的 activeProfileId / templateVersionId 与你预置的 Profile / 模板版本一致
+□ clientType 不在 muer.client-types 时被 Muer 拒绝（而不是你在认证器里拒绝）
+```
+
+## 常见错误
+
+| 现象 | 原因与修法 |
+| --- | --- |
+| 登录永远 401，认证器看起来没被调用 | 确认 Bean 类型是 `IdentityAuthenticator` 且只存在一个；检查日志是否真的进入你的方法。 |
+| 正确凭据也 401 | `clientType` 与 `muer.client-types` 不精确匹配（大小写），或凭据校验逻辑有误。 |
+| 启动抛异常：某个 `IamPrincipal` 字段非法 | 例如 `userId<=0`、空字符串、`activeProfileId` 为 null。日志会指出字段；回头检查 `DemoAccount` 数据。 |
+| 能登录但随后业务 403 | 认证器返回的 `activeProfileId/templateVersionId` 指向的 Profile 未预置或无对应权限，见[权限管理](/getting-started/permission-management/)。 |
+| 在认证器里也写了一份 clientType 允许名单 | 不要重复判断：`muer.client-types` 由 Muer 在登录层统一校验，两处维护会漂移。 |
+
+更多启动 / 登录 / 403 排查见[排障](/operations/troubleshooting/)。
 
 ## 源码
 
