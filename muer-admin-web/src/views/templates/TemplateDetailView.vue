@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue';
 import { useRoute } from 'vue-router';
-import { ElMessage } from 'element-plus';
-import { admin, adminTemplates, notifyError } from '@/api/client';
-import type { PermissionTemplateSummary, PermissionTemplateVersionResponse } from '@/api/generated/api';
+import { ElMessage, ElMessageBox } from 'element-plus';
+import { admin, adminPermissions, adminTemplates, notifyError } from '@/api/client';
+import type { PermissionSummary, PermissionTemplateSummary, PermissionTemplateVersionResponse } from '@/api/generated/api';
 import { useAppStore } from '@/stores/app';
 
 const route = useRoute();
@@ -18,16 +18,48 @@ const editorVisible = ref(false);
 const editingVersion = ref<PermissionTemplateVersionResponse | null>(null);
 const workingPermissions = ref<string[]>([]);
 const editor = reactive({ newPermission: '' });
+const draftVisible = ref(false);
+const draftPermissions = ref<string[]>([]);
+const permissionOptions = ref<PermissionSummary[]>([]);
 
 async function load() {
   loading.value = true;
   try {
     template.value = (await adminTemplates.getPermissionTemplate({ templateId: templateId.value })).data;
     versions.value = (await adminTemplates.listPermissionTemplateVersions({ templateId: templateId.value })).data;
+    permissionOptions.value = (await adminPermissions.listPermissions({ limit: 100 })).data.items ?? [];
   } catch (error) {
     notifyError(error);
   } finally {
     loading.value = false;
+  }
+}
+
+function openDraftCreator() {
+  draftPermissions.value = [];
+  draftVisible.value = true;
+}
+
+async function createDraft() {
+  try {
+    await adminTemplates.createPermissionTemplateVersion({
+      templateId: templateId.value,
+      permissionTemplateVersionCreateRequest: { permissions: new Set(draftPermissions.value) },
+    });
+    ElMessage.success('Draft 版本已创建');
+    draftVisible.value = false;
+    await load();
+  } catch (error) { notifyError(error); }
+}
+
+async function publish(version: PermissionTemplateVersionResponse) {
+  try {
+    await ElMessageBox.confirm('发布后该版本将不可再编辑。', '发布版本', { type: 'warning' });
+    await adminTemplates.publishPermissionTemplateVersion({ versionId: version.versionId });
+    ElMessage.success('版本已发布');
+    await load();
+  } catch (error) {
+    if (error !== 'cancel' && error !== 'close') notifyError(error);
   }
 }
 
@@ -90,7 +122,10 @@ onMounted(load);
     </el-card>
 
     <el-card shadow="never" style="margin-top: 16px">
-      <template #header>版本与权限（版本不可变：PUBLISHED 版本只读）</template>
+      <template #header>
+        <span>版本与权限（版本不可变：PUBLISHED 版本只读）</span>
+        <el-button v-if="appStore.can('iam.admin.template.write')" type="primary" size="small" style="float: right" @click="openDraftCreator">新建版本</el-button>
+      </template>
       <el-table :data="versions" size="small">
         <el-table-column label="Version ID" width="110" prop="versionId" />
         <el-table-column label="Version" width="110" prop="versionNumber" />
@@ -119,10 +154,25 @@ onMounted(load);
             >
               编辑 Draft
             </el-button>
+            <el-button v-if="row.status === 'DRAFT' && appStore.can('iam.admin.template.write')" size="small" link type="success" @click="publish(row)">发布</el-button>
           </template>
         </el-table-column>
       </el-table>
     </el-card>
+
+    <el-dialog v-model="draftVisible" title="新建 Draft 版本" width="560px">
+      <el-form label-width="110px">
+        <el-form-item label="Permissions">
+          <el-select v-model="draftPermissions" multiple filterable style="width: 100%" placeholder="选择已注册权限">
+            <el-option v-for="permission in permissionOptions" :key="permission.permissionCode" :label="permission.permissionCode" :value="permission.permissionCode" />
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="draftVisible = false">取消</el-button>
+        <el-button type="primary" @click="createDraft">创建 Draft</el-button>
+      </template>
+    </el-dialog>
 
     <el-dialog v-model="editorVisible" title="编辑 Draft 权限" width="560px">
       <div v-if="editingVersion">
