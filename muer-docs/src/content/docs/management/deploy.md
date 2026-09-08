@@ -43,8 +43,7 @@ location /iam/ {
 }
 ```
 
-完整的安全清单（HTTPS、CSP、CORS、Token 存储、代理头）见仓库
-`docs/IAM_ADMIN_CONSOLE_DEPLOYMENT.md`。
+生产空库先按[初始化第一个管理员](/management/bootstrap-first-admin/)完成显式授权引导；不要启用演示 Seeder 或公开匿名 Bootstrap Endpoint。
 
 ## 环境变量
 

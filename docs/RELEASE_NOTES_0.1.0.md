@@ -133,7 +133,7 @@ Quick Start 不要求使用大量 `curl` / `jq`，接口示例主要按请求方
 admin-demo / demo-pass / WEB
 ```
 
-该账号不会在生产环境自动创建，Muer 也不提供公开的管理员 Bootstrap HTTP 后门。生产第一个管理员必须通过受控 SQL / Migration / Deployment Seeder 或宿主 Initial Provisioning 建立。
+该账号不会在生产环境自动创建，Muer 也不提供公开的管理员 Bootstrap HTTP 后门。生产第一个管理员由宿主在创建自己的用户后，显式调用 `MuerAdministrationBootstrapService` 建立管理员授权投影；Service 不创建用户名、密码或认证账户。
 
 ## 依赖与运行基线
 

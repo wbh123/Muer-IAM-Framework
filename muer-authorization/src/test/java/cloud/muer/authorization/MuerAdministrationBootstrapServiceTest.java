@@ -41,6 +41,19 @@ class MuerAdministrationBootstrapServiceTest {
                 new AdministrationBootstrapRequest(7L, Set.of("WEB"))));
     }
 
+    @Test
+    void bootstrapping_a_second_user_reuses_template_without_changing_first_user() {
+        var fixture = new Fixture();
+        var first = fixture.service.bootstrapFirstAdministrator(new AdministrationBootstrapRequest(7L, Set.of("WEB")));
+        var second = fixture.service.bootstrapFirstAdministrator(new AdministrationBootstrapRequest(8L, Set.of("WEB")));
+
+        assertEquals(first.templateId(), second.templateId());
+        assertEquals(first.templateVersionId(), second.templateVersionId());
+        assertEquals(2, fixture.profiles.values.size());
+        assertEquals(first.profileId(), fixture.profiles.findByUserId(7L).getFirst().profileId());
+        assertEquals(second.profileId(), fixture.profiles.findByUserId(8L).getFirst().profileId());
+    }
+
     private static final class Fixture {
         final Versions versions = new Versions(); final Templates templates = new Templates(versions); final Profiles profiles = new Profiles();
         final MuerAdministrationBootstrapService service;
@@ -51,7 +64,7 @@ class MuerAdministrationBootstrapServiceTest {
         }
     }
     private static final class Users implements IamUserRepository {
-        public Optional<IamUser> findById(long id) { return id == 7 ? Optional.of(new IamUser(7, "admin", "HOST", true, 0)) : Optional.empty(); }
+        public Optional<IamUser> findById(long id) { return id == 7 || id == 8 ? Optional.of(new IamUser(id, "admin-" + id, "HOST", true, 0)) : Optional.empty(); }
         public List<IamUser> findPage(long after, int limit) { return List.of(); } public void save(IamUser user) { }
     }
     private static final class Templates implements PermissionTemplateCommandRepository {

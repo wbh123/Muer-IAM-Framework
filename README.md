@@ -212,7 +212,7 @@ password: demo-pass
 clientType: WEB
 ```
 
-生产环境不会自动创建该账号，也不存在公开的管理员 Bootstrap HTTP 后门。
+生产环境不会自动创建该账号，也不存在公开的管理员 Bootstrap HTTP 后门。宿主应在创建自己的首个用户后显式调用 `MuerAdministrationBootstrapService`，幂等建立管理员 Template、PUBLISHED Version 与 Profile。
 
 前端启动：
 
@@ -223,7 +223,7 @@ npm run api:generate
 npm run dev
 ```
 
-完整 Nginx、首个生产管理员与安全配置见 [Muer Admin Console Deployment](docs/IAM_ADMIN_CONSOLE_DEPLOYMENT.md)。
+部署入口见 [Muer Admin Console Deployment](docs/IAM_ADMIN_CONSOLE_DEPLOYMENT.md)，首个生产管理员的最终说明位于 [`muer-docs` Bootstrap 页面](muer-docs/src/content/docs/management/bootstrap-first-admin.md)。
 
 ## Runtime observability
 

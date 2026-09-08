@@ -117,6 +117,7 @@ export default defineConfig({
           label: '管理控制台',
           items: [
             { label: 'Muer Admin Console', slug: 'management/console' },
+            { label: '初始化第一个管理员', slug: 'management/bootstrap-first-admin' },
             { label: '第一次使用管理控制台', slug: 'management/first-admin-tutorial' },
             { label: '安装与部署', slug: 'management/deploy' },
           ],

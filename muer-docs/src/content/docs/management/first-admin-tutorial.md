@@ -1,177 +1,112 @@
 ---
 title: 第一次使用 Muer Admin Console
-description: 登录管理控制台，用真实界面查看 Permission、Template、Profile 与 Scope，并理解 0.1.0 下哪些配置在界面上完成、哪些要用 Seeder 或 Management API。
+description: 按当前界面创建 Template、Version 与 Profile，并维护 Scope。
 ---
 
-这篇教程带你走一遍 Muer Admin Console 的真实界面，目标不是“点完能创建所有东西”，而是让你第一次就搞懂**哪些是开发者用代码声明的、哪些是管理员用界面/API 配置的**，以及当前 0.1.0 版 Console 到底能做什么、不能做什么。
+本页按当前 0.1.0 Console 的真实能力操作。生产空库请先完成[第一个管理员 Bootstrap](/management/bootstrap-first-admin/)；开发演示也可以使用 `muer-example` 的 dev-only 管理员。
 
-在开始前，建议先完成[15 分钟快速开始](/getting-started/quick-start/)，那里的 `document:read` / `document:update` 与 Profile 401 / 402 就是本教程操作的对象。
-
-## 0. 先建立正确心智
-
-Muer 把“权限”这件事分成两层，**这两层分别由不同的人负责**：
+## 1. 权限与配置的分工
 
 ```text
-开发者（代码）                    管理员（配置）
-PermissionDefinitionProvider      Permission Template
-  → document:read                   → Template Version（含权限集合）
-  → document:update                 → Profile（绑定 Version）
-                                    → Scope（资源范围）
+开发者代码                         管理员 Console
+PermissionDefinitionProvider       创建 Permission Template
+  → document:read                    → 创建 DRAFT Version
+  → document:update                  → 选择 Permission 并发布
+                                      → 创建 Profile 并绑定 Version
+                                      → 创建和维护 Scope
 ```
 
-- **Permission** 是开发者用 `PermissionDefinitionProvider` 在代码里声明的“能力清单”。管理员**不会也不该**在界面上新建 `document:read` 这种权限。
-- **Template / Template Version / Profile / Scope** 是管理员配置的“谁、通过哪个版本、在哪个范围内拥有哪些能力”。
+Permission 页面只读，因为业务 Permission 必须由开发者在代码中声明。Template、Version、Profile 与 Scope 才是管理员维护的授权投影。
 
-记住这一点，就不会在 Console 里找不到“新建权限”按钮而困惑——那个按钮本来就不存在。
+## 2. 启动并登录
 
-## 1. 前置：启动带 Admin 演示账号的宿主应用
-
-Admin Console 是一个独立的前端，它操作的数据在宿主应用里。开发演示用的是 `muer-example` 应用 + `muer-admin-web` 前端。
-
-**第 1 步：启动 `muer-example`，并开启 Admin 演示账号。**
-
-```bash
-export SPRING_PROFILES_ACTIVE=dev
-export MUER_EXAMPLE_SEED_ADMIN=true        # 关键：才会创建 admin-demo 账号
-export MUER_EXAMPLE_SEED_DEMO=true         # 附带 alice / Reader / Editor 演示数据
-mvn -pl muer-example spring-boot:run
-```
-
-> `MUER_EXAMPLE_SEED_ADMIN=true` 会创建**仅限 dev 演示**的账号 `admin-demo / demo-pass`。生产与普通 dev 都不会自动存在该账号。
-
-**第 2 步：启动 Admin Console 前端。**
+Console 是独立静态前端，后端由宿主应用提供：
 
 ```bash
 cd muer-admin-web
 npm ci
-npm run dev        # 默认 http://localhost:5173
+npm run dev
 ```
 
-在浏览器打开 `http://localhost:5173`。
+默认打开 `http://localhost:5173`。使用宿主系统已有、并已通过 Bootstrap 获得 `iam.admin.*` 的账号登录。
 
-**完成检查**
+仅做仓库本地演示时，可以按 `muer-example` 自身说明开启 `dev` Seeder，使用 `admin-demo / demo-pass / WEB`。这不是生产 Bootstrap，也不会成为默认生产账号。
 
-- [ ] `muer-example` 启动成功；
-- [ ] `http://localhost:5173` 能看到登录页。
+## 3. 查看 Permission Registry
 
-## 2. 登录
+打开 **Permissions**，确认宿主 `PermissionDefinitionProvider` 注册的 Permission，例如 `document:read`、`document:update` 与 `iam.admin.*`。
 
-Console 登录页与业务登录同源：它用 `POST /iam/auth/login` 换取 Bearer Token，存进浏览器 Session。
+这里没有新建或删除 Permission 的按钮。缺少 Permission 时应修正宿主 Provider 并重启应用，而不是写数据库。
 
-**现在做：** 在登录页输入
+## 4. 创建 Template
 
-```text
-用户名  admin-demo
-密码    demo-pass
-```
+打开 **Templates**，点击 **新建模板**，填写：
 
-登录后默认落在**运营概览（Dashboard）**。
+- `Template Key`：稳定、唯一的业务 Key；
+- `Name`：管理员可读名称；
+- `Description`：可选说明。
 
-> 左侧菜单出现哪些页，取决于 `admin-demo` 的 Profile（405）里 `iam.admin.*` 权限。看不到某页通常是权限不足，而不是故障。
+创建成功后 Console 会进入 Template 详情页。
 
-**完成检查**
+## 5. 创建并发布 Version
 
-- [ ] 登录成功，进入 Dashboard。
+在 Template 详情点击 **新建版本**：
 
-## 3. 查看 Permission（只读，印证“代码声明”）
+1. 从 Permission Registry 多选该版本包含的 Permission；
+2. 创建 DRAFT；
+3. DRAFT 阶段可继续编辑 Permission；
+4. 核对无误后点击 **发布** 并确认。
 
-左侧点 **Permissions**。你会看到一行行 Permission Code，例如 `document:read`、`document:update`，还有 `iam.admin.*` 那一批。
+发布后 Version 不可变，Console 也会只读展示。后续变更应创建新 DRAFT，而不是修改已发布版本。
 
-这里**没有“新建/删除权限”的按钮**，这是设计如此：
+## 6. 创建 Profile
 
-- 权限来自宿主应用的 `PermissionDefinitionProvider` 代码；
-- Console 只负责**展示**开发者声明的能力及其使用情况。
+打开 **Profiles**，点击 **新建 Profile**，选择或填写：
 
-**如果你在界面里找不到某个权限**，回到宿主代码，确认它有没有通过 Provider 声明、应用是否重新启动过。
+- User：来自当前宿主用户列表；
+- Profile Name；
+- Published Version：只能选择已发布版本；
+- Client Types；
+- Enabled；
+- 可选的初始 Resource Scopes。
 
-**完成检查**
+提交后 Profile 会绑定选中的 PUBLISHED Template Version。Console 当前支持从零创建 Profile，不需要 Seeder 或手写 SQL。
 
-- [ ] 你能在 Permissions 里看到 `document:read` / `document:update`。
+## 7. 查看和编辑 Profile
 
-## 4. 查看 Template 与其 Version
+进入 Profile 详情可以看到：
 
-左侧点 **Templates**，能看到模板列表（名称、Key、最新版本状态）。
+- User ID 与绑定的 Template Version；
+- Client Types、Enabled 与有效时间；
+- Resource Scopes；
+- 由 Template Version 计算出的 Effective Permissions。
 
-点进任一模板进 **Template 详情**，会看到：
+持有 `iam.admin.profile.write` 时，可以编辑 Client Types、Enabled、有效时间和 Scope。Scope 编辑器支持添加/删除 `Type / Reference ID / Access` 行。
 
-- 模板字段（Template ID / Key / Name / Enabled / Description）；
-- **版本与权限**表：每行是一个 Template Version，含 Version Number、Status（`DRAFT` / `PUBLISHED` / `RETIRED`）、以及该版本包含的权限 Code。
+当前 Profile 详情编辑器**不能把已有 Profile 切换到另一个 Template Version**。需要版本升级时使用 Management API 或创建新的 Profile；不要直接改表。
 
-关键规则（界面上已注明）：**版本不可变，PUBLISHED 版本只读**。
+## 8. 验证授权结果
 
-- 如果某行版本是 `DRAFT`，且有 `iam.admin.template.write` 权限，会看到 **「编辑 Draft」** 按钮；
-- 点击后可在一个对话框里**增删该 Draft 版本的权限 Code**，然后点「保存」把 Draft 更新回服务端。
+让目标用户重新登录获得与当前授权投影一致的新 Token，然后验证：
 
-> 当前 0.1.0 Console **不支持**：从零新建一个 Template、新建一个 Version、或把一个 DRAFT 版本「发布」为 PUBLISHED。这些能力在 Console 里没有对应按钮。
+1. 一个应允许的业务请求返回 `200`；
+2. 一个缺 Permission 或 Scope 的请求返回 `403`；
+3. Diagnostics 能解释拒绝步骤；
+4. 审计页能看到对应管理操作。
 
-**完成检查**
+## 9. 当前 Console 能力清单
 
-- [ ] 你能在 `muer-example` 的 QuickStart 数据里看到 Template 201 / 202 及 Version 301 / 302；
-- [ ] 你能分清 `DRAFT` 可编辑、`PUBLISHED` 只读。
+| 能力 | 当前状态 |
+| --- | --- |
+| 查看 Permission Registry | 支持，只读 |
+| 创建 Template | 支持 |
+| 创建 DRAFT Version | 支持 |
+| 编辑 DRAFT Permission | 支持 |
+| 发布 Version | 支持 |
+| 修改 PUBLISHED Version | 不支持，设计上不可变 |
+| 创建 Profile 并绑定 PUBLISHED Version | 支持 |
+| 编辑 Profile 属性与 Scope | 支持 |
+| 切换已有 Profile 的 Template Version | 当前详情页不支持 |
+| 查看/撤销 Session、查看 Audit、运行 Diagnostics | 支持，取决于管理员权限 |
 
-## 5. 查看 Profile 与其绑定的 Version
-
-左侧点 **Profiles**，列表支持按用户 ID、Enabled、Revoked、Client Type 过滤。你会看到 QuickStart 的 Profile 401（Alice Reader）与 402（Alice Editor）。
-
-点进一个 Profile 进 **Profile 详情**，会看到：
-
-- 基本信息：Profile ID、User ID、Profile Name、绑定的 **Template Version**、Client Types、Enabled、Valid From / Until；
-- 左栏 **Resource Scopes**：该 Profile 的资源范围行（Scope Type / Scope Ref ID / Access Mode）；
-- 右栏 **Effective Permissions**：由绑定的 Template Version 计算出的最终权限 Code。
-
-**完成检查**
-
-- [ ] 打开 Profile 401，能看到它绑定 Version 301，Scope 为 `PROJECT / 101 / READ`，有效权限只有 `document:read`。
-
-## 6. 编辑 Profile 与 Resource Scope（0.1.0 界面真实支持的写操作）
-
-在 Profile 详情页，若你持有 `iam.admin.profile.write`，会出现两个按钮：
-
-- **编辑 Profile**：可改 Client Types、Enabled、Valid From / Valid Until，然后「保存」；
-- **编辑 Resource Scope**：以表格形式列出当前 Scope，可**添加一行 / 删除一行**，每行填 `Type`（如 `PROJECT`）、`Reference ID`（如 `101`）、`Access`（`READ` / `WRITE`），然后「保存」。
-
-例如给 Alice Reader 增加对 Project 202 的读权限，就在 Scope 编辑器里加一行 `PROJECT / 202 / READ` 后保存。
-
-> 注意：**Profile 详情里不能改它绑定的 Template Version**（编辑表单没有该字段）。要改变一个 Profile 引用的版本，需在别处（Seeder / Management API / 数据层）完成——当前 0.1.0 Console 不提供此操作。
-
-**完成检查**
-
-- [ ] 你能在 Profile 402 的 Scope 编辑器里看到 `PROJECT/101/READ` 与 `PROJECT/101/WRITE` 两行。
-
-## 7. 让 alice 得到 / 改变权限的现实路径
-
-到这一步你就明白了：**0.1.0 Console 是“查看 + 有限编辑”工具，不是“从零搭建授权”的构造器。** 如果你要从空库把 alice 配置成 Reader / Editor，当前版本的现实路径是：
-
-1. **先有 Permission**：由宿主代码声明（本教程 §3）；
-2. **先有 Template + PUBLISHED Version**：Console 不能新建/发布 → 用 QuickStart Seeder（`MUER_EXAMPLE_SEED_DEMO=true` 或 `examples/quickstart` 的 Seeder）一次性建好 201/301、202/302；
-3. **建 Profile 并绑定 Version**：Console 不能新建 Profile → Seeder / Management API 建 401 / 402；
-4. **加 / 改 Scope**：这里 **Console 可以做**——在 Profile 详情「编辑 Resource Scope」里增删行并保存（对应 `PUT /iam/admin/profiles/{profileId}/scopes`）；
-5. **alice 重新登录**：拿新 Token 验证权限变化。
-
-如果你要走的正是这篇的 QuickStart 场景，最快的是直接跑 QuickStart Seeder 拿到 401/402，再用 Console 的 Profile / Scope 编辑体验“改一下 scope 看结果”。
-
-> 本教程不展开 Management API 的请求细节；需要时参考 [HTTP API](/reference/http-api/) 与 [Management API 相关页](/management/console/)。
-
-**完成检查**
-
-- [ ] 你能说清：Console 里能做的是“编辑 DRAFT 版本权限、编辑 Profile 的 client/enabled、编辑 Profile 的 Scope”；
-- [ ] 你能说清：Console 里不能做的是“新建 Template / 发布 Version / 新建 Profile / 改 Profile 绑定版本”，这些在 0.1.0 走 Seeder 或 Management API。
-
-## 8. 其它页面速览
-
-- **Users / User Detail**：查看用户与 Identity，展示授权版本号。
-- **Sessions**：查看会话，可撤销（`iam.admin.session.revoke`）。
-- **Audit**：审计事件（登录、授权、Session 变更等）。
-- **Diagnostics**：对**当前登录的管理员**跑一次授权诊断（与管理面资源类型相关），用于排查 Console 自身某页为何打不开。
-
-## 9. 你现在学会了什么
-
-```text
-Permission  = 开发者代码声明（只读列表）
-Template/Version = 管理员配置（0.1.0 Console 只能改 DRAFT 版本的权限）
-Profile     = 管理员配置（0.1.0 Console 能编辑属性，不能改绑定版本）
-Scope       = 管理员配置（0.1.0 Console 能增删行并保存）
-从空库搭建授权 = 0.1.0 走 Seeder / Management API
-```
-
-用 Console 排查 403 的闭环见[排障](/operations/troubleshooting/)，接口细节见 [HTTP API](/reference/http-api/)。
+所有按钮与路由守卫只改善体验；真正的安全边界始终是后端对 `/iam/admin/**` 的 `iam.admin.*` 校验。

@@ -33,8 +33,8 @@ IAM Spring Boot Starter
 | 概览 | `/dashboard` | 轻量运营计数 + 最近审计事件 |
 | 用户 | `/users`、`/users/:id` | 搜索/过滤、启停、详情 Tabs（Identity/Profile/Session/Audit） |
 | Permission | `/permissions` | Permission Explorer：registry + 使用计数 |
-| Permission Template | `/templates`、`/templates/:id` | 模板/版本/权限查看；仅 DRAFT 可编辑 |
-| Profile | `/profiles`、`/profiles/:id` | 筛选、编辑、Scope 管理、Effective Permissions 只读展示 |
+| Permission Template | `/templates`、`/templates/:id` | 创建模板与 DRAFT Version、编辑 DRAFT Permission、发布 Version；PUBLISHED 只读 |
+| Profile | `/profiles`、`/profiles/:id` | 创建并绑定 PUBLISHED Version、筛选、属性与 Scope 管理、Effective Permissions 只读展示 |
 | Session | `/sessions` | 跨用户 Session 查询与强制撤销（仅状态，无 token） |
 | Audit | `/audit` | 只读审计搜索与详情 Drawer |
 | Diagnostics | `/diagnostics` | Authorization Playground：逐步决策诊断 |
@@ -71,7 +71,7 @@ npm run dev
 打开 Vite 输出的地址，通常是 `http://localhost:5173`。
 
 :::caution[仅用于开发演示]
-`admin-demo / demo-pass` 不会在生产环境自动创建。生产第一个管理员必须通过受控 SQL、migration、deployment seeder 或宿主 initial provisioning 创建。
+`admin-demo / demo-pass` 不会在生产环境自动创建。生产第一个管理员由宿主显式调用 `MuerAdministrationBootstrapService` 创建授权投影，详见[初始化第一个管理员](/management/bootstrap-first-admin/)。
 :::
 
 ## 建议手工验收
@@ -86,7 +86,7 @@ npm run dev
 6. 缺少某项 `iam.admin.*` Capability 时，对应路由进入 403，同时后端接口也拒绝访问；
 7. Logout 调用后端登出并清理浏览器会话。
 
-详细部署和生产初始化见 [Admin Console 部署指南](https://github.com/wbh123/Muer-IAM-Framework/blob/main/docs/IAM_ADMIN_CONSOLE_DEPLOYMENT.md)。
+详细操作见[第一次使用管理控制台](/management/first-admin-tutorial/)，部署见[安装与部署](/management/deploy/)。
 
 ## 权限模型（IAM 管理 IAM）
 

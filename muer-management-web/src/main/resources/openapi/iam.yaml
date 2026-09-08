@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: Generic IAM Management API
+  title: Muer IAM Management API
   version: 0.1.0
 servers:
   - url: /
