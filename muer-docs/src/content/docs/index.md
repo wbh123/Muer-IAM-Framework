@@ -4,7 +4,7 @@ description: Muer 为现代业务系统提供统一身份、认证、授权、�
 hero:
   tagline: 让身份能力，在每个系统中自然生长。Muer 为现代业务系统提供统一身份、认证、授权、会话、审计与诊断能力，同时保持清晰、可组合的接入边界。
   actions:
-    - text: 快速开始
+    - text: 15 分钟快速开始
       link: /getting-started/quick-start/
       icon: right-arrow
       variant: primary
@@ -19,7 +19,7 @@ template: splash
 Muer Identity 是面向现代业务系统的轻量 IAM 框架，让统一身份、认证、授权、会话、审计与诊断能力自然融入已有应用。
 
 - Muer **不拥有**宿主的账号、密码或业务数据，它只回答三件事：谁是当前用户、能执行哪些权限、能访问哪些资源范围。
-- 宿主通过少量 SPI（`IdentityAuthenticator`、`ResourceHierarchyProvider`、`MvcResourceDescriptorResolver`）把自己的用户源与业务资源映射进来。
+- 宿主通过少量 SPI（`IdentityAuthenticator`、`PermissionDefinitionProvider`、`ResourceHierarchyProvider`、`MvcResourceDescriptorResolver`）把自己的用户源与业务资源映射进来。
 - 版本为 `0.1.0-SNAPSHOT`（Release Candidate），**尚未发布到 Maven Central**。
 
 ## 核心能力
@@ -53,7 +53,8 @@ public Document get(@PathVariable String id) {
 
 ## 从这里开始
 
-- 🚀 **第一次使用**：想立刻上手？阅读[快速开始](/getting-started/quick-start/)，用真实 HTTP 请求走通完整链路。
+- 🚀 **第一次使用**：想立刻上手？阅读[15 分钟快速开始](/getting-started/quick-start/)，用真实 HTTP 请求走通完整链路。
+- 📦 **完整可运行示例**：想要一份对照源码？直接看 GitHub 的 [`examples/quickstart`](https://github.com/wbh123/Muer-IAM-Framework/tree/main/examples/quickstart)——它与快速开始教程一一对应，`mvn test` 即可验证。
 - 🔌 **接入已有系统**：已经有自己的用户表 / Role / 部门数据？看[已有系统接入](/migration/overview/)，通过 `IdentityAuthenticator`、Permission Provider 与 Resolver 映射进来。
 - 🛡️ **管理权限**：用 Template / Profile / Scope 决定"谁拥有什么"？看[权限管理](/getting-started/permission-management/)与[管理控制台](/management/console/)。
 - 🚢 **准备上线**：要部署并做健康检查？看[手动部署](/getting-started/manual-deployment/)、[可观测性](/operations/observability/)与[生产检查清单](/operations/production-checklist/)。

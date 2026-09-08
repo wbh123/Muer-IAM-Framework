@@ -29,9 +29,9 @@ export default defineConfig({
           ],
         },
         {
-          label: '从这里开始',
+          label: '开始使用',
           items: [
-            { label: '快速开始', slug: 'getting-started/quick-start' },
+            { label: '15 分钟快速开始', slug: 'getting-started/quick-start' },
             { label: '安装', slug: 'getting-started/installation' },
             { label: '基础配置', slug: 'getting-started/configuration' },
             { label: '定义权限', slug: 'getting-started/define-permissions' },
@@ -115,7 +115,8 @@ export default defineConfig({
         {
           label: '管理控制台',
           items: [
-            { label: 'Management Console', slug: 'management/console' },
+            { label: 'Muer Admin Console', slug: 'management/console' },
+            { label: '第一次使用管理控制台', slug: 'management/first-admin-tutorial' },
             { label: '安装与部署', slug: 'management/deploy' },
           ],
         },
