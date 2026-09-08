@@ -9,9 +9,33 @@ Muer 提供三类互补能力：管理控制台用于治理状态与审计，Act
 
 当宿主应用引入 Spring Boot Health / Actuator 类库时，Starter 提供 `muerHealthIndicator`。它返回 `UP` 和 `enabled: true`，仅表示框架已装配；不会探测 MySQL、Redis 或外部身份源。基础设施健康应由宿主应用各自的健康贡献者负责。
 
+### 从零启用 Actuator
+
+Actuator 是可选依赖，Muer Starter 不会强制引入。先在宿主应用添加：
+
+```xml
+<dependency>
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-starter-actuator</artifactId>
+</dependency>
+```
+
+启动应用后，将 `health`、`metrics`（以及需要 Prometheus 时的 `prometheus`）加入
+`management.endpoints.web.exposure.include`，再访问 `GET /actuator/health`。版本由 Spring Boot
+Dependency Management 统一管理，不要在示例中手工固定版本。
+
 ## Micrometer 指标
 
 当运行时存在 `MeterRegistry` 时，Starter 自动注册指标适配器；没有注册表时使用无操作实现，不要求额外配置，也不影响认证、授权或会话行为。
+
+需要 Prometheus 格式时，再添加：
+
+```xml
+<dependency>
+  <groupId>io.micrometer</groupId>
+  <artifactId>micrometer-registry-prometheus</artifactId>
+</dependency>
+```
 
 | 名称 | 类型 | 标签 |
 | --- | --- | --- |
