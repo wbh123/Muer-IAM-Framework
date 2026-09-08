@@ -9,21 +9,21 @@
 
 | 用途 | 类型 | 源码位置 |
 | --- | --- | --- |
-| 登录凭据校验 | `IdentityAuthenticator` | `muer-authentication/src/main/java/io/github/muer/authentication/IdentityAuthenticator.java` |
-| 应用权限声明 | `PermissionDefinition`、`PermissionDefinitionProvider` | `muer-authorization/src/main/java/io/github/muer/authorization/` |
-| 已认证主体 | `IamPrincipal` | `muer-core/src/main/java/io/github/muer/core/model/IamPrincipal.java` |
-| 资源范围关系 | `ResourceHierarchyProvider`、`ResourceDescriptor`、`ResourceScope` | `muer-core/src/main/java/io/github/muer/core/port/ResourceHierarchyProvider.java` |
-| 授权请求与决定 | `AuthorizationEngine`、`AuthorizationRequest`、`AuthorizationDecision` | `muer-authorization/src/main/java/io/github/muer/authorization/AuthorizationEngine.java` |
-| 额外策略 | `AuthorizationPolicy`、`AuthorizationPolicyResult` | `muer-authorization/src/main/java/io/github/muer/authorization/AuthorizationPolicy.java` |
-| MVC 声明式检查 | `@RequirePermission`、`MvcResourceDescriptorResolver` | `muer-spring-boot-autoconfigure/src/main/java/io/github/muer/autoconfigure/web/RequirePermission.java` |
-| MVC 失败信封替换 | `IamAuthorizationFailureHandler` | `muer-spring-boot-autoconfigure/src/main/java/io/github/muer/autoconfigure/web/IamAuthorizationFailureHandler.java` |
-| 认证与会话模型 | `AuthenticationResult`、`AuthSession`、`TokenRecord` | `muer-authentication/src/main/java/io/github/muer/authentication/AuthenticationResult.java` |
-| profile 与模板模型 | `AuthorizationProfile`、`PermissionTemplateVersion`、`TemplateVersionStatus` | `muer-authorization/src/main/java/io/github/muer/authorization/AuthorizationProfile.java` |
-| 审计模型 | `AuditRecord`、`AuditSubjectLink`、`AuditSubjectRelation` | `muer-audit/src/main/java/io/github/muer/audit/AuditRecord.java` |
-| 管理读侧 SPI（Admin Console） | `UserQueryRepository`、`OverviewRepository` | `muer-core/src/main/java/io/github/muer/core/port/UserQueryRepository.java` |
-| 管理读侧 SPI（Admin Console） | `AuthorizationProfileQueryRepository`、`PermissionTemplateQueryRepository`、`PermissionTemplate`、`PermissionSummary` | `muer-authorization/src/main/java/io/github/muer/authorization/` |
-| 管理读侧 SPI（Admin Console） | `SessionQueryRepository` | `muer-session/src/main/java/io/github/muer/session/SessionQueryRepository.java` |
-| 管理读侧 SPI（Admin Console） | `AuditQueryRepository`、`AuditEvent`、`AuditEventFilter`、`AuditEventPage` | `muer-audit/src/main/java/io/github/muer/audit/` |
+| 登录凭据校验 | `IdentityAuthenticator` | `muer-authentication/src/main/java/cloud/muer/authentication/IdentityAuthenticator.java` |
+| 应用权限声明 | `PermissionDefinition`、`PermissionDefinitionProvider` | `muer-authorization/src/main/java/cloud/muer/authorization/` |
+| 已认证主体 | `IamPrincipal` | `muer-core/src/main/java/cloud/muer/core/model/IamPrincipal.java` |
+| 资源范围关系 | `ResourceHierarchyProvider`、`ResourceDescriptor`、`ResourceScope` | `muer-core/src/main/java/cloud/muer/core/port/ResourceHierarchyProvider.java` |
+| 授权请求与决定 | `AuthorizationEngine`、`AuthorizationRequest`、`AuthorizationDecision` | `muer-authorization/src/main/java/cloud/muer/authorization/AuthorizationEngine.java` |
+| 额外策略 | `AuthorizationPolicy`、`AuthorizationPolicyResult` | `muer-authorization/src/main/java/cloud/muer/authorization/AuthorizationPolicy.java` |
+| MVC 声明式检查 | `@RequirePermission`、`MvcResourceDescriptorResolver` | `muer-spring-boot-autoconfigure/src/main/java/cloud/muer/autoconfigure/web/RequirePermission.java` |
+| MVC 失败信封替换 | `IamAuthorizationFailureHandler` | `muer-spring-boot-autoconfigure/src/main/java/cloud/muer/autoconfigure/web/IamAuthorizationFailureHandler.java` |
+| 认证与会话模型 | `AuthenticationResult`、`AuthSession`、`TokenRecord` | `muer-authentication/src/main/java/cloud/muer/authentication/AuthenticationResult.java` |
+| profile 与模板模型 | `AuthorizationProfile`、`PermissionTemplateVersion`、`TemplateVersionStatus` | `muer-authorization/src/main/java/cloud/muer/authorization/AuthorizationProfile.java` |
+| 审计模型 | `AuditRecord`、`AuditSubjectLink`、`AuditSubjectRelation` | `muer-audit/src/main/java/cloud/muer/audit/AuditRecord.java` |
+| 管理读侧 SPI（Admin Console） | `UserQueryRepository`、`OverviewRepository` | `muer-core/src/main/java/cloud/muer/core/port/UserQueryRepository.java` |
+| 管理读侧 SPI（Admin Console） | `AuthorizationProfileQueryRepository`、`PermissionTemplateQueryRepository`、`PermissionTemplate`、`PermissionSummary` | `muer-authorization/src/main/java/cloud/muer/authorization/` |
+| 管理读侧 SPI（Admin Console） | `SessionQueryRepository` | `muer-session/src/main/java/cloud/muer/session/SessionQueryRepository.java` |
+| 管理读侧 SPI（Admin Console） | `AuditQueryRepository`、`AuditEvent`、`AuditEventFilter`、`AuditEventPage` | `muer-audit/src/main/java/cloud/muer/audit/` |
 
 管理查询 SPI 与既有可写 port 相互独立：自行实现持久化的宿主无需修改既有 port 实现，
 只需在需要管理读能力时提供上述新 SPI 的 bean（默认 MyBatis 实现使用同一个
@@ -51,7 +51,7 @@
 ## 配置
 
 配置前缀是 `muer`，源码为
-`muer-spring-boot-autoconfigure/src/main/java/io/github/muer/autoconfigure/MuerProperties.java`。
+`muer-spring-boot-autoconfigure/src/main/java/cloud/muer/autoconfigure/MuerProperties.java`。
 
 | 属性 | 默认值 | 说明与约束 |
 | --- | --- | --- |

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="io.github.muer.persistence.mapper.IamSessionMapper">
-    <resultMap id="authSession" type="io.github.muer.session.AuthSession">
+<mapper namespace="cloud.muer.persistence.mapper.IamSessionMapper">
+    <resultMap id="authSession" type="cloud.muer.session.AuthSession">
         <constructor>
             <arg column="session_id" javaType="java.lang.String"/>
             <arg column="user_id" javaType="_long"/>

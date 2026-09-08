@@ -1,12 +1,12 @@
 spring:
   datasource:
-    url: ${IAM_EXAMPLE_JDBC_URL:jdbc:mysql://localhost:3306/iam_example}
-    username: ${IAM_EXAMPLE_DB_USERNAME:iam}
-    password: ${IAM_EXAMPLE_DB_PASSWORD:iam-secret}
+    url: ${MUER_EXAMPLE_JDBC_URL:jdbc:mysql://localhost:3306/iam_example}
+    username: ${MUER_EXAMPLE_DB_USERNAME:iam}
+    password: ${MUER_EXAMPLE_DB_PASSWORD:iam-secret}
   data:
     redis:
-      host: ${IAM_EXAMPLE_REDIS_HOST:localhost}
-      port: ${IAM_EXAMPLE_REDIS_PORT:6379}
+      host: ${MUER_EXAMPLE_REDIS_HOST:localhost}
+      port: ${MUER_EXAMPLE_REDIS_PORT:6379}
 
 muer:
   enabled: true

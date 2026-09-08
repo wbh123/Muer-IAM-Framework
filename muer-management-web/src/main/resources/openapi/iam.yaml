@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: Generic IAM Management API
+  title: Muer IAM Management API
   version: 0.1.0
 servers:
   - url: /
@@ -498,6 +498,23 @@ paths:
               schema: {$ref: '#/components/schemas/PermissionTemplateListResponse'}
         '401': {description: Authentication required}
         '403': {description: Administration permission denied}
+    post:
+      tags: [Management Templates]
+      operationId: createPermissionTemplate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/PermissionTemplateCreateRequest'}
+      responses:
+        '201':
+          description: Permission template created
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/PermissionTemplateSummary'}
+        '400': {description: Invalid template data}
+        '401': {description: Authentication required}
+        '403': {description: Administration permission denied}
   /iam/admin/templates/{templateId}:
     get:
       tags: [Management Templates]
@@ -536,6 +553,29 @@ paths:
         '401': {description: Authentication required}
         '403': {description: Administration permission denied}
         '404': {description: Permission template not found}
+    post:
+      tags: [Management Templates]
+      operationId: createPermissionTemplateVersion
+      parameters:
+        - name: templateId
+          in: path
+          required: true
+          schema: {type: integer, format: int64, minimum: 1}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/PermissionTemplateVersionCreateRequest'}
+      responses:
+        '201':
+          description: New draft version with a server-assigned version number
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/PermissionTemplateVersionResponse'}
+        '400': {description: Invalid version data}
+        '401': {description: Authentication required}
+        '403': {description: Administration permission denied}
+        '404': {description: Permission template not found}
   /iam/admin/template-versions/{versionId}:
     get:
       tags: [Management Templates]
@@ -554,6 +594,25 @@ paths:
         '401': {description: Authentication required}
         '403': {description: Administration permission denied}
         '404': {description: Template version not found}
+  /iam/admin/template-versions/{versionId}/publish:
+    post:
+      tags: [Management Templates]
+      operationId: publishPermissionTemplateVersion
+      parameters:
+        - name: versionId
+          in: path
+          required: true
+          schema: {type: integer, format: int64, minimum: 1}
+      responses:
+        '200':
+          description: Draft version published and made immutable
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/PermissionTemplateVersionResponse'}
+        '401': {description: Authentication required}
+        '403': {description: Administration permission denied}
+        '404': {description: Template version not found}
+        '409': {description: Version is not a draft}
   /iam/admin/profiles:
     get:
       tags: [Management Profiles]
@@ -595,6 +654,24 @@ paths:
               schema: {$ref: '#/components/schemas/ProfileListResponse'}
         '401': {description: Authentication required}
         '403': {description: Administration permission denied}
+    post:
+      tags: [Management Profiles]
+      operationId: createAuthorizationProfile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/AuthorizationProfileCreateRequest'}
+      responses:
+        '201':
+          description: Profile created against a published template version
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/AuthorizationProfileResponse'}
+        '400': {description: Invalid profile data or unpublished template version}
+        '401': {description: Authentication required}
+        '403': {description: Administration permission denied}
+        '404': {description: User not found}
   /iam/admin/users/{userId}/profiles:
     get:
       tags: [Management Profiles]
@@ -779,13 +856,13 @@ components:
         principal: {$ref: '#/components/schemas/PrincipalResponse'}
     PrincipalResponse:
       type: object
-      required: [userId, identityId, identityDomain, clientType, authorizationVersion]
+      required: [userId, identityId, identityDomain, activeProfileId, templateVersionId, clientType, authorizationVersion]
       properties:
         userId: {type: integer, format: int64}
         identityId: {type: string}
         identityDomain: {type: string}
-        activeProfileId: {type: integer, format: int64, nullable: true}
-        templateVersionId: {type: integer, format: int64, nullable: true}
+        activeProfileId: {type: integer, format: int64, minimum: 1}
+        templateVersionId: {type: integer, format: int64, minimum: 1}
         clientType: {type: string}
         authorizationVersion: {type: integer, format: int64}
     SessionResponse:
@@ -891,6 +968,19 @@ components:
     AuthorizationProfileRequest:
       allOf:
         - {$ref: '#/components/schemas/AuthorizationProfileResponse'}
+    AuthorizationProfileCreateRequest:
+      type: object
+      required: [userId, profileName, templateVersionId, clientTypes, enabled, revoked, scopes]
+      properties:
+        userId: {type: integer, format: int64, minimum: 1}
+        profileName: {type: string, minLength: 1, maxLength: 191}
+        templateVersionId: {type: integer, format: int64, minimum: 1}
+        clientTypes: {type: array, minItems: 1, uniqueItems: true, items: {type: string, minLength: 1, maxLength: 64}}
+        enabled: {type: boolean}
+        revoked: {type: boolean}
+        validFrom: {type: string, format: date-time, nullable: true}
+        validUntil: {type: string, format: date-time, nullable: true}
+        scopes: {type: array, items: {$ref: '#/components/schemas/ResourceScope'}}
     PermissionTemplateVersionRequest:
       type: object
       required: [templateId, versionNumber, status, permissions]
@@ -972,6 +1062,17 @@ components:
         latestVersionId: {type: integer, format: int64, nullable: true}
         latestVersionNumber: {type: integer, nullable: true}
         latestVersionStatus: {type: string, enum: [DRAFT, PUBLISHED, RETIRED], nullable: true}
+    PermissionTemplateCreateRequest:
+      type: object
+      required: [templateKey, name]
+      properties:
+        templateKey: {type: string, minLength: 1, maxLength: 128}
+        name: {type: string, minLength: 1, maxLength: 255}
+        description: {type: string, maxLength: 2000, nullable: true}
+    PermissionTemplateVersionCreateRequest:
+      type: object
+      properties:
+        permissions: {type: array, uniqueItems: true, items: {type: string, minLength: 1, maxLength: 255}}
     PermissionTemplateListResponse:
       type: object
       required: [items]

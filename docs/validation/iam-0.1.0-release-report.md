@@ -29,7 +29,7 @@ This report is a documentation-only follow-up and does not change product runtim
 - Audit and authenticated self Authorization Diagnostics;
 - Management API for users, identities, permissions, templates, profiles/scopes, sessions, audit and overview;
 - `GET /iam/auth/capabilities` for current-principal capabilities;
-- optional `iam-admin-web` Vue 3 Management Console;
+- optional `muer-admin-web` Vue 3 Management Console;
 - Astro + Starlight documentation site and manual deployment/QuickStart documentation.
 
 The Admin Console is part of the 0.1.0 release scope but is **not** a runtime dependency of applications that only consume the Starter.
@@ -121,9 +121,9 @@ All three main-branch workflows passed for the product candidate merge commit `b
 
 | Workflow | Run ID | Head SHA | Conclusion | Important jobs |
 | --- | --- | --- | --- | --- |
-| Verify IAM Starter | `33970825245` | `bd409d9b` | success | `verify`, `Verify IAM Management API`, `Independent Consumer acceptance`, `Docker/Testcontainers consumer showcase` |
-| Verify IAM Admin Console | `33970825261` | `bd409d9b` | success | OpenAPI generation, type check, tests, production build |
-| Verify IAM Documentation | `33970825217` | `bd409d9b` | success | workflow guard, install, Astro check, Astro build |
+| Verify Muer Starter | `33970825245` | `bd409d9b` | success | `verify`, `Verify Muer Management API`, `Independent Consumer acceptance`, `Docker/Testcontainers consumer showcase` |
+| Verify Muer Admin Console | `33970825261` | `bd409d9b` | success | OpenAPI generation, type check, tests, production build |
+| Verify Muer Documentation | `33970825217` | `bd409d9b` | success | workflow guard, install, Astro check, Astro build |
 
 The same feature head `03e723ff` also passed all three PR workflows before PR #2 was merged into `main`.
 

@@ -7,6 +7,41 @@ set -euo pipefail
 
 repository_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
+# The final cutover forbids the transitional Java/Maven namespace in runtime
+# code, POMs, generated imports, and active documentation. Keep the former
+# literal split across variables so this guard does not match its own source.
+former_namespace="io.github.$(printf '%s' 'muer')"
+former_website="https://muer.$(printf '%s' 'github.io')"
+former_repository="github.com/wbh123/$(printf '%s' 'iam')"
+legacy_admin_dir="iam-$(printf '%s' 'admin-web')"
+legacy_docs_dir="iam-$(printf '%s' 'docs')"
+legacy_hits="$(
+  grep -rInF "$former_namespace" "$repository_root" \
+    --exclude-dir=.git --exclude-dir=.worktrees --exclude-dir=node_modules \
+    --exclude-dir=dist --exclude-dir=target --exclude-dir=.astro \
+    --exclude-dir=scripts \
+    2>/dev/null \
+  | grep -v '/docs/superpowers/' \
+  | grep -v '/MIGRATION.md:' \
+  || true
+)"
+if [ -n "$legacy_hits" ]; then
+  echo 'former Java/Maven namespace remains in active project files:' >&2
+  printf '%s\n' "$legacy_hits" >&2
+  exit 1
+fi
+
+for obsolete in "$former_website" "$former_repository" "$legacy_admin_dir" "$legacy_docs_dir"; do
+  if grep -rInF "$obsolete" "$repository_root" \
+      --exclude-dir=.git --exclude-dir=.worktrees --exclude-dir=node_modules \
+      --exclude-dir=dist --exclude-dir=target --exclude-dir=.astro \
+      --exclude-dir=scripts \
+      2>/dev/null | grep -v '/docs/superpowers/' | grep -v '/MIGRATION.md:'; then
+    echo "obsolete active identity remains: $obsolete" >&2
+    exit 1
+  fi
+done
+
 # 1) 禁止旧品牌 Java 命名空间出现在运行时代码与当前使用文档中。
 #    允许的位置仅限历史迁移/设计文档：docs/superpowers/、MIGRATION.md、db 迁移。
 #    旧命名空间 = 'io.github' + '.iamstarter'（此处不字面写出，避免自匹配）。
@@ -32,13 +67,22 @@ if [ -n "$legacy_hits" ]; then
 fi
 
 # 2) 根 POM 使用 Muer groupId。
-if ! grep -q '<groupId>io.github.muer</groupId>' "$repository_root/pom.xml"; then
-    echo 'root POM groupId is not io.github.muer' >&2
+if ! grep -q '<groupId>cloud.muer</groupId>' "$repository_root/pom.xml"; then
+    echo 'root POM groupId is not cloud.muer' >&2
+    exit 1
+fi
+
+if ! grep -q '<url>https://muer.cloud</url>' "$repository_root/pom.xml"; then
+    echo 'root POM website is not https://muer.cloud' >&2
+    exit 1
+fi
+if ! grep -q 'repositoryName: wbh123/Muer-IAM-Framework' "$repository_root/metadata/project-metadata.yaml"; then
+    echo 'metadata repositoryName is not wbh123/Muer-IAM-Framework' >&2
     exit 1
 fi
 
 # 3) AutoConfiguration imports 指向 MuerAutoConfiguration。
-if ! grep -qx 'io.github.muer.autoconfigure.MuerAutoConfiguration' \
+if ! grep -qx 'cloud.muer.autoconfigure.MuerAutoConfiguration' \
     "$repository_root/muer-spring-boot-autoconfigure/src/main/resources/META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports"; then
     echo 'AutoConfiguration.imports does not name MuerAutoConfiguration' >&2
     exit 1

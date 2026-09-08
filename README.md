@@ -54,7 +54,7 @@ Audit / Diagnostics 解释发生了什么
 - [Public API / SPI](docs/PUBLIC_API.md)
 - [Admin Console 部署](docs/IAM_ADMIN_CONSOLE_DEPLOYMENT.md)
 - [0.1.0 Release Notes](docs/RELEASE_NOTES_0.1.0.md)
-- 文档站源码：[`iam-docs/`](iam-docs/)；正式站点目标：`https://muer.github.io`
+- 文档站源码：[`muer-docs/`](muer-docs/)；正式站点目标：`https://muer.cloud`
 
 ## Five-minute integration
 
@@ -62,13 +62,13 @@ Audit / Diagnostics 解释发生了什么
 
 ```xml
 <dependency>
-    <groupId>io.github.muer</groupId>
+    <groupId>cloud.muer</groupId>
     <artifactId>muer-spring-boot-starter</artifactId>
     <version>0.1.0-SNAPSHOT</version>
 </dependency>
 ```
 
-普通宿主应用只需要依赖 `muer-spring-boot-starter`。`iam-admin-web` 与 `iam-docs` 都不是运行时依赖。
+普通宿主应用只需要依赖 `muer-spring-boot-starter`。`muer-admin-web` 与 `muer-docs` 都不是运行时依赖。
 
 ### 2. 配置 MySQL、Redis 与 Muer
 
@@ -170,14 +170,14 @@ User / Session
 
 管理员有两种正式方式：
 
-1. 使用随 0.1.0 提供的 **IAM Admin Console**；
+1. 使用随 0.1.0 提供的 **Muer Admin Console**；
 2. 如果企业已有统一后台，直接调用 **Muer Management API** 集成到自己的页面。
 
 不建议直接修改 `iam_*` 表；MyBatis Mapper、数据库表结构和自动配置内部 Bean 不属于稳定消费边界。
 
-## IAM Admin Console
+## Muer Admin Console
 
-`iam-admin-web/` 是 0.1.0 随附的**可选管理客户端**，使用 Vue 3 + TypeScript + Element Plus，并从 `muer-management-web/src/main/resources/openapi/iam.yaml` 自动生成 TypeScript Client。
+`muer-admin-web/` 是 0.1.0 随附的**可选管理客户端**，使用 Vue 3 + TypeScript + Element Plus，并从 `muer-management-web/src/main/resources/openapi/iam.yaml` 自动生成 TypeScript Client。
 
 当前覆盖：
 
@@ -212,18 +212,18 @@ password: demo-pass
 clientType: WEB
 ```
 
-生产环境不会自动创建该账号，也不存在公开的管理员 Bootstrap HTTP 后门。
+生产环境不会自动创建该账号，也不存在公开的管理员 Bootstrap HTTP 后门。宿主应在创建自己的首个用户后显式调用 `MuerAdministrationBootstrapService`，幂等建立管理员 Template、PUBLISHED Version 与 Profile。
 
 前端启动：
 
 ```bash
-cd iam-admin-web
+cd muer-admin-web
 npm ci
 npm run api:generate
 npm run dev
 ```
 
-完整 Nginx、首个生产管理员与安全配置见 [IAM Admin Console Deployment](docs/IAM_ADMIN_CONSOLE_DEPLOYMENT.md)。
+部署入口见 [Muer Admin Console Deployment](docs/IAM_ADMIN_CONSOLE_DEPLOYMENT.md)，首个生产管理员的最终说明位于 [`muer-docs` Bootstrap 页面](muer-docs/src/content/docs/management/bootstrap-first-admin.md)。
 
 ## Runtime observability
 
@@ -284,8 +284,8 @@ muer-spring-boot-starter   ← 普通业务应用入口
 muer-example
 muer-tests
 
-iam-admin-web              ← 可选管理客户端
-iam-docs                   ← 文档站
+muer-admin-web              ← 可选管理客户端
+muer-docs                   ← 文档站
 ```
 
 HTTP 路径 `/iam/**`、数据库表 `iam_*` 与管理 Permission `iam.admin.*` 继续保留，因为它们表达 IAM 领域协议；Muer 是品牌、Java/Maven 命名空间和 Spring 配置身份。

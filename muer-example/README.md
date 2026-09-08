@@ -106,11 +106,11 @@ Redis instance that contain the generic showcase projection. The Testcontainers
 integration command below creates and seeds that projection automatically.
 
 ```bash
-export IAM_EXAMPLE_JDBC_URL='jdbc:mysql://127.0.0.1:3306/iam_example'
-export IAM_EXAMPLE_DB_USERNAME='iam'
-export IAM_EXAMPLE_DB_PASSWORD='replace-with-local-password'
-export IAM_EXAMPLE_REDIS_HOST='127.0.0.1'
-export IAM_EXAMPLE_REDIS_PORT='6379'
+export MUER_EXAMPLE_JDBC_URL='jdbc:mysql://127.0.0.1:3306/iam_example'
+export MUER_EXAMPLE_DB_USERNAME='iam'
+export MUER_EXAMPLE_DB_PASSWORD='replace-with-local-password'
+export MUER_EXAMPLE_REDIS_HOST='127.0.0.1'
+export MUER_EXAMPLE_REDIS_PORT='6379'
 
 mvn -pl muer-example -am spring-boot:run
 ```
@@ -118,7 +118,7 @@ mvn -pl muer-example -am spring-boot:run
 Keep the application running, then set its address in a second shell:
 
 ```bash
-export IAM_EXAMPLE_BASE_URL='http://127.0.0.1:8080'
+export MUER_EXAMPLE_BASE_URL='http://127.0.0.1:8080'
 ```
 
 The commands below use `curl` and `jq`; they retain the token returned by your
@@ -134,11 +134,11 @@ configured `WEB` client. It returns an `accessToken` and `sessionId`.
 
 ```bash
 LOGIN_RESPONSE="$(curl --fail-with-body -sS \
-  -X POST "$IAM_EXAMPLE_BASE_URL/iam/auth/login" \
+  -X POST "$MUER_EXAMPLE_BASE_URL/iam/auth/login" \
   -H 'Content-Type: application/json' \
   --data '{"username":"operator-a","password":"demo-pass","clientType":"WEB"}')"
-export IAM_EXAMPLE_TOKEN="$(jq -r '.accessToken' <<<"$LOGIN_RESPONSE")"
-export IAM_EXAMPLE_SESSION_ID="$(jq -r '.sessionId' <<<"$LOGIN_RESPONSE")"
+export MUER_EXAMPLE_TOKEN="$(jq -r '.accessToken' <<<"$LOGIN_RESPONSE")"
+export MUER_EXAMPLE_SESSION_ID="$(jq -r '.sessionId' <<<"$LOGIN_RESPONSE")"
 ```
 
 A rejected password or non-`WEB` client returns `401` and creates no session.
@@ -149,14 +149,14 @@ A rejected password or non-`WEB` client returns `401` and creates no session.
 lists that principal's active persisted sessions.
 
 ```bash
-curl --fail-with-body -sS "$IAM_EXAMPLE_BASE_URL/iam/auth/me" \
-  -H "Authorization: Bearer $IAM_EXAMPLE_TOKEN"
+curl --fail-with-body -sS "$MUER_EXAMPLE_BASE_URL/iam/auth/me" \
+  -H "Authorization: Bearer $MUER_EXAMPLE_TOKEN"
 
-curl --fail-with-body -sS "$IAM_EXAMPLE_BASE_URL/iam/sessions" \
-  -H "Authorization: Bearer $IAM_EXAMPLE_TOKEN"
+curl --fail-with-body -sS "$MUER_EXAMPLE_BASE_URL/iam/sessions" \
+  -H "Authorization: Bearer $MUER_EXAMPLE_TOKEN"
 ```
 
-The session list includes `IAM_EXAMPLE_SESSION_ID`; MySQL remains the durable
+The session list includes `MUER_EXAMPLE_SESSION_ID`; MySQL remains the durable
 session authority while Redis indexes opaque tokens.
 
 ### 3. Read an allowed order and observe a forbidden department scope
@@ -165,8 +165,8 @@ session authority while Redis indexes opaque tokens.
 scope for department `501`.
 
 ```bash
-curl --fail-with-body -sS "$IAM_EXAMPLE_BASE_URL/example/orders/9001" \
-  -H "Authorization: Bearer $IAM_EXAMPLE_TOKEN"
+curl --fail-with-body -sS "$MUER_EXAMPLE_BASE_URL/example/orders/9001" \
+  -H "Authorization: Bearer $MUER_EXAMPLE_TOKEN"
 ```
 
 `GET /example/orders/9002` returns `403`: the valid identity lacks department
@@ -174,8 +174,8 @@ curl --fail-with-body -sS "$IAM_EXAMPLE_BASE_URL/example/orders/9001" \
 
 ```bash
 curl -sS -o /dev/null -w '%{http_code}\n' \
-  "$IAM_EXAMPLE_BASE_URL/example/orders/9002" \
-  -H "Authorization: Bearer $IAM_EXAMPLE_TOKEN"
+  "$MUER_EXAMPLE_BASE_URL/example/orders/9002" \
+  -H "Authorization: Bearer $MUER_EXAMPLE_TOKEN"
 # 403
 ```
 
@@ -186,8 +186,8 @@ that profile has no `order.approve` permission.
 
 ```bash
 curl -sS -o /dev/null -w '%{http_code}\n' \
-  -X POST "$IAM_EXAMPLE_BASE_URL/example/orders/9001/approve" \
-  -H "Authorization: Bearer $IAM_EXAMPLE_TOKEN"
+  -X POST "$MUER_EXAMPLE_BASE_URL/example/orders/9001/approve" \
+  -H "Authorization: Bearer $MUER_EXAMPLE_TOKEN"
 # 403
 ```
 
@@ -199,14 +199,14 @@ a new token; it does not modify the reader token.
 
 ```bash
 SWITCH_RESPONSE="$(curl --fail-with-body -sS \
-  -X POST "$IAM_EXAMPLE_BASE_URL/iam/authorization/profiles/402/switch" \
-  -H "Authorization: Bearer $IAM_EXAMPLE_TOKEN")"
-export IAM_EXAMPLE_APPROVER_TOKEN="$(jq -r '.accessToken' <<<"$SWITCH_RESPONSE")"
-export IAM_EXAMPLE_APPROVER_SESSION_ID="$(jq -r '.sessionId' <<<"$SWITCH_RESPONSE")"
+  -X POST "$MUER_EXAMPLE_BASE_URL/iam/authorization/profiles/402/switch" \
+  -H "Authorization: Bearer $MUER_EXAMPLE_TOKEN")"
+export MUER_EXAMPLE_APPROVER_TOKEN="$(jq -r '.accessToken' <<<"$SWITCH_RESPONSE")"
+export MUER_EXAMPLE_APPROVER_SESSION_ID="$(jq -r '.sessionId' <<<"$SWITCH_RESPONSE")"
 
 curl --fail-with-body -sS \
-  -X POST "$IAM_EXAMPLE_BASE_URL/example/orders/9001/approve" \
-  -H "Authorization: Bearer $IAM_EXAMPLE_APPROVER_TOKEN"
+  -X POST "$MUER_EXAMPLE_BASE_URL/example/orders/9001/approve" \
+  -H "Authorization: Bearer $MUER_EXAMPLE_APPROVER_TOKEN"
 ```
 
 The approval returns `200`. The original reader token still cannot approve.
@@ -219,9 +219,9 @@ returns a denied `PERMISSION_DENIED` decision with its decision steps.
 
 ```bash
 curl --fail-with-body -sS \
-  -X POST "$IAM_EXAMPLE_BASE_URL/iam/authorization/diagnostics" \
+  -X POST "$MUER_EXAMPLE_BASE_URL/iam/authorization/diagnostics" \
   -H 'Content-Type: application/json' \
-  -H "Authorization: Bearer $IAM_EXAMPLE_TOKEN" \
+  -H "Authorization: Bearer $MUER_EXAMPLE_TOKEN" \
   --data '{"permissionCode":"order.approve","applicationCode":"EXAMPLE","clientType":"WEB","resourceType":"ORDER","resourceId":"9001","scopeAccess":"WRITE"}'
 ```
 
@@ -236,15 +236,15 @@ returns `401`; the separate reader session remains active.
 
 ```bash
 curl --fail-with-body -sS -o /dev/null -w '%{http_code}\n' \
-  -X POST "$IAM_EXAMPLE_BASE_URL/iam/sessions/$IAM_EXAMPLE_APPROVER_SESSION_ID/revoke" \
+  -X POST "$MUER_EXAMPLE_BASE_URL/iam/sessions/$MUER_EXAMPLE_APPROVER_SESSION_ID/revoke" \
   -H 'Content-Type: application/json' \
-  -H "Authorization: Bearer $IAM_EXAMPLE_APPROVER_TOKEN" \
+  -H "Authorization: Bearer $MUER_EXAMPLE_APPROVER_TOKEN" \
   --data '{}'
 # 204
 
 curl -sS -o /dev/null -w '%{http_code}\n' \
-  "$IAM_EXAMPLE_BASE_URL/example/orders/9001" \
-  -H "Authorization: Bearer $IAM_EXAMPLE_APPROVER_TOKEN"
+  "$MUER_EXAMPLE_BASE_URL/example/orders/9001" \
+  -H "Authorization: Bearer $MUER_EXAMPLE_APPROVER_TOKEN"
 # 401
 ```
 

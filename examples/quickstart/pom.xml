@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Standalone Muer quick-start consumer.
+
+  This project intentionally does NOT inherit the framework parent POM and is
+  NOT part of the framework reactor. It is a plain third-party Spring Boot
+  application that consumes Muer exactly like a real user would: by depending on
+  the aggregate Starter cloud.muer:muer-spring-boot-starter (Java 21, Spring
+  Boot 4).
+
+  spring-boot-starter-web / -security / -jdbc / -data-redis and the MySQL driver
+  (mysql-connector-j) are all pulled transitively by the Starter, so they are not
+  repeated here. To consume it, first install Muer locally:
+
+      git clone https://github.com/wbh123/Muer-IAM-Framework.git
+      cd Muer-IAM-Framework
+      mvn clean install -DskipTests
+
+  Then run this app with:
+
+      mvn -f examples/quickstart/pom.xml spring-boot:run
+
+  See https://muer.cloud/getting-started/quick-start/
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>4.0.0</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>com.example</groupId>
+    <artifactId>muer-quickstart</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+    <name>muer-quickstart</name>
+    <description>Standalone Muer quick-start consumer (Document System)</description>
+
+    <properties>
+        <java.version>21</java.version>
+        <maven.compiler.release>21</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <!-- The only Muer dependency a consumer needs. It brings the IAM engine,
+             the /iam/** management REST API, Flyway schema migration, the MySQL
+             driver, and wiring for web / security / jdbc / redis. -->
+        <dependency>
+            <groupId>cloud.muer</groupId>
+            <artifactId>muer-spring-boot-starter</artifactId>
+            <version>0.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <!-- Smoke test only: it starts a Spring context with a mocked identity
+             layer and does NOT need MySQL / Redis / Testcontainers. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>

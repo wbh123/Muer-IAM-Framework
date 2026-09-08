@@ -79,9 +79,10 @@ Every `AuthorizationDecisionStep` supplies stable code, title, result,
 required value, actual value, reason, source and related ID. Step results are
 `PASS`, `FAIL`, `OVERRIDDEN`, `NOT_APPLICABLE` or `WARNING`.
 
-`ResourceScopeResolver` evaluates scope membership using an application
-`ResourceHierarchyProvider`; IAM does not know resource types or hierarchy
-storage. `AuthorizationPolicy` is the only extension point for business risk,
+`ResourceScopeResolver` evaluates host-business scope membership using an application
+`ResourceHierarchyProvider`; Muer only has a built-in, explicit allow-list for its own
+Management Resource types and does not know host resource types or hierarchy storage.
+`AuthorizationPolicy` is the only extension point for business risk,
 delegation, compliance and time-window decisions. It can deny or annotate a
 decision but cannot bypass the core checks.
 
@@ -109,7 +110,7 @@ revocation.
 IP, user agent, login/last-seen/logout/revocation/expiry state. `LoginEvent`
 records successful and failed attempts without credentials or raw tokens.
 Session touch is Redis-throttled and updates MySQL only at
-`iam.session.touch-interval`.
+`muer.session.touch-interval`.
 
 Authorization-affecting changes (identity, profile, template-permission or
 scope) increment `authorizationVersion`; principal resolution rejects a token
@@ -150,7 +151,7 @@ server. Diagnostics call the runtime engine and project its exact decision.
 ## Starter configuration and Spring Security integration
 
 ```yaml
-iam:
+muer:
   enabled: true
   schema:
     enabled: true

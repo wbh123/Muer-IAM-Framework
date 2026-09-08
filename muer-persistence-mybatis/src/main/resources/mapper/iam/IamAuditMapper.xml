@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="io.github.muer.persistence.mapper.IamAuditMapper">
-    <resultMap id="eventRow" type="io.github.muer.persistence.AuditEventRow">
+<mapper namespace="cloud.muer.persistence.mapper.IamAuditMapper">
+    <resultMap id="eventRow" type="cloud.muer.persistence.AuditEventRow">
         <constructor>
             <idArg column="log_id" javaType="_long"/>
             <arg column="event_id" javaType="java.lang.String"/>
@@ -18,12 +18,12 @@
         </constructor>
     </resultMap>
 
-    <resultMap id="subject" type="io.github.muer.persistence.AuditSubjectLinkRow">
+    <resultMap id="subject" type="cloud.muer.persistence.AuditSubjectLinkRow">
         <constructor>
             <arg column="audit_log_id" javaType="_long"/>
             <arg column="subject_type" javaType="java.lang.String"/>
             <arg column="subject_id" javaType="java.lang.String"/>
-            <arg column="relation_code" javaType="io.github.muer.audit.AuditSubjectRelation"/>
+            <arg column="relation_code" javaType="cloud.muer.audit.AuditSubjectRelation"/>
         </constructor>
     </resultMap>
 

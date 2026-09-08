@@ -15,7 +15,7 @@ require() {
 }
 
 require 'demonstration credentials' 'operator-a.*demo-pass|demo-pass.*operator-a'
-require 'runtime environment variables' 'IAM_EXAMPLE_JDBC_URL'
+require 'runtime environment variables' 'MUER_EXAMPLE_JDBC_URL'
 require 'login endpoint' 'POST[[:space:]]+/iam/auth/login'
 require 'principal and session reads' 'GET[[:space:]]+/iam/auth/me'
 require 'session listing' 'GET[[:space:]]+/iam/sessions'

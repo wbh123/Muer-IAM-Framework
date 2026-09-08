@@ -1,0 +1,41 @@
+# Muer quick-start Document System configuration.
+#
+# Every value below maps to a real Spring Boot / Muer property. Environment
+# variables use the MUER_* convention (no IAM_EXAMPLE_* leftovers). If you
+# already have MySQL / Redis, just fill in the connection values. If you do not,
+# bring the optional local infra up with:
+#
+#     docker compose -f examples/quickstart/docker-compose.yml up -d
+#
+# which provisions MySQL (database `iam_example`) and Redis 7 on localhost.
+
+spring:
+  datasource:
+    url: ${MUER_JDBC_URL:jdbc:mysql://localhost:3306/iam_example}
+    username: ${MUER_DB_USERNAME:iam}
+    password: ${MUER_DB_PASSWORD:iam-secret}
+  data:
+    redis:
+      host: ${MUER_REDIS_HOST:localhost}
+      port: ${MUER_REDIS_PORT:6379}
+      password: ${MUER_REDIS_PASSWORD:}
+
+muer:
+  enabled: true
+  # The Starter runs its Flyway migration and creates the IAM tables for you.
+  schema:
+    enabled: true
+    history-table: iam_flyway_schema_history
+  token:
+    ttl: 8h
+    redis-prefix: iam
+  session:
+    enabled: true
+    touch-interval: 10m
+  # Client types Muer accepts on login. The demo authenticator and the Profiles
+  # seed are all configured for WEB.
+  client-types:
+    - WEB
+  # Dev-only, opt-in demo authorization seeding. Keep OFF outside local dev.
+  quickstart:
+    seed-demo: ${MUER_QUICKSTART_SEED_DEMO:false}

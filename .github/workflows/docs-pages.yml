@@ -25,21 +25,24 @@ jobs:
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: iam-docs/package-lock.json
+          cache-dependency-path: muer-docs/package-lock.json
 
       - name: Verify documentation workflow configuration
         run: bash scripts/test-docs-workflow.sh
 
+      - name: Verify documentation matches the runtime contract
+        run: bash scripts/verify-documentation-contract.sh
+
       - name: Install documentation dependencies
-        working-directory: iam-docs
+        working-directory: muer-docs
         run: npm ci
 
       - name: Type-check the documentation site
-        working-directory: iam-docs
+        working-directory: muer-docs
         run: npm run check
 
       - name: Build the documentation site
-        working-directory: iam-docs
+        working-directory: muer-docs
         run: npm run build
         env:
           SITE_URL: https://muer.cloud
@@ -48,7 +51,7 @@ jobs:
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: iam-docs/dist
+          path: muer-docs/dist
 
       - name: Deploy to GitHub Pages
         id: deployment

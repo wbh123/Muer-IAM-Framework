@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="io.github.muer.persistence.mapper.IamPermissionTemplateQueryMapper">
-    <resultMap id="templateRow" type="io.github.muer.persistence.PermissionTemplateRow">
+<mapper namespace="cloud.muer.persistence.mapper.IamPermissionTemplateQueryMapper">
+    <resultMap id="templateRow" type="cloud.muer.persistence.PermissionTemplateRow">
         <constructor>
             <arg column="template_id" javaType="_long"/>
             <arg column="template_key" javaType="java.lang.String"/>
@@ -11,16 +11,16 @@
         </constructor>
     </resultMap>
 
-    <resultMap id="versionRow" type="io.github.muer.persistence.mapper.IamPermissionTemplateQueryMapper$VersionProjection">
+    <resultMap id="versionRow" type="cloud.muer.persistence.mapper.IamPermissionTemplateQueryMapper$VersionProjection">
         <constructor>
             <arg column="version_id" javaType="_long"/>
             <arg column="template_id" javaType="_long"/>
             <arg column="version_number" javaType="_int"/>
-            <arg column="status" javaType="io.github.muer.authorization.TemplateVersionStatus"/>
+            <arg column="status" javaType="cloud.muer.authorization.TemplateVersionStatus"/>
         </constructor>
     </resultMap>
 
-    <resultMap id="permissionRow" type="io.github.muer.persistence.PermissionSummaryRow">
+    <resultMap id="permissionRow" type="cloud.muer.persistence.PermissionSummaryRow">
         <constructor>
             <arg column="permission_id" javaType="_long"/>
             <arg column="permission_code" javaType="java.lang.String"/>

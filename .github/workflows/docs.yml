@@ -1,4 +1,4 @@
-name: Verify IAM Documentation
+name: Verify Muer Documentation
 
 on:
   push:
@@ -20,19 +20,36 @@ jobs:
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: iam-docs/package-lock.json
+          cache-dependency-path: muer-docs/package-lock.json
 
       - name: Verify documentation workflow configuration
         run: bash scripts/test-docs-workflow.sh
 
+      - name: Verify documentation matches the runtime contract
+        run: bash scripts/verify-documentation-contract.sh
+
+      # The Quick Start consumer is a real third-party project that consumes the
+      # Starter from the local Maven repository. Install the needed Muer modules,
+      # then compile + smoke-test the consumer (no MySQL / Redis required).
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Install Muer snapshot for Quick Start
+        run: mvn -B -pl muer-spring-boot-starter -am install -DskipTests
+
+      - name: Build Quick Start consumer example
+        run: mvn -B -f examples/quickstart/pom.xml test
+
       - name: Install documentation dependencies
-        working-directory: iam-docs
+        working-directory: muer-docs
         run: npm ci
 
       - name: Type-check the documentation site
-        working-directory: iam-docs
+        working-directory: muer-docs
         run: npm run check
 
       - name: Build the documentation site
-        working-directory: iam-docs
+        working-directory: muer-docs
         run: npm run build
