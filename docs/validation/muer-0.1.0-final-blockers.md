@@ -8,7 +8,7 @@
 | P1 | Diagnostics 请求字段与运行时不一致 | RESOLVED | 文档与契约统一使用 `domain` |
 | P1 | Principal Profile 标识可空 | RESOLVED | OpenAPI 要求正数 `activeProfileId` / `templateVersionId` |
 | P1 | Management lifecycle 不完整 | RESOLVED | Template、Draft Version、Publish、Profile Create API 与 Console 已具备 |
-| P1 | 全新生产库 First Administrator 闭环 | RESOLVED | 宿主显式调用 `MuerAdministrationBootstrapService`；Profile 含 `IAM_ADMIN / *` READ/WRITE Scope，无公开 Bootstrap HTTP 接口 |
+| P1 | 全新生产库 First Administrator 闭环 | RESOLVED | 宿主显式调用 `MuerAdministrationBootstrapService`；Profile 含 `IAM_ADMIN / *` READ/WRITE Scope，无公开 Bootstrap HTTP 接口；Starter 内置 Muer Management Resource 的精确层级解释，并与宿主业务层级 OR 组合 |
 | P1 | Quick Start Seeder 破坏 unrelated 数据 | RESOLVED | 固定 Demo 范围清理、ID/业务键冲突 fail-fast、H2 Safety Test |
 | P2 | Quick Start 与 From Zero 内容重叠 | RESOLVED | Quick Start 运行现成示例；手写接入说明位于 From Zero |
 | P2 | Admin Console 教程与 HEAD 漂移 | RESOLVED | 文档覆盖 Template、Version、Publish、Profile Create 与当前限制 |
@@ -22,6 +22,16 @@ P0: 0
 P1: 0
 P2 blocking release: 0
 ```
+
+## P1 closeout: First Administrator scope interpretation
+
+This P1 was reopened as **OPEN** for this cutover because the first-administrator
+bootstrap created `IAM_ADMIN / *` scopes while the default Starter hierarchy
+returned `false`. It is **RESOLVED** only after the default Starter bootstrap
+chain, positive and negative authorization cases, host-provider composition,
+and the no-ambiguity Spring bean case are covered by tests. The built-in rule is
+an explicit Management Resource type allow-list; it neither uses an `IAM_`
+prefix rule nor grants any host business resource.
 
 ## Post-0.1.0
 

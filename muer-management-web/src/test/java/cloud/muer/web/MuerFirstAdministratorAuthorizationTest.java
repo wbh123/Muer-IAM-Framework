@@ -77,7 +77,12 @@ class MuerFirstAdministratorAuthorizationTest {
             return new DefaultAuthorizationEngine(
                     (resource, scope) -> "IAM_ADMIN".equals(scope.scopeType())
                             && "*".equals(scope.scopeRefId())
-                            && resource.resourceType().startsWith("IAM_"),
+                            && Set.of("IAM_AUDIT_COLLECTION", "IAM_AUDIT_LOG", "IAM_AUTHORIZATION_PROFILE",
+                            "IAM_AUTHORIZATION_PROFILE_COLLECTION", "IAM_IDENTITY", "IAM_OVERVIEW",
+                            "IAM_PERMISSION_COLLECTION", "IAM_PERMISSION_TEMPLATE",
+                            "IAM_PERMISSION_TEMPLATE_COLLECTION", "IAM_PERMISSION_TEMPLATE_VERSION",
+                            "IAM_SESSION", "IAM_SESSION_COLLECTION", "IAM_USER", "IAM_USER_COLLECTION")
+                            .contains(resource.resourceType()),
                     principal -> versions.require(profiles.require(principal.activeProfileId())
                             .templateVersionId()).permissions(),
                     principal -> profiles.require(principal.activeProfileId()).scopes(),

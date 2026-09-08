@@ -1,26 +1,42 @@
 package cloud.muer.autoconfigure;
 
 import cloud.muer.authorization.AuthorizationEngine;
+import cloud.muer.authorization.AuthorizationProfile;
 import cloud.muer.authorization.AuthorizationProfileRepository;
+import cloud.muer.authorization.AuthorizationRequest;
 import cloud.muer.authorization.AuthorizationVersionRepository;
+import cloud.muer.authorization.AdministrationBootstrapRequest;
+import cloud.muer.authorization.MuerAdministrationBootstrapService;
+import cloud.muer.authorization.PermissionSummary;
+import cloud.muer.authorization.PermissionSummaryPage;
+import cloud.muer.authorization.PermissionTemplate;
+import cloud.muer.authorization.PermissionTemplateQueryRepository;
 import cloud.muer.authorization.PermissionTemplateVersionRepository;
 import cloud.muer.authorization.PermissionTemplateCommandRepository;
 import cloud.muer.authorization.PermissionTemplateLifecycleService;
+import cloud.muer.authorization.PermissionTemplateVersion;
+import cloud.muer.authorization.TemplateVersionStatus;
 import cloud.muer.authentication.AuthenticationService;
 import cloud.muer.authentication.IdentityAuthenticator;
 import cloud.muer.authentication.LoginRequest;
 import cloud.muer.core.model.IamPrincipal;
+import cloud.muer.core.model.IamUser;
+import cloud.muer.core.model.ResourceDescriptor;
+import cloud.muer.core.model.ResourceScope;
+import cloud.muer.core.model.ScopeAccess;
 import cloud.muer.core.metrics.MuerMetrics;
 import cloud.muer.core.metrics.NoOpMuerMetrics;
 import cloud.muer.autoconfigure.observability.MicrometerMuerMetrics;
 import cloud.muer.autoconfigure.observability.MuerHealthIndicator;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import cloud.muer.core.port.ResourceHierarchyProvider;
+import cloud.muer.core.port.IamUserRepository;
 import cloud.muer.session.TokenStore;
 import cloud.muer.session.SessionRepository;
 import cloud.muer.web.IamAdministrationController;
 import cloud.muer.web.IamAuthenticationController;
 import cloud.muer.web.IamAuthorizationController;
+import cloud.muer.web.IamManagementTemplatesController;
 import cloud.muer.web.IamSessionController;
 import cloud.muer.persistence.MyBatisAuthorizationProfileRepository;
 import cloud.muer.persistence.MyBatisAuthorizationVersionRepository;
@@ -46,12 +62,17 @@ import org.springframework.mock.web.MockFilterChain;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.time.Duration;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.HashMap;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -112,6 +133,62 @@ class MuerAutoConfigurationTest {
                     assertFalse(context.containsBean("iamAuthorizationEngine"));
                     assertFalse(context.containsBean("iamBearerTokenFilter"));
                 });
+    }
+
+    @Test
+    void default_hierarchy_allows_muer_management_but_not_host_resources() {
+        authorizationRunner(DefaultAuthorizationConfiguration.class).run(context -> {
+            var engine = context.getBean(AuthorizationEngine.class);
+            var principal = DefaultAuthorizationConfiguration.principal();
+
+            assertTrue(engine.decide(principal, request("iam.admin.template.read",
+                    "IAM_PERMISSION_TEMPLATE_COLLECTION", "templates", ScopeAccess.READ)).allowed());
+            assertFalse(engine.decide(principal, request("document:read",
+                    "DOCUMENT", "1001", ScopeAccess.READ)).allowed());
+            assertFalse(engine.decide(principal, request("iam.admin.user.read",
+                    "IAM_USER", "7", ScopeAccess.READ)).allowed());
+        });
+    }
+
+    @Test
+    void default_autoconfiguration_bootstraps_an_administrator_that_can_read_and_write_management_resources() {
+        authorizationRunner(BootstrapAuthorizationConfiguration.class).run(context -> {
+            var result = context.getBean(MuerAdministrationBootstrapService.class)
+                    .bootstrapFirstAdministrator(new AdministrationBootstrapRequest(7L, Set.of("WEB")));
+            var principal = new IamPrincipal(7L, "host-admin", "HOST", result.profileId(),
+                    result.templateVersionId(), "WEB", 1L);
+            var engine = context.getBean(AuthorizationEngine.class);
+
+            assertTrue(engine.decide(principal, request("iam.admin.template.read",
+                    "IAM_PERMISSION_TEMPLATE_COLLECTION", "templates", ScopeAccess.READ)).allowed());
+            assertTrue(engine.decide(principal, request("iam.admin.template.write",
+                    "IAM_PERMISSION_TEMPLATE_COLLECTION", "templates", ScopeAccess.WRITE)).allowed());
+
+            SecurityContextHolder.getContext().setAuthentication(
+                    new TestingAuthenticationToken(principal, null, "ROLE_TEST"));
+            assertEquals(200, context.getBean(IamManagementTemplatesController.class)
+                    .listPermissionTemplates(null, null).getStatusCode().value());
+        });
+    }
+
+    @Test
+    void host_hierarchy_is_composed_with_muer_management_hierarchy() {
+        authorizationRunner(DefaultAuthorizationConfiguration.class, HostResourceHierarchyConfiguration.class).run(context -> {
+            var engine = context.getBean(AuthorizationEngine.class);
+            var principal = DefaultAuthorizationConfiguration.principal();
+
+            assertTrue(engine.decide(principal, request("iam.admin.template.read",
+                    "IAM_PERMISSION_TEMPLATE_COLLECTION", "templates", ScopeAccess.READ)).allowed());
+            assertTrue(engine.decide(principal, request("document:read",
+                    "DOCUMENT", "1001", ScopeAccess.READ)).allowed());
+        });
+    }
+
+    @Test
+    void host_resource_hierarchy_remains_unambiguous_for_host_consumers() {
+        authorizationRunner(DefaultAuthorizationConfiguration.class, HostResourceHierarchyConfiguration.class).run(context ->
+                assertEquals(context.getBean("hostResourceHierarchyProvider", ResourceHierarchyProvider.class),
+                        context.getBean(ResourceHierarchyProvider.class)));
     }
 
     @Test
@@ -271,6 +348,19 @@ class MuerAutoConfigurationTest {
         assertEquals(7L, authenticated.userId());
     }
 
+    @SafeVarargs
+    private static ApplicationContextRunner authorizationRunner(Class<?>... configurations) {
+        return new ApplicationContextRunner()
+                .withUserConfiguration(configurations)
+                .withConfiguration(org.springframework.boot.autoconfigure.AutoConfigurations.of(MuerAutoConfiguration.class));
+    }
+
+    private static AuthorizationRequest request(String permission, String resourceType, String resourceId,
+                                                ScopeAccess access) {
+        return new AuthorizationRequest(permission, "HOST", "WEB",
+                new ResourceDescriptor(resourceType, resourceId, List.of(), Map.of()), access);
+    }
+
     @Configuration(proxyBeanMethods = false)
     static class AdapterConfiguration {
         @Bean
@@ -301,6 +391,198 @@ class MuerAutoConfigurationTest {
         @Bean
         ResourceHierarchyProvider hierarchyProvider() {
             return (resource, scope) -> false;
+        }
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    static class DefaultAuthorizationConfiguration {
+        private static final AuthorizationProfile PROFILE = new AuthorizationProfile(10L, 7L, "admin", 20L,
+                Set.of("WEB"), true, false, null, null, List.of(
+                new ResourceScope("IAM_ADMIN", "*", ScopeAccess.READ),
+                new ResourceScope("PROJECT", "101", ScopeAccess.READ)));
+        private static final PermissionTemplateVersion VERSION = new PermissionTemplateVersion(20L, 1L, 1,
+                TemplateVersionStatus.PUBLISHED, Set.of("iam.admin.template.read", "document:read"));
+
+        static IamPrincipal principal() {
+            return new IamPrincipal(7L, "host-admin", "HOST", 10L, 20L, "WEB", 1L);
+        }
+
+        @Bean
+        TokenStore tokenStore() { return mock(TokenStore.class); }
+
+        @Bean
+        SessionRepository sessionRepository() { return mock(SessionRepository.class); }
+
+        @Bean
+        AuthorizationVersionRepository authorizationVersionRepository() {
+            return new AuthorizationVersionRepository() {
+                public long currentVersion(long userId) { return 1L; }
+                public long increment(long userId) { return 2L; }
+            };
+        }
+
+        @Bean
+        AuthorizationProfileRepository authorizationProfileRepository() {
+            return new AuthorizationProfileRepository() {
+                public AuthorizationProfile require(long profileId) { return PROFILE; }
+                public List<AuthorizationProfile> findByUserId(long userId) { return List.of(PROFILE); }
+                public void save(AuthorizationProfile profile) { }
+            };
+        }
+
+        @Bean
+        PermissionTemplateVersionRepository permissionTemplateVersionRepository() {
+            return new PermissionTemplateVersionRepository() {
+                public PermissionTemplateVersion require(long versionId) { return VERSION; }
+                public void save(PermissionTemplateVersion version) { }
+            };
+        }
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    static class HostResourceHierarchyConfiguration {
+        @Bean
+        ResourceHierarchyProvider hostResourceHierarchyProvider() {
+            return (resource, scope) -> "PROJECT".equals(scope.scopeType())
+                    && "101".equals(scope.scopeRefId())
+                    && "DOCUMENT".equals(resource.resourceType())
+                    && "1001".equals(resource.resourceId());
+        }
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    static class BootstrapAuthorizationConfiguration {
+        @Bean
+        BootstrapFixture bootstrapFixture() {
+            return new BootstrapFixture();
+        }
+
+        @Bean
+        TokenStore tokenStore() { return mock(TokenStore.class); }
+
+        @Bean
+        SessionRepository sessionRepository() { return mock(SessionRepository.class); }
+
+        @Bean
+        AuthorizationVersionRepository authorizationVersionRepository() {
+            return new AuthorizationVersionRepository() {
+                public long currentVersion(long userId) { return 1L; }
+                public long increment(long userId) { return 2L; }
+            };
+        }
+
+        @Bean
+        AuthorizationProfileRepository authorizationProfileRepository(BootstrapFixture fixture) {
+            return fixture.profiles;
+        }
+
+        @Bean
+        PermissionTemplateVersionRepository permissionTemplateVersionRepository(BootstrapFixture fixture) {
+            return fixture.versions;
+        }
+
+        @Bean
+        IamUserRepository iamUserRepository() {
+            return new IamUserRepository() {
+                public Optional<IamUser> findById(long userId) {
+                    return userId == 7 ? Optional.of(new IamUser(7L, "host-admin", "HOST", true, 1L))
+                            : Optional.empty();
+                }
+                public List<IamUser> findPage(long afterUserId, int limit) { return List.of(); }
+                public void save(IamUser user) { }
+            };
+        }
+
+        @Bean
+        PermissionTemplateCommandRepository permissionTemplateCommandRepository(BootstrapFixture fixture) {
+            return fixture.templates;
+        }
+
+        @Bean
+        PermissionTemplateQueryRepository permissionTemplateQueryRepository(BootstrapFixture fixture) {
+            return new PermissionTemplateQueryRepository() {
+                public Optional<PermissionTemplate> findTemplate(long templateId) {
+                    return fixture.findTemplate(templateId);
+                }
+                public List<PermissionTemplate> listTemplates(long afterTemplateId, int limit) {
+                    return fixture.listTemplates(afterTemplateId, limit);
+                }
+                public List<PermissionTemplateVersion> findVersionsByTemplate(long templateId) {
+                    return fixture.findVersionsByTemplate(templateId);
+                }
+                public Optional<PermissionTemplateVersion> findVersionById(long versionId) {
+                    return fixture.findVersionById(versionId);
+                }
+                public PermissionSummaryPage listPermissions(String keyword, String domain,
+                                                              long afterPermissionId, int limit) {
+                    return fixture.listPermissions(keyword, domain, afterPermissionId, limit);
+                }
+            };
+        }
+    }
+
+    static final class BootstrapFixture {
+        private long nextTemplateId = 1L;
+        private long nextVersionId = 1L;
+        private long nextProfileId = 1L;
+        final Map<Long, PermissionTemplate> templatesById = new HashMap<>();
+        final Map<Long, PermissionTemplateVersion> versionsById = new HashMap<>();
+        final Map<Long, AuthorizationProfile> profilesById = new HashMap<>();
+        final PermissionTemplateCommandRepository templates = new PermissionTemplateCommandRepository() {
+            public PermissionTemplate createTemplate(String key, String name, String description, boolean enabled) {
+                var template = new PermissionTemplate(nextTemplateId++, key, name, description, enabled);
+                templatesById.put(template.templateId(), template);
+                return template;
+            }
+
+            public PermissionTemplateVersion createNextDraftVersion(long templateId, Set<String> permissions) {
+                var version = new PermissionTemplateVersion(nextVersionId++, templateId, 1,
+                        TemplateVersionStatus.DRAFT, permissions);
+                versionsById.put(version.versionId(), version);
+                return version;
+            }
+        };
+        final PermissionTemplateVersionRepository versions = new PermissionTemplateVersionRepository() {
+            public PermissionTemplateVersion require(long versionId) { return versionsById.get(versionId); }
+            public void save(PermissionTemplateVersion version) { versionsById.put(version.versionId(), version); }
+        };
+        final AuthorizationProfileRepository profiles = new AuthorizationProfileRepository() {
+            public AuthorizationProfile require(long profileId) { return profilesById.get(profileId); }
+            public List<AuthorizationProfile> findByUserId(long userId) {
+                return profilesById.values().stream().filter(profile -> profile.userId() == userId).toList();
+            }
+            public void save(AuthorizationProfile profile) { profilesById.put(profile.profileId(), profile); }
+            public AuthorizationProfile create(AuthorizationProfile profile) {
+                var created = new AuthorizationProfile(nextProfileId++, profile.userId(), profile.profileName(),
+                        profile.templateVersionId(), profile.clientTypes(), profile.enabled(), profile.revoked(),
+                        profile.validFrom(), profile.validUntil(), profile.scopes());
+                profilesById.put(created.profileId(), created);
+                return created;
+            }
+        };
+
+        public Optional<PermissionTemplate> findTemplate(long templateId) {
+            return Optional.ofNullable(templatesById.get(templateId));
+        }
+
+        public List<PermissionTemplate> listTemplates(long afterTemplateId, int limit) {
+            return templatesById.values().stream().filter(template -> template.templateId() > afterTemplateId)
+                    .limit(limit).toList();
+        }
+
+        public List<PermissionTemplateVersion> findVersionsByTemplate(long templateId) {
+            return versionsById.values().stream().filter(version -> version.templateId() == templateId).toList();
+        }
+
+        public Optional<PermissionTemplateVersion> findVersionById(long versionId) {
+            return Optional.ofNullable(versionsById.get(versionId));
+        }
+
+        public PermissionSummaryPage listPermissions(String keyword, String domain, long afterPermissionId, int limit) {
+            var permissions = List.of(
+                    new PermissionSummary("iam.admin.template.read", "Read templates", null, true, 1L),
+                    new PermissionSummary("iam.admin.template.write", "Write templates", null, true, 2L));
+            return new PermissionSummaryPage(afterPermissionId == 0 ? permissions : List.of(), 2L);
         }
     }
 

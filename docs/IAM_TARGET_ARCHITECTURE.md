@@ -79,9 +79,10 @@ Every `AuthorizationDecisionStep` supplies stable code, title, result,
 required value, actual value, reason, source and related ID. Step results are
 `PASS`, `FAIL`, `OVERRIDDEN`, `NOT_APPLICABLE` or `WARNING`.
 
-`ResourceScopeResolver` evaluates scope membership using an application
-`ResourceHierarchyProvider`; IAM does not know resource types or hierarchy
-storage. `AuthorizationPolicy` is the only extension point for business risk,
+`ResourceScopeResolver` evaluates host-business scope membership using an application
+`ResourceHierarchyProvider`; Muer only has a built-in, explicit allow-list for its own
+Management Resource types and does not know host resource types or hierarchy storage.
+`AuthorizationPolicy` is the only extension point for business risk,
 delegation, compliance and time-window decisions. It can deny or annotate a
 decision but cannot bypass the core checks.
 

@@ -60,7 +60,7 @@ PermissionDefinitionProvider
 - READ / WRITE Scope；
 - `AuthorizationEngine` 直接调用；
 - `@RequirePermission` Servlet MVC 声明式授权；
-- `ResourceHierarchyProvider` 和 `MvcResourceDescriptorResolver` 保持业务资源归属由宿主解释；
+- Starter 内置 Muer Management Resource 的精确 `IAM_ADMIN / *` 解释；`ResourceHierarchyProvider` 和 `MvcResourceDescriptorResolver` 仍由宿主解释业务资源归属；
 - Role 仍只是可选元数据，不是最终授权输入。
 
 ### Audit & Diagnostics
@@ -150,7 +150,7 @@ admin-demo / demo-pass / WEB
 
 - 0.1.0 不新增 OAuth 2.0、OpenID Connect、SAML、LDAP 或单点登录协议；
 - 不把 Muer 拆成强制独立身份服务；
-- 默认 `ResourceHierarchyProvider` 不猜测业务资源关系，使用 Scope 前必须由宿主适配；
+- Starter 不猜测宿主业务资源关系；宿主使用 Scope 时仍须提供相应适配，但 Muer 自身的 Management Resource 已由 Starter 内置解释；
 - `/iam/**` 使用独立 Stateless Security Chain；宿主业务路由仍由宿主 Security Chain 管理；
 - Admin Console 当前具备后端集成测试、OpenAPI 生成、TypeScript 类型检查、Vitest 和生产构建，完整 Playwright 浏览器端到端测试延后；
 - Actuator / Micrometer 是可选运行时集成，不是 Starter 强制依赖。

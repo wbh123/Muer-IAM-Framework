@@ -9,14 +9,8 @@ import org.springframework.stereotype.Component;
 public final class ExampleResourceHierarchyAdapter implements ResourceHierarchyProvider {
     @Override
     public boolean isWithinScope(ResourceDescriptor resource, ResourceScope scope) {
-        // IAM management resources are IAM_* descriptors. A scope of type IAM_ADMIN
-        // with reference '*' grants the management console scope for this example's
-        // own IAM_* resources. It never grants host business resources (PROJECT etc.),
-        // which continue to require their concrete type/id scopes below.
-        if ("IAM_ADMIN".equals(scope.scopeType()) && "*".equals(scope.scopeRefId())
-                && resource.resourceType().startsWith("IAM_")) {
-            return true;
-        }
+        // The Starter itself interprets IAM_ADMIN/* for Muer Management resources.
+        // This host adapter owns only the example application's business hierarchy.
         if (resource.resourceType().equals(scope.scopeType())
                 && resource.resourceId().equals(scope.scopeRefId())) {
             return true;

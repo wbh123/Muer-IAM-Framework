@@ -126,9 +126,8 @@ public class MuerAutoConfiguration {
             "mapper/iam/IamAuditMapper.xml");
 
     @Bean
-    @ConditionalOnMissingBean(ResourceHierarchyProvider.class)
-    ResourceHierarchyProvider iamResourceHierarchyProvider() {
-        return (resource, scope) -> false;
+    MuerManagementResourceHierarchyProvider muerManagementResourceHierarchyProvider() {
+        return new MuerManagementResourceHierarchyProvider();
     }
 
     @Bean(initMethod = "migrate")
@@ -252,13 +251,16 @@ public class MuerAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(AuthorizationEngine.class)
-    @ConditionalOnBean({ResourceHierarchyProvider.class, AuthorizationProfileRepository.class,
-            PermissionTemplateVersionRepository.class})
-    AuthorizationEngine iamAuthorizationEngine(ResourceHierarchyProvider hierarchy,
+    @ConditionalOnBean({AuthorizationProfileRepository.class, PermissionTemplateVersionRepository.class})
+    AuthorizationEngine iamAuthorizationEngine(MuerManagementResourceHierarchyProvider managementHierarchy,
+                                               ObjectProvider<ResourceHierarchyProvider> hostHierarchies,
                                                AuthorizationProfileRepository profiles,
                                                PermissionTemplateVersionRepository templates,
                                                ObjectProvider<AuthorizationPolicy> policies,
                                                MuerMetrics metrics) {
+        var providers = hostHierarchies.orderedStream().toList();
+        ResourceHierarchyProvider hierarchy = (resource, scope) -> managementHierarchy.isWithinScope(resource, scope)
+                || providers.stream().anyMatch(provider -> provider.isWithinScope(resource, scope));
         return new DefaultAuthorizationEngine(hierarchy,
                 principal -> principal.activeProfileId() == null ? java.util.Set.of()
                         : templates.require(profiles.require(principal.activeProfileId()).templateVersionId()).permissions(),

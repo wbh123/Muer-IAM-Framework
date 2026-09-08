@@ -95,7 +95,9 @@ Service 会：
 - 绕过宿主用户与认证体系；
 - 用固定数据库 ID 覆盖既有数据。
 
-Bootstrap 只建立 Muer 授权投影。用户名、密码、MFA、账号生命周期与身份审计仍由宿主系统负责。宿主的 `ResourceHierarchyProvider` 应保留现有管理根语义：`IAM_ADMIN / *` 覆盖 `/iam/admin/**` 使用的 `IAM_*` Management Resource，但不覆盖宿主业务资源。
+Bootstrap 只建立 Muer 授权投影。用户名、密码、MFA、账号生命周期与身份审计仍由宿主系统负责。Starter 内置了 Muer Management Resource 的层级解释：`IAM_ADMIN / *` 覆盖 Muer 自己的 Management API 所使用的明确资源类型。宿主无需为这些 Muer 管理资源重复编写层级规则。
+
+宿主的 `ResourceHierarchyProvider` 只应声明自己的业务资源层级；Starter 会将它与内置 Muer 规则按“任一规则命中即可”的方式组合。`IAM_ADMIN / *` 绝不会自动覆盖例如 `DOCUMENT / 1001` 等宿主资源，也不会以 `IAM_` 前缀匹配未知资源类型。权限码和 Scope 仍同时必需。
 
 ## 完成后
 
