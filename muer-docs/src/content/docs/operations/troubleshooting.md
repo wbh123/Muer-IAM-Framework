@@ -68,7 +68,7 @@ curl --fail-with-body -sS \
   -X POST http://127.0.0.1:8080/iam/authorization/diagnostics \
   -H 'Content-Type: application/json' \
   -H "Authorization: Bearer $TOKEN" \
-  --data '{"permissionCode":"document:read","applicationCode":"EXAMPLE","clientType":"WEB","resourceType":"PROJECT","resourceId":"101","scopeAccess":"READ"}'
+  --data '{"permissionCode":"document:read","domain":"EXAMPLE","clientType":"WEB","resourceType":"PROJECT","resourceId":"101","scopeAccess":"READ"}'
 ```
 
 返回的 `AuthorizationDecision` 含 `steps`（每一步 `passed` / `reason`）与 `decisionCode`。对照 [错误码](/reference/error-codes/) 顺藤摸瓜：

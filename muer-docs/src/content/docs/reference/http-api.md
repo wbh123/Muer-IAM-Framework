@@ -37,7 +37,7 @@ Authorization: Bearer <accessToken>
 }
 ```
 
-成功响应（HTTP `200`，`Content-Type: application/json`）的字段由 `LoginResponse` 定义：`accessToken`、`sessionId`、`expiresAt`、`principal` 均为必填；`principal.activeProfileId` 与 `principal.templateVersionId` 为可空字段——用户尚未绑定任何 Profile 时为空。下列仅为结构示例，Token 与时间戳是动态值：
+成功响应（HTTP `200`，`Content-Type: application/json`）的字段由 `LoginResponse` 定义：`accessToken`、`sessionId`、`expiresAt`、`principal` 均为必填；已认证 Principal 必须绑定有效的 `activeProfileId` 与 `templateVersionId`。用户应在登录前完成 Authorization Profile Provisioning，而不是返回空 Profile Principal。下列仅为结构示例，Token 与时间戳是动态值：
 
 ```json
 {
@@ -92,7 +92,7 @@ Authorization: Bearer <accessToken>
 }
 ```
 
-`userId`、`identityId`、`identityDomain`、`clientType`、`authorizationVersion` 始终返回；`activeProfileId`、`templateVersionId` 在用户已绑定并激活授权 Profile 时返回整数值，否则为空。
+`userId`、`identityId`、`identityDomain`、`activeProfileId`、`templateVersionId`、`clientType`、`authorizationVersion` 始终返回且 Profile 标识为正数。
 
 ## Session
 

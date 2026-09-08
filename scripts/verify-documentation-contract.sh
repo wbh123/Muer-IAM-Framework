@@ -157,6 +157,21 @@ fi
 # --- 6. Core Quick Start endpoints exist in the OpenAPI contract -------------
 printf 'HTTP endpoint contract\n'
 if require_file 'OpenAPI iam.yaml exists' "$openapi"; then
+  # Principal identifiers are required by the runtime constructor and must not
+  # drift back to nullable OpenAPI fields.
+  grep -Eq 'required: \[userId, identityId, identityDomain, activeProfileId, templateVersionId, clientType, authorizationVersion\]' "$openapi" \
+    && pass 'PrincipalResponse requires active profile and template version' \
+    || note_failure 'PrincipalResponse must require activeProfileId and templateVersionId'
+  if grep -A12 -E '^    PrincipalResponse:' "$openapi" | grep -Eq 'activeProfileId:.*nullable: true|templateVersionId:.*nullable: true'; then
+    note_failure 'PrincipalResponse profile identifiers must not be nullable'
+  else
+    pass 'PrincipalResponse profile identifiers are non-nullable'
+  fi
+  if grep -RFn '"applicationCode"' "$docs_content/operations" "$docs_content/getting-started" 2>/dev/null; then
+    note_failure 'Authorization diagnostics docs must use domain, not applicationCode'
+  else
+    pass 'Authorization diagnostics docs use the current request schema'
+  fi
   # Compare the set of path lines declared in OpenAPI with the endpoints the
   # active docs ask readers to call. We only assert the core endpoints used by
   # the Quick Start actually exist in the contract.

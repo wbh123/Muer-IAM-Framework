@@ -779,13 +779,13 @@ components:
         principal: {$ref: '#/components/schemas/PrincipalResponse'}
     PrincipalResponse:
       type: object
-      required: [userId, identityId, identityDomain, clientType, authorizationVersion]
+      required: [userId, identityId, identityDomain, activeProfileId, templateVersionId, clientType, authorizationVersion]
       properties:
         userId: {type: integer, format: int64}
         identityId: {type: string}
         identityDomain: {type: string}
-        activeProfileId: {type: integer, format: int64, nullable: true}
-        templateVersionId: {type: integer, format: int64, nullable: true}
+        activeProfileId: {type: integer, format: int64, minimum: 1}
+        templateVersionId: {type: integer, format: int64, minimum: 1}
         clientType: {type: string}
         authorizationVersion: {type: integer, format: int64}
     SessionResponse:
