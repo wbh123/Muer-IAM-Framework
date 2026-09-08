@@ -12,8 +12,9 @@
 #      repository wbh123/Muer-IAM-Framework, group cloud.muer, package cloud.muer).
 #   2. Active muer-docs content contains no legacy technical identity (the
 #      former Java namespace, the former GitHub web hosts, the former repository
-#      slug under wbh123, and the old frontend directory names). Historical
-#      docs/ and docs/superpowers/** are intentionally excluded (legacy records).
+#      slug under wbh123, and the old frontend directory names). The scan is
+#      scoped to muer-docs/src/content/docs only; the maintainer-only docs/
+#      directory is not part of the public documentation contract.
 #   3. Spring configuration prefix in active docs is muer.* -- no stray iam.*
 #      property-prefix usage (legitimate iam.admin.* management permissions,
 #      iam_* tables and /iam/** HTTP paths are allowed).
