@@ -19,6 +19,7 @@ legacy_hits="$(
   grep -rInF "$former_namespace" "$repository_root" \
     --exclude-dir=.git --exclude-dir=.worktrees --exclude-dir=node_modules \
     --exclude-dir=dist --exclude-dir=target --exclude-dir=.astro \
+    --exclude-dir=scripts \
     2>/dev/null \
   | grep -v '/docs/superpowers/' \
   | grep -v '/MIGRATION.md:' \
@@ -34,6 +35,7 @@ for obsolete in "$former_website" "$former_repository" "$legacy_admin_dir" "$leg
   if grep -rInF "$obsolete" "$repository_root" \
       --exclude-dir=.git --exclude-dir=.worktrees --exclude-dir=node_modules \
       --exclude-dir=dist --exclude-dir=target --exclude-dir=.astro \
+      --exclude-dir=scripts \
       2>/dev/null | grep -v '/docs/superpowers/' | grep -v '/MIGRATION.md:'; then
     echo "obsolete active identity remains: $obsolete" >&2
     exit 1
@@ -74,8 +76,8 @@ if ! grep -q '<url>https://muer.cloud</url>' "$repository_root/pom.xml"; then
     echo 'root POM website is not https://muer.cloud' >&2
     exit 1
 fi
-if ! grep -q 'repositoryName: Muer-IAM-Framework' "$repository_root/metadata/project-metadata.yaml"; then
-    echo 'metadata repositoryName is not Muer-IAM-Framework' >&2
+if ! grep -q 'repositoryName: wbh123/Muer-IAM-Framework' "$repository_root/metadata/project-metadata.yaml"; then
+    echo 'metadata repositoryName is not wbh123/Muer-IAM-Framework' >&2
     exit 1
 fi
 

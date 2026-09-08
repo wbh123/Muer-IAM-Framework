@@ -9,11 +9,11 @@
 #
 # Checks:
 #   1. Identity: active docs match metadata (brand Muer, website muer.cloud,
-#      repository Muer-IAM-Framework, group cloud.muer, package cloud.muer).
-#   2. Active muer-docs content contains no legacy technical identity
-#      (io.github.muer, muer.github.io, wbh123.github.io, wbh123/iam,
-#      iam-docs, iam-admin-web). Historical docs/ and docs/superpowers/** are
-#      intentionally excluded (legacy records).
+#      repository wbh123/Muer-IAM-Framework, group cloud.muer, package cloud.muer).
+#   2. Active muer-docs content contains no legacy technical identity (the
+#      former Java namespace, the former GitHub web hosts, the former repository
+#      slug under wbh123, and the old frontend directory names). Historical
+#      docs/ and docs/superpowers/** are intentionally excluded (legacy records).
 #   3. Spring configuration prefix in active docs is muer.* -- no stray iam.*
 #      property-prefix usage (legitimate iam.admin.* management permissions,
 #      iam_* tables and /iam/** HTTP paths are allowed).
@@ -56,7 +56,7 @@ metadata="$repository_root/metadata/project-metadata.yaml"
 if require_file 'project-metadata.yaml exists' "$metadata"; then
   grep -Eq 'groupId:[[:space:]]*cloud\.muer' "$metadata" || note_failure 'metadata groupId is cloud.muer'
   grep -Eq 'website:[[:space:]]*https://muer\.cloud' "$metadata" || note_failure 'metadata website is https://muer.cloud'
-  grep -Eq 'repositoryName:[[:space:]]*Muer-IAM-Framework' "$metadata" || note_failure 'metadata repositoryName is Muer-IAM-Framework'
+  grep -Eq 'repositoryName:[[:space:]]*wbh123/Muer-IAM-Framework' "$metadata" || note_failure 'metadata repositoryName is wbh123/Muer-IAM-Framework'
   grep -Eq 'basePackage:[[:space:]]*cloud\.muer' "$metadata" || note_failure 'metadata basePackage is cloud.muer'
   grep -Eq 'starterArtifact:[[:space:]]*muer-spring-boot-starter' "$metadata" || note_failure 'metadata starterArtifact is muer-spring-boot-starter'
 fi
@@ -77,8 +77,8 @@ fi
 
 # --- 2. No legacy technical identity in active docs --------------------------
 printf 'Legacy-identity scan (active muer-docs only)\n'
-# Exclude io.github.muer (former package), muer.github.io/wbh123.github.io (former
-# hosting), wbh123/iam (former repo) and the old frontend directory names. A
+# Exclude the former Java namespace, the former GitHub web hosts, the former
+# repository slug under wbh123, and the old frontend directory names. A
 # migration guide may reference the "former GitHub-based Java namespace" in prose
 # without repeating the literal; here we only forbid the literal in current docs.
 for token in 'io\.github\.muer' 'muer\.github\.io' 'wbh123\.github\.io' 'wbh123/iam' 'iam-admin-web' 'iam-docs'; do

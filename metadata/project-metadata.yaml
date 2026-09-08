@@ -7,7 +7,7 @@
 
 project:
   displayName: Muer IAM Framework
-  repositoryName: Muer-IAM-Framework
+  repositoryName: wbh123/Muer-IAM-Framework
   description: Identity infrastructure that grows naturally with your applications.
 
 coordinates:
