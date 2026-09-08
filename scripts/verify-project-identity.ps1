@@ -78,8 +78,12 @@ if ($starterPom.project.artifactId -ne $starterArtifact) {
     throw "Starter artifactId '$($starterPom.project.artifactId)' does not match '$starterArtifact'."
 }
 
+# examples/quickstart is a standalone third-party consumer (package
+# com.example.muerquickstart) that intentionally lives outside the cloud.muer
+# package. It is not framework source, so it is excluded from the package-root
+# scan just like target output is.
 $javaFiles = Get-ChildItem -LiteralPath $RepositoryRoot -Recurse -File -Filter '*.java' |
-    Where-Object { $_.FullName -notmatch '[\\/]target[\\/]' }
+    Where-Object { $_.FullName -notmatch '[\\/]target[\\/]' -and $_.FullName -notmatch '[\\/]examples[\\/]quickstart[\\/]' }
 foreach ($javaFile in $javaFiles) {
     $content = Get-Content -LiteralPath $javaFile.FullName -Raw -Encoding utf8
     if ($content -match '(?m)^package\s+' -and $content -notmatch "(?m)^package\s+$([regex]::Escape($basePackage))(?:\.|;)") {
