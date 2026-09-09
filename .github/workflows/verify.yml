@@ -94,6 +94,9 @@ jobs:
       - name: Check Docker availability
         run: docker info
 
+      - name: Install framework modules for the Showcase consumer
+        run: mvn -B install -DskipTests
+
       - name: Run MySQL and Redis consumer walkthrough
         run: mvn -B -f examples/showcase/pom.xml -Pintegration test
 
