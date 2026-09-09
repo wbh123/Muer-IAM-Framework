@@ -20,7 +20,7 @@ jobs:
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: muer-docs/package-lock.json
+          cache-dependency-path: apps/muer-docs-site/package-lock.json
 
       - name: Verify documentation workflow configuration
         run: bash scripts/test-docs-workflow.sh
@@ -37,19 +37,19 @@ jobs:
           java-version: '21'
 
       - name: Install Muer snapshot for Quick Start
-        run: mvn -B -pl muer-spring-boot-starter -am install -DskipTests
+        run: mvn -B -pl modules/muer-spring-boot-starter -am install -DskipTests
 
       - name: Build Quick Start consumer example
         run: mvn -B -f examples/quickstart/pom.xml test
 
       - name: Install documentation dependencies
-        working-directory: muer-docs
+        working-directory: apps/muer-docs-site
         run: npm ci
 
       - name: Type-check the documentation site
-        working-directory: muer-docs
+        working-directory: apps/muer-docs-site
         run: npm run check
 
       - name: Build the documentation site
-        working-directory: muer-docs
+        working-directory: apps/muer-docs-site
         run: npm run build

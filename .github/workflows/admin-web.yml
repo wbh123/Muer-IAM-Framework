@@ -20,7 +20,7 @@ jobs:
         with:
           node-version: '22'
           cache: npm
-          cache-dependency-path: muer-admin-web/package-lock.json
+          cache-dependency-path: apps/muer-admin-console/package-lock.json
 
       # openapi-generator-cli needs a JVM to turn iam.yaml into the TS client.
       - uses: actions/setup-java@v4
@@ -30,20 +30,20 @@ jobs:
 
       - name: Install frontend dependencies
         run: npm ci
-        working-directory: muer-admin-web
+        working-directory: apps/muer-admin-console
 
       - name: Generate TypeScript client from OpenAPI contract
         run: npm run api:generate
-        working-directory: muer-admin-web
+        working-directory: apps/muer-admin-console
 
       - name: Type check
         run: npm run type-check
-        working-directory: muer-admin-web
+        working-directory: apps/muer-admin-console
 
       - name: Test
         run: npm test
-        working-directory: muer-admin-web
+        working-directory: apps/muer-admin-console
 
       - name: Build
         run: npm run build
-        working-directory: muer-admin-web
+        working-directory: apps/muer-admin-console
