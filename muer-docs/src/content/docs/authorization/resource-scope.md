@@ -178,9 +178,9 @@ GET Document 1001(WRITE) document:update ✅ PROJECT 101 WRITE ❌  → DENY（S
 
 > Scope 是用来**收窄**授权边界的。不要为了图省事用宽泛 Scope 绕过 Permission 检查——能力与范围必须同时成立。
 
-## 一种特别的 Scope：管理资源由 Starter 内置处理
+## 一种特别的 Scope：Muer 管理能力由 Starter 内置解释
 
-Muer 自己的 Management API 使用的资源（`IAM_ADMIN/*`、`IAM_*`）层级，由 Starter 内置的规则解释，宿主**不需要**为这些 Muer 管理资源写 `ResourceHierarchyProvider`。宿主的 Provider 只负责你的业务资源（`PROJECT`、`DOCUMENT`、`DEPARTMENT` 等）。`IAM_ADMIN/*` 不会自动覆盖 `DOCUMENT/1001` 这类宿主资源。见[初始化第一个管理员](/management/bootstrap-first-admin/)。
+`IAM_ADMIN / *` 是 Muer 管理能力使用的**管理根 Scope**，不是一种 Management Resource。它所覆盖的具体 Muer Management Resource 层级由 Starter 内置规则解释，宿主**不需要**为这些 Muer 管理资源实现 `ResourceHierarchyProvider`。宿主的 Provider 只负责自己的业务资源（`PROJECT`、`DOCUMENT`、`DEPARTMENT` 等）。`IAM_ADMIN / *` 不会自动覆盖 `DOCUMENT / 1001` 这类宿主资源。见[初始化第一个管理员](/management/bootstrap-first-admin/)。
 
 ## 完整接口定义见参考
 
@@ -204,7 +204,7 @@ Muer 自己的 Management API 使用的资源（`IAM_ADMIN/*`、`IAM_*`）层级
 | `PROJECT / 101` 怎么也盖不住 `DOCUMENT / 1001` | Resolver 构造的 `parentPath` 少了 `PROJECT:101`，或格式写成 `101`。 |
 | 想按部门授权却始终失效 | 检查你给文档的 `parentPath` 是否真的包含 `DEPARTMENT:10`，且 hierarchy 支持部门级判断。 |
 | 开了很宽的 Scope（如 `* / * / WRITE`） | 权限面过大。Scope 应与实际资源树层级匹配，避免绕过 Permission 检查。 |
-| 为 Muer 的 `IAM_ADMIN/*` 自己写 hierarchy | 不需要。管理资源层级由 Starter 内置；宿主只声明业务资源。 |
+| 为 `IAM_ADMIN / *` 所覆盖的 Muer 管理资源自己写 hierarchy | 不需要。管理资源层级由 Starter 内置；宿主只声明业务资源。 |
 
 ## 下一步
 
