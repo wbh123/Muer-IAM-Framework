@@ -1,13 +1,21 @@
 ---
-title: 安装
-description: 把 IAM Spring Boot Starter 引入宿主应用，并准备 Java、MySQL、Redis 与宿主 SPI。
+title: 安装与环境准备
+description: 把 Muer 引入宿主应用，并准备 Java、MySQL、Redis 与宿主 SPI。
 sidebar:
   order: 2
 ---
 
 ## 它解决什么问题
 
-IAM 以「一个 Starter 依赖 + 宿主提供少量 SPI」的方式嵌入现有 Spring Boot 应用，不需要额外部署一套独立 IAM 服务。
+Muer 以「一个 Starter 依赖 + 宿主提供少量 SPI」的方式嵌入现有 Spring Boot 应用，不需要额外部署一套独立 IAM 服务。
+
+:::note[本页职责边界]
+本页只回答：**怎么拿到 Muer、支持什么 Java / Spring Boot、默认需要什么基础设施、Starter 坐标是什么**。它不教你怎么跑通、也不逐参数解释：
+
+- 想「先跑成功」→ 读[10~15 分钟快速开始](/getting-started/quick-start/)；
+- 想「怎么接入我自己的项目」→ 读[从零接入自己的项目](/getting-started/from-zero-tutorial/)；
+- 想「查每个参数」→ 读[配置项参考](/reference/configuration/)。
+:::
 
 ## 依赖坐标
 

@@ -3,6 +3,10 @@ title: 初始化第一个管理员
 description: 在生产空库中由宿主显式、安全、幂等地建立第一个 Muer 管理员。
 ---
 
+:::note[你什么时候需要这一页？]
+如果你只是运行 Quick Start、本地 Demo 或学习 Muer，**不需要**执行本页流程。只有在「全新的生产数据库，需要创建第一个正式管理员」时，才需要 First Administrator Bootstrap。
+:::
+
 Muer 的 Management API 自身受 `iam.admin.*` 权限保护。全新数据库还没有管理员 Profile，因此不能通过尚未授权的 Admin API 创建第一个管理员：
 
 ```text

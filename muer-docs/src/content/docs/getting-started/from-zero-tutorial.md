@@ -1,5 +1,5 @@
 ---
-title: 从零接入 Muer
+title: 从零接入自己的 Spring Boot
 description: 手写宿主用户适配、权限声明、资源描述、授权接口与诊断闭环——每一步都讲清为什么、值从哪来、执行后发生什么、怎么判断做对了。
 sidebar:
   order: 2
@@ -24,6 +24,19 @@ sidebar:
 ```
 
 并且你**理解了每一层为什么存在**。完整成品见 [`examples/quickstart`](https://github.com/wbh123/Muer-IAM-Framework/tree/main/examples/quickstart)，下面的包名与代码结构和它一致。
+
+## 阶段里程碑：走到哪里可以停
+
+本页较长，但**每一步都是一个可停下的成功点**。你可以按需停下，不必一次走完：
+
+| 阶段 | 达到的标志 | 可以停在这里吗？ |
+| --- | --- | --- |
+| **阶段 1：登录已经跑通** | `POST /iam/auth/login` 返回 200 拿到 token；`GET /iam/auth/me` 能读到当前用户 | ✅ 如果项目目前只需要认证，可以在此停下 |
+| **阶段 2：业务权限已经注册** | 应用启动后，`document:read` / `document:update` 等 permission 已被声明（见第 4 步） | 想先只接认证，可暂缓 |
+| **阶段 3：用户授权完成** | Alice 有一个指向已发布模板版本的 Profile，登录后 principal 带出正确的 `activeProfileId` / `templateVersionId`（见第 5~6 步） | 想做「谁拥有什么」的细粒度授权时再继续 |
+| **阶段 4：资源级授权完成** | `@RequirePermission` 接口能区分「项目内可读」与「跨项目 403」 | 需要 Scope / 资源级控制时再继续 |
+
+> 建议最小路径：**阶段 1** → 跑通登录后停一下，确认基础链路没问题，再决定是否按 2→3→4 往上加。不要因为本页很长就被劝退——**先跑通登录，你已经完成了 80% 的接入工作**。
 
 ## 为什么需要一个“投影”而不直接存你的用户
 
