@@ -32,4 +32,4 @@ npm run build          # 产出 dist/
   都会经 `AuthorizationEngine` 重新授权。
 - Session 页面不展示任何 token/Redis key；审计页只读。
 
-更多部署说明见 `docs/IAM_ADMIN_CONSOLE_DEPLOYMENT.md`。
+更多部署说明见 [Muer Admin Console Deployment](https://muer.cloud/management/deploy/)。

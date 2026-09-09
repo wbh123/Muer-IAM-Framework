@@ -1,4 +1,4 @@
-# IAM 0.1.0 Release Validation Report
+# Muer 0.1.0 Release Validation Report
 
 ## Candidate
 

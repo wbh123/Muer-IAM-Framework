@@ -1,8 +1,48 @@
+# Java / Maven
 target/
-.worktrees/
+*.class
+
+# IntelliJ IDEA
 .idea/
 *.iml
+
+# Eclipse
 .classpath
 .project
 .settings/
+
+# VS Code
+.vscode/
+
+# Worktrees
+.worktrees/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs / temp
+*.log
+*.tmp
+*.bak
+*.swp
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Node
+node_modules/
+dist/
+.astro/
+
+# Coverage
+coverage/
+
+# Agent / local development artifacts
+.superpowers/
+.workbuddy/
+
+# Example local environment
 examples/quickstart/.env

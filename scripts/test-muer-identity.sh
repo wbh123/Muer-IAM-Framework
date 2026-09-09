@@ -17,11 +17,11 @@ legacy_admin_dir="iam-$(printf '%s' 'admin-web')"
 legacy_docs_dir="iam-$(printf '%s' 'docs')"
 legacy_hits="$(
   grep -rInF "$former_namespace" "$repository_root" \
-    --exclude-dir=.git --exclude-dir=.worktrees --exclude-dir=node_modules \
+    --exclude-dir=.git --exclude-dir=.worktrees --exclude-dir=.workbuddy \
+    --exclude-dir=node_modules \
     --exclude-dir=dist --exclude-dir=target --exclude-dir=.astro \
     --exclude-dir=scripts \
     2>/dev/null \
-  | grep -v '/docs/superpowers/' \
   | grep -v '/MIGRATION.md:' \
   || true
 )"
@@ -33,29 +33,30 @@ fi
 
 for obsolete in "$former_website" "$former_repository" "$legacy_admin_dir" "$legacy_docs_dir"; do
   if grep -rInF "$obsolete" "$repository_root" \
-      --exclude-dir=.git --exclude-dir=.worktrees --exclude-dir=node_modules \
+      --exclude-dir=.git --exclude-dir=.worktrees --exclude-dir=.workbuddy \
+      --exclude-dir=node_modules \
       --exclude-dir=dist --exclude-dir=target --exclude-dir=.astro \
       --exclude-dir=scripts \
-      2>/dev/null | grep -v '/docs/superpowers/' | grep -v '/MIGRATION.md:'; then
+      2>/dev/null | grep -v '/MIGRATION.md:'; then
     echo "obsolete active identity remains: $obsolete" >&2
     exit 1
   fi
 done
 
 # 1) 禁止旧品牌 Java 命名空间出现在运行时代码与当前使用文档中。
-#    允许的位置仅限历史迁移/设计文档：docs/superpowers/、MIGRATION.md、db 迁移。
+#    允许的位置仅限历史迁移文档：MIGRATION.md、db 迁移。
 #    旧命名空间 = 'io.github' + '.iamstarter'（此处不字面写出，避免自匹配）。
 #    grep -I 忽略二进制；排除构建产物与其它 worktree，避免误报。
 legacy_hits="$(
   grep -rInE 'io\.github\.iamstarter' "$repository_root" \
     --exclude-dir=.git \
     --exclude-dir=.worktrees \
+    --exclude-dir=.workbuddy \
     --exclude-dir=node_modules \
     --exclude-dir=dist \
     --exclude-dir=target \
     --exclude-dir=.astro \
     2>/dev/null \
-  | grep -v '^[^:]*/docs/superpowers/' \
   | grep -v '/MIGRATION.md:' \
   | grep -v '/db/iam/migration/' \
   || true

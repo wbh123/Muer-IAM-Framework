@@ -50,9 +50,9 @@ Audit / Diagnostics 解释发生了什么
 ## Quick links
 
 - [快速开始](docs/QUICK_START.md)
-- [接入指南](docs/IAM_INTEGRATION_GUIDE.md)
+- [接入指南](https://muer.cloud/getting-started/from-zero-tutorial/)
 - [Public API / SPI](docs/PUBLIC_API.md)
-- [Admin Console 部署](docs/IAM_ADMIN_CONSOLE_DEPLOYMENT.md)
+- [Admin Console 部署](https://muer.cloud/management/deploy/)
 - [0.1.0 Release Notes](docs/RELEASE_NOTES_0.1.0.md)
 - 文档站源码：[`muer-docs/`](muer-docs/)；正式站点目标：`https://muer.cloud`
 
@@ -223,7 +223,7 @@ npm run api:generate
 npm run dev
 ```
 
-部署入口见 [Muer Admin Console Deployment](docs/IAM_ADMIN_CONSOLE_DEPLOYMENT.md)，首个生产管理员的最终说明位于 [`muer-docs` Bootstrap 页面](muer-docs/src/content/docs/management/bootstrap-first-admin.md)。
+部署入口见 [Muer Admin Console Deployment](https://muer.cloud/management/deploy/)，首个生产管理员的最终说明位于 [`muer-docs` Bootstrap 页面](muer-docs/src/content/docs/management/bootstrap-first-admin.md)。
 
 ## Runtime observability
 
@@ -309,7 +309,7 @@ HTTP 路径 `/iam/**`、数据库表 `iam_*` 与管理 Permission `iam.admin.*` 
 建议阅读顺序：
 
 1. [Quick Start](docs/QUICK_START.md)
-2. [IAM Integration Guide](docs/IAM_INTEGRATION_GUIDE.md)
+2. [从零接入 Muer](https://muer.cloud/getting-started/from-zero-tutorial/)
 3. 文档站“定义权限 / 权限管理”
 4. 文档站“运维 / Observability”
 5. [Public API Reference](docs/PUBLIC_API.md)
