@@ -13,7 +13,7 @@ sidebar:
 - **muer-session**：会话与令牌。`AuthSession`、`TokenRecord`、`LoginResult`，基于 Redis 存储。
 - **muer-spring-boot-autoconfigure**：Spring Boot 自动配置。`MuerProperties`、`IamBearerTokenFilter`、`RequirePermission`、`MvcResourceDescriptorResolver`、`IamAuthorizationInterceptor`。
 - **modules/muer-http-api**：HTTP 管理层。暴露 `/iam/**` 端点，含 `openapi/iam.yaml`。
-- **muer-example**：演示。`ExampleIdentityAdapter`、`QuickStartDemoSeeder`、`DocumentController`（alice/demo-pass 场景）。
+- **examples/showcase**：演示。`ExampleIdentityAdapter`、`QuickStartDemoSeeder`、`DocumentController`（alice/demo-pass 场景）。
 
 ## 依赖方向
 

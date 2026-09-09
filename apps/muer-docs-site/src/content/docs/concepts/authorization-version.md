@@ -18,7 +18,7 @@ userId, identityId, identityDomain, activeProfileId(Long),
 templateVersionId(Long), clientType, authorizationVersion
 ```
 
-演示账号 alice 登录后该值为 `0`（源码 [ExampleIdentityAdapter](https://github.com/wbh123/Muer-IAM-Framework/blob/main/muer-example/src/main/java/cloud/muer/example/ExampleIdentityAdapter.java)）。
+演示账号 alice 登录后该值为 `0`（源码 [ExampleIdentityAdapter](https://github.com/wbh123/Muer-IAM-Framework/blob/main/examples/showcase/src/main/java/cloud/muer/showcase/ExampleIdentityAdapter.java)）。
 
 ## 管理端点
 

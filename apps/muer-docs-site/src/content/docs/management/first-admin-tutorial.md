@@ -3,7 +3,7 @@ title: 第一次使用管理控制台
 description: 按当前界面创建 Template、Version 与 Profile，并维护 Scope。
 ---
 
-本页按当前 0.1.0 Console 的真实能力操作。生产空库请先完成[第一个管理员 Bootstrap](/management/bootstrap-first-admin/)；开发演示也可以使用 `muer-example` 的 dev-only 管理员。
+本页按当前 0.1.0 Console 的真实能力操作。生产空库请先完成[第一个管理员 Bootstrap](/management/bootstrap-first-admin/)；开发演示也可以使用 `examples/showcase` 的 dev-only 管理员。
 
 ## 1. 权限与配置的分工
 
@@ -30,7 +30,7 @@ npm run dev
 
 默认打开 `http://localhost:5173`。使用宿主系统已有、并已通过 Bootstrap 获得 `iam.admin.*` 的账号登录。
 
-仅做仓库本地演示时，可以按 `muer-example` 自身说明开启 `dev` Seeder，使用 `admin-demo / demo-pass / WEB`。这不是生产 Bootstrap，也不会成为默认生产账号。
+仅做仓库本地演示时，可以按 `examples/showcase` 自身说明开启 `dev` Seeder，使用 `admin-demo / demo-pass / WEB`。这不是生产 Bootstrap，也不会成为默认生产账号。
 
 ## 3. 查看 Permission Registry
 

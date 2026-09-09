@@ -44,16 +44,16 @@ IAM 是一个多模块 Maven 工程，但普通宿主应用通常只需要依赖
 - persistence implementation；
 - `internal` / `impl` 包。
 
-## `muer-example` 的角色
+## `examples/showcase` 的角色
 
-`muer-example` 是仓库中的 Consumer Showcase，用于证明 Starter 可以被独立 Spring Boot 应用消费。
+`examples/showcase` 是仓库中的 Consumer Showcase，用于证明 Starter 可以被独立 Spring Boot 应用消费。
 
 它同时提供 QuickStart 的 Alice / Document 示例，但**不是**要求用户照搬的生产项目模板。生产应用应该保留自己的用户模型、业务资源和部署方式，只接入 IAM 公共 API / SPI。
 
 ## 文档与测试的边界
 
 - 用户文档负责说明如何配置、启动和调用 IAM；
-- `muer-example` 展示真实接入方式；
+- `examples/showcase` 展示真实接入方式；
 - Testcontainers、独立 Consumer 验收与完整回归由项目 CI 负责。
 
 因此普通使用者无需复制仓库测试环境，也不需要为了部署 IAM 运行所有测试。

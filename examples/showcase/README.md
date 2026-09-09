@@ -93,7 +93,7 @@ Run the document and session acceptance suite against temporary MySQL and
 Redis containers:
 
 ```bash
-mvn -pl muer-showcase -am -Pintegration \
+mvn -f examples/showcase/pom.xml -Pintegration \
   -Dtest=IamConsumerIntegrationTest \
   -Dsurefire.failIfNoSpecifiedTests=false test
 ```
@@ -112,7 +112,7 @@ export MUER_SHOWCASE_DB_PASSWORD='replace-with-local-password'
 export MUER_SHOWCASE_REDIS_HOST='127.0.0.1'
 export MUER_SHOWCASE_REDIS_PORT='6379'
 
-mvn -pl muer-showcase -am spring-boot:run
+mvn -f examples/showcase/pom.xml spring-boot:run
 ```
 
 Keep the application running, then set its address in a second shell:
@@ -254,7 +254,7 @@ The fast smoke check is container-free and proves a consuming Spring Boot
 application discovers the starter:
 
 ```bash
-mvn -pl muer-showcase -am -Dtest=IamStarterAutoConfigurationSmokeTest -Dsurefire.failIfNoSpecifiedTests=false test
+mvn -f examples/showcase/pom.xml -Dtest=IamStarterAutoConfigurationSmokeTest -Dsurefire.failIfNoSpecifiedTests=false test
 ```
 
 The real-infrastructure suite requires Docker. It starts isolated MySQL and
@@ -262,5 +262,5 @@ Redis Testcontainers, seeds the generic projection, and proves this HTTP
 walkthrough including profile switching and revocation:
 
 ```bash
-mvn -pl muer-showcase -am -Pintegration -Dtest=IamStarterConsumptionTest,IamSecurityIntegrationTest -Dsurefire.failIfNoSpecifiedTests=false test
+mvn -f examples/showcase/pom.xml -Pintegration -Dtest=IamStarterConsumptionTest,IamSecurityIntegrationTest -Dsurefire.failIfNoSpecifiedTests=false test
 ```

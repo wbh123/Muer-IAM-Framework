@@ -114,7 +114,7 @@ Profile 是哪个、是否有效
 
 ## Admin Console 403
 
-Admin Console 属于管理能力，由 `iam.admin.*` 管理权限（如 `iam.admin.overview.read`、`iam.admin.profile.read`、`iam.admin.permission.read` 等）与对应 Scope 决定。403 时核对：当前登录身份是否绑定了一个含所需 `iam.admin.*` 权限 + 相应 Scope 的 Profile。演示用的 `admin-demo` 账号需以 `MUER_EXAMPLE_SEED_ADMIN=true` 的 dev profile 启动才会预置。
+Admin Console 属于管理能力，由 `iam.admin.*` 管理权限（如 `iam.admin.overview.read`、`iam.admin.profile.read`、`iam.admin.permission.read` 等）与对应 Scope 决定。403 时核对：当前登录身份是否绑定了一个含所需 `iam.admin.*` 权限 + 相应 Scope 的 Profile。演示用的 `admin-demo` 账号需以 `MUER_SHOWCASE_SEED_ADMIN=true` 的 dev profile 启动才会预置。
 
 ## Actuator 没有 `muer` health
 

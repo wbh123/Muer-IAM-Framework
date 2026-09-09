@@ -29,7 +29,7 @@ This report is a documentation-only follow-up and does not change product runtim
 - Audit and authenticated self Authorization Diagnostics;
 - Management API for users, identities, permissions, templates, profiles/scopes, sessions, audit and overview;
 - `GET /iam/auth/capabilities` for current-principal capabilities;
-- optional `muer-admin-web` Vue 3 Management Console;
+- optional `apps/muer-admin-console` Vue 3 Management Console;
 - Astro + Starlight documentation site and manual deployment/QuickStart documentation.
 
 The Admin Console is part of the 0.1.0 release scope but is **not** a runtime dependency of applications that only consume the Starter.
@@ -93,7 +93,7 @@ Security and compatibility boundaries reviewed before merge:
 
 ## Administrator bootstrap
 
-`muer-example` provides an explicit development-only administrator for manual Console acceptance only when **both** conditions hold:
+`examples/showcase` provides an explicit development-only administrator for manual Console acceptance only when **both** conditions hold:
 
 ```text
 SPRING_PROFILES_ACTIVE=dev

@@ -243,18 +243,18 @@ Optional<ResourceDescriptor> resolve(HttpServletRequest request, HandlerMethod h
 
 LoginResponse 必填：`accessToken`、`sessionId`、`expiresAt`、`principal`。
 
-Principal 必填：`userId,identityId,identityDomain,clientType,authorizationVersion`；可空：`activeProfileId,templateVersionId`。
+Principal 必填：`userId,identityId,identityDomain,activeProfileId,templateVersionId,clientType,authorizationVersion`。
 
 ### 演示用户
 
-`muer-example` 中：
+`examples/showcase` 中：
 
 - alice 默认 → userId=101, activeProfileId=401, templateVersionId=301；
 - 另有 author-a、reader-b、disabled-c、operator-a/b 等 Consumer Showcase 身份。
 
 ### QuickStartDemoSeeder
 
-仅在 `dev` Profile + `muer.example.seed-demo=true` 时启用：
+仅在 `dev` Profile + `muer.showcase.seed-demo=true` 时启用：
 
 - permission：701 document:read、702 document:update；
 - template：201 reader、202 editor；
@@ -277,16 +277,16 @@ Resolver 把文档映射成 `ResourceDescriptor("DOCUMENT", id, parentPath=["PRO
 
 GitHub blob 基址：`https://github.com/wbh123/Muer-IAM-Framework/blob/main/`
 
-- IamPrincipal: `muer-core/src/main/java/io/github/iamstarter/core/model/IamPrincipal.java`
-- ScopeAccess: `muer-core/src/main/java/io/github/iamstarter/core/model/ScopeAccess.java`
-- ResourceDescriptor/ResourceScope: `muer-core/src/main/java/io/github/iamstarter/core/model/`
-- ResourceHierarchyProvider: `muer-core/src/main/java/io/github/iamstarter/core/port/ResourceHierarchyProvider.java`
-- IdentityAuthenticator: `muer-authentication/src/main/java/io/github/iamstarter/authentication/IdentityAuthenticator.java`
-- AuthorizationEngine 等：`muer-authorization/src/main/java/io/github/iamstarter/authorization/`
-- AuthSession/TokenRecord: `muer-session/src/main/java/io/github/iamstarter/session/`
-- MVC 授权集成：`muer-spring-boot-autoconfigure/src/main/java/io/github/iamstarter/autoconfigure/web/`
-- IamProperties / Bearer Filter: `muer-spring-boot-autoconfigure/src/main/java/io/github/iamstarter/autoconfigure/`
-- Example: `muer-example/src/main/java/io/github/iamstarter/example/`
+- IamPrincipal: `modules/muer-core/src/main/java/cloud/muer/core/model/IamPrincipal.java`
+- ScopeAccess: `modules/muer-core/src/main/java/cloud/muer/core/model/ScopeAccess.java`
+- ResourceDescriptor/ResourceScope: `modules/muer-core/src/main/java/cloud/muer/core/model/`
+- ResourceHierarchyProvider: `modules/muer-core/src/main/java/cloud/muer/core/port/ResourceHierarchyProvider.java`
+- IdentityAuthenticator: `modules/muer-authentication/src/main/java/cloud/muer/authentication/IdentityAuthenticator.java`
+- AuthorizationEngine 等：`modules/muer-authorization/src/main/java/cloud/muer/authorization/`
+- AuthSession/TokenRecord: `modules/muer-session/src/main/java/cloud/muer/session/`
+- MVC 授权集成：`modules/muer-spring-boot-autoconfigure/src/main/java/cloud/muer/autoconfigure/web/`
+- MuerProperties / Bearer Filter: `modules/muer-spring-boot-autoconfigure/src/main/java/cloud/muer/autoconfigure/`
+- Showcase: `examples/showcase/src/main/java/cloud/muer/showcase/`
 - OpenAPI: `contracts/openapi/iam.yaml`
 
 ## 写作语言与风格

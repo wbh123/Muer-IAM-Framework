@@ -42,13 +42,13 @@ IAM Spring Boot Starter
 
 ## 本地启动
 
-先按[快速开始](/getting-started/quick-start/)或[手动部署](/getting-started/manual-deployment/)准备 MySQL、Redis 并启动 `muer-example`。
+先按[快速开始](/getting-started/quick-start/)或[手动部署](/getting-started/manual-deployment/)准备 MySQL、Redis 并启动 `examples/showcase`。
 
 开发演示管理员只有在下面两个条件同时满足时才会创建：
 
 ```text
 SPRING_PROFILES_ACTIVE=dev
-MUER_EXAMPLE_SEED_ADMIN=true
+MUER_SHOWCASE_SEED_ADMIN=true
 ```
 
 登录信息：

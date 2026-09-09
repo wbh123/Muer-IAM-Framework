@@ -1,6 +1,6 @@
 # Muer Quick Start
 
-Muer 用户文档以 `muer-docs/` 为唯一事实源。最新页面：
+Muer 用户文档以 `apps/muer-docs-site/` 为唯一事实源。最新页面：
 
 - 官方文档：<https://muer.cloud/getting-started/quick-start/>
 - 从零接入：<https://muer.cloud/getting-started/from-zero-tutorial/>

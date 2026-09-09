@@ -35,7 +35,7 @@ record AuthorizationProfile(
 
 ## 演示数据（真实）
 
-来自 [`QuickStartDemoSeeder`](https://github.com/wbh123/Muer-IAM-Framework/blob/main/muer-example/src/main/java/cloud/muer/example/QuickStartDemoSeeder.java)：
+来自 [`QuickStartDemoSeeder`](https://github.com/wbh123/Muer-IAM-Framework/blob/main/examples/showcase/src/main/java/cloud/muer/showcase/QuickStartDemoSeeder.java)：
 
 | Profile | 用户/模板 | clientTypes | 默认 | scopes |
 | --- | --- | --- | --- | --- |

@@ -21,7 +21,7 @@
 #   4. reference/configuration.md documents the real MuerProperties key set and
 #      does not advertise properties that do not exist in MuerProperties.
 #   5. examples/showcase demonstration environment variables are consistently
-#      MUER_EXAMPLE_*; no stale IAM_EXAMPLE_* remains in active code/docs.
+#      MUER_SHOWCASE_*; no stale IAM_EXAMPLE_* remains in active code/docs.
 #   6. Core Quick Start endpoints exist in the real OpenAPI contract
 #      (modules/muer-http-api/src/main/resources/openapi/iam.yaml).
 #   7. The standalone examples/quickstart consumer exists, consumes only
@@ -125,7 +125,7 @@ if require_file 'MuerProperties.java exists' "$properties_src"; then
   fi
 fi
 
-# --- 5. Example environment variables are consistently MUER_EXAMPLE_* --------
+# --- 5. Example environment variables are consistently MUER_SHOWCASE_* --------
 printf 'Example environment variable contract\n'
 example_sources=(
   "$repository_root/examples/showcase/src/main/resources/application.yaml"
@@ -148,11 +148,11 @@ else
   pass 'no stale IAM_EXAMPLE_ in active docs or example sources'
 fi
 # Demonstration variables in active docs use the MUER_ prefix (either the
-# MUER_EXAMPLE_* showcase variables or the MUER_* quickstart variables).
-if grep -rqE 'MUER_(EXAMPLE_)?[A-Z_]+' "$docs_content/getting-started" 2>/dev/null; then
-  pass 'active docs reference MUER_* / MUER_EXAMPLE_* demonstration variables'
+# MUER_SHOWCASE_* showcase variables or the MUER_* quickstart variables).
+if grep -rqE 'MUER_(SHOWCASE_)?[A-Z_]+' "$docs_content/getting-started" 2>/dev/null; then
+  pass 'active docs reference MUER_* / MUER_SHOWCASE_* demonstration variables'
 else
-  note_failure 'active docs should reference MUER_* / MUER_EXAMPLE_* demonstration variables'
+  note_failure 'active docs should reference MUER_* / MUER_SHOWCASE_* demonstration variables'
 fi
 
 # --- 6. Core Quick Start endpoints exist in the OpenAPI contract -------------

@@ -106,9 +106,9 @@ Starter 不会替你持有用户与业务资源。根据你使用的能力注册
 
 示例实现：
 
-- [ExampleIdentityAdapter.java](https://github.com/wbh123/Muer-IAM-Framework/blob/main/muer-example/src/main/java/cloud/muer/example/ExampleIdentityAdapter.java)
-- [ExampleResourceHierarchyAdapter.java](https://github.com/wbh123/Muer-IAM-Framework/blob/main/muer-example/src/main/java/cloud/muer/example/ExampleResourceHierarchyAdapter.java)
-- [ExampleDocumentResourceResolver.java](https://github.com/wbh123/Muer-IAM-Framework/blob/main/muer-example/src/main/java/cloud/muer/example/ExampleDocumentResourceResolver.java)
+- [ExampleIdentityAdapter.java](https://github.com/wbh123/Muer-IAM-Framework/blob/main/examples/showcase/src/main/java/cloud/muer/showcase/ExampleIdentityAdapter.java)
+- [ExampleResourceHierarchyAdapter.java](https://github.com/wbh123/Muer-IAM-Framework/blob/main/examples/showcase/src/main/java/cloud/muer/showcase/ExampleResourceHierarchyAdapter.java)
+- [ExampleDocumentResourceResolver.java](https://github.com/wbh123/Muer-IAM-Framework/blob/main/examples/showcase/src/main/java/cloud/muer/showcase/ExampleDocumentResourceResolver.java)
 
 ## 最小接入模式
 

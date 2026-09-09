@@ -85,7 +85,7 @@ Capabilities
 Diagnostics
 ```
 
-`muer-admin-web` 是随 0.1.0 提供的可选 Vue 3 + TypeScript + Element Plus 管理客户端。TypeScript Client 由同一份 `muer-management-web/.../iam.yaml` 自动生成。
+`apps/muer-admin-console` 是随 0.1.0 提供的可选 Vue 3 + TypeScript + Element Plus 管理客户端。TypeScript Client 由同一份 `contracts/openapi/iam.yaml` 自动生成。
 
 后台菜单和路由 Capability Guard 只负责用户体验；所有 `/iam/admin/**` 请求仍由后端 `AuthorizationEngine` 使用细粒度 `iam.admin.*` Permission 重新授权，不存在 Role / Super Admin 旁路。
 
@@ -107,7 +107,7 @@ MySQL / Redis 连通性继续由宿主 Spring Boot 的 DataSource / Redis Health
 
 ### Documentation
 
-`muer-docs` 使用 Astro + Starlight，当前文档体系覆盖：
+`apps/muer-docs-site` 使用 Astro + Starlight，当前文档体系覆盖：
 
 - Quick Start；
 - MySQL / Redis 手动配置；
@@ -125,7 +125,7 @@ Quick Start 不要求使用大量 `curl` / `jq`，接口示例主要按请求方
 
 ## 管理员初始化边界
 
-`muer-example` 可以显式创建开发演示管理员，但必须同时满足开发 Profile 与显式 Seed 开关。
+`examples/showcase` 可以显式创建开发演示管理员，但必须同时满足开发 Profile 与显式 Seed 开关。
 
 演示账号：
 

@@ -3,7 +3,7 @@
 本页只列出当前源码中供消费应用使用的稳定候选 API/SPI。版本为
 `0.1.0-SNAPSHOT`，因此“稳定”表示本次开发候选的消费边界，而不是已经发布的二进制
 兼容承诺。所有路径和状态以
-[`iam.yaml`](../muer-management-web/src/main/resources/openapi/iam.yaml) 为准。
+[`iam.yaml`](../contracts/openapi/iam.yaml) 为准。
 
 ## 消费者 API 与 SPI
 
@@ -101,7 +101,7 @@
 
 `GET /iam/sessions` 的 `userId` query 参数已经 deprecated 且被忽略；当前 principal
 始终决定所列 session 的归属。请求与响应 schema、参数限制和完整描述见
-[`iam.yaml`](../muer-management-web/src/main/resources/openapi/iam.yaml)。
+[`iam.yaml`](../contracts/openapi/iam.yaml)。
 
 ### 管理查询端点（Admin Console 支撑）
 

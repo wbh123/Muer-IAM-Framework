@@ -50,7 +50,7 @@ sidebar:
 Authorization: Bearer <accessToken>
 ```
 
-`alice / demo-pass` 只是 `muer-example` 的演示身份。生产系统继续使用自己的用户表、密码校验或企业身份源。
+`alice / demo-pass` 只是 `examples/showcase` 的演示身份。生产系统继续使用自己的用户表、密码校验或企业身份源。
 
 ## 源码
 

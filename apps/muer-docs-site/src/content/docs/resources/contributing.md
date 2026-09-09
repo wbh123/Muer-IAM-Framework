@@ -18,7 +18,7 @@ IAM 源码位于 GitHub：<https://github.com/wbh123/Muer-IAM-Framework>（分�
 ## 开发流程
 
 1. Fork 并在 `main` 切出特性分支。
-2. 本地以 `dev`  profile + `muer.example.seed-demo=true` 启动 `muer-example`，用 alice/demo-pass 验证。
+2. 本地以 `dev`  profile + `muer.showcase.seed-demo=true` 启动 `examples/showcase`，用 alice/demo-pass 验证。
 3. 保持 API 与本文档站一致：新增/修改端点须同步更新 `iam.yaml` 与 `src/content/docs/`。
 4. 提交信息清晰说明动机与影响范围。
 

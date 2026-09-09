@@ -22,7 +22,7 @@ IAM 不是一个独立身份服务器，而是一组**可嵌入**的 Spring Boot
 | 管理 Web | `modules/muer-http-api` | 登录、Session、Profile、诊断等 HTTP 端点（见 [OpenAPI](https://github.com/wbh123/Muer-IAM-Framework/blob/main/contracts/openapi/iam.yaml)） |
 | 自动装配 | `muer-spring-boot-autoconfigure` | Bearer Filter、`RequirePermission` 拦截器、`MuerProperties` |
 | 聚合 | `muer-spring-boot-starter` | 聚合上述依赖，宿主只需引入它 |
-| 示例 | `muer-example` | 唯一消费应用，演示完整链路 |
+| 示例 | `examples/showcase` | 唯一消费应用，演示完整链路 |
 
 ## 宿主需要实现哪些 Bean
 

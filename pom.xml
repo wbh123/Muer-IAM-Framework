@@ -45,6 +45,7 @@
         <module>modules/muer-http-api</module>
         <module>modules/muer-spring-boot-autoconfigure</module>
         <module>modules/muer-spring-boot-starter</module>
+        <module>tests/architecture</module>
     </modules>
 
     <properties>
