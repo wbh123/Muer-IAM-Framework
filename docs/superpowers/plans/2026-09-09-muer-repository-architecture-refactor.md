@@ -77,7 +77,7 @@
 - [ ] Move both directories with `git mv` and set package names to `muer-admin-console` and `muer-docs-site`.
 - [ ] Remove all Admin Console references to Java module source paths and update its API generator to the shared contract.
 - [ ] Update Docs Site source links without changing public slugs or Pages settings.
-- [ ] In `mamba wust`, run `npm ci`, API generation/type-check/tests/build for Admin Console, then `npm ci`, `npm run check`, and `npm run build` for Docs Site.
+- [ ] In the local development environment, run `npm ci`, API generation/type-check/tests/build for Admin Console, then `npm ci`, `npm run check`, and `npm run build` for Docs Site.
 - [ ] Commit `refactor: organize Muer web applications`.
 
 ### Task 6: Move architecture tests and align governance

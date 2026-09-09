@@ -61,7 +61,7 @@ Passed:
 - `bash scripts/test-showcase-readme.sh`
 - `bash scripts/test-muer-identity.sh`
 - Admin Console: `npm ci`, `npm run api:generate`, `npm run type-check`,
-  `npm test` (14 tests), and `npm run build` under the `wust` environment
+  `npm test` (14 tests), and `npm run build` in the local development environment
 - Docs Site: `npm ci`, `npm run check` (0 errors, 0 warnings, 0 hints), and
   `npm run build` (66 pages)
 - `git diff --check`
