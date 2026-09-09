@@ -1,0 +1,4 @@
+muer:
+  showcase:
+    seed-demo: ${MUER_SHOWCASE_SEED_DEMO:false}
+    seed-admin: ${MUER_SHOWCASE_SEED_ADMIN:false}
