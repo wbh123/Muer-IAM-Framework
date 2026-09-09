@@ -37,6 +37,9 @@ jobs:
       - name: Verify Muer project identity
         run: bash scripts/test-muer-identity.sh
 
+      - name: Verify framework Reactor and architecture tests
+        run: mvn -B verify
+
       - name: Test Spring Boot auto-configuration
         run: >-
           mvn -B -pl modules/muer-spring-boot-autoconfigure -am
