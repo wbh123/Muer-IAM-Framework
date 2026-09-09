@@ -57,6 +57,26 @@ management:
 
 版本由 Spring Boot Dependency Management 统一管理，不要在示例里手工固定版本。
 
+:::caution[生产环境注意]
+上面示例里的 `show-details: always` 是为**本地学习与排障**方便的。`always` 会无条件把健康细节（包括数据库、Redis、磁盘等各组件的 detail）返回给任何调用者，**不应被原样复制到生产**。
+
+生产环境建议任选其一：
+
+- 使用 `when-authorized`（本项目基于 Spring Boot 4.0.0，支持该取值）——仅当调用者通过健康检查端点的授权后，`/actuator/health` 才展示明细，未授权调用者只看到顶层状态：
+
+  ```yaml
+  management:
+    endpoint:
+      health:
+        show-details: when-authorized
+  ```
+
+- 或限制 `/actuator/**` 的访问来源（网络层 / Spring Security），只让监控系统可访问；
+- 或按企业安全策略关闭不需要暴露的 endpoint，只保留 `health` 甚至只保留进程存活探测。
+
+`when-authorized` 需要配合 `management.endpoint.health.roles`（或 Security 授权）来界定谁能看到明细；具体行为以你实际配置与 Spring Boot 版本为准。
+:::
+
 ### 预期返回（在 show-details 下）
 
 配好 `show-details` 后，`GET /actuator/health` 里应能看到 `muer` 组件：
@@ -151,6 +171,7 @@ curl -s localhost:8080/actuator/metrics/muer.authorization.duration
 □ 引入 spring-boot-starter-actuator 后，/actuator/health 返回 200
 □ 配好 show-details 后能看到 muer 组件（status UP, details.enabled=true）
 □ 我理解 muer=UP 不代表 MySQL/Redis/LDAP/宿主用户服务正常
+□ 我清楚 `show-details: always` 仅用于本地调试，生产会改为受控暴露（when-authorized / 限源 / 收窄 exposure）
 □ 想抓 Prometheus 时已加 micrometer-registry-prometheus 并把 prometheus 加入 exposure
 □ 我能用 metrics 端点查 muer.authentication.attempts / muer.authorization.decisions
 □ 我没有把 user ID / token / 权限码等高基数数据放进指标
@@ -163,6 +184,7 @@ curl -s localhost:8080/actuator/metrics/muer.authorization.duration
 | `/actuator/health` 看不到 `muer` 组件 | 未配 `show-details`，或未引入 Actuator / Health 类库；Muer Starter 不强制引入。 |
 | 访问 `/actuator/prometheus` 404 | 没加 `micrometer-registry-prometheus` 依赖，或没把 `prometheus` 加进 exposure.include。 |
 | 误以为 `muer=UP` 就表示数据库正常 | `muer` 只报告框架装配。数据源健康看 Spring Boot 自带的 `db`/`redis` 组件。 |
+| 把 `show-details: always` 直接搬到生产 | `always` 会向所有调用者暴露组件健康细节。生产用 `when-authorized` 或限制 `/actuator/**` 访问来源。 |
 | 把 user id / 权限码写成 metric 标签 | 违反高基数/敏感维度约束。这类信息属于诊断与审计，不进指标。 |
 
 ## 下一步

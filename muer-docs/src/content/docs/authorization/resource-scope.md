@@ -64,9 +64,20 @@ record ResourceScope(
 | --- | --- | --- | --- |
 | `scopeType` | `PROJECT` | 资源层级类型，例如 `PROJECT` / `DEPARTMENT` / `DOCUMENT` | 区分「作用在项目这一层」还是「作用在文档这一层」 |
 | `scopeRefId` | `101` | 该层级里的具体节点标识 | 定位「是 101 这个项目，不是 202」 |
-| `accessMode` | `READ` | `ScopeAccess.READ` 或 `WRITE` | 区分「只能读」还是「还能写」 |
+| `accessMode` | `READ` | `ScopeAccess.READ` 或 `WRITE`（精确匹配，见下） | 限定该 Scope 匹配 `READ` 还是 `WRITE` 请求 |
 
 `scopeType` 和 `scopeRefId` 拼起来，就是节点在资源树里的“地址”（`PROJECT:101`）；`accessMode` 决定这个地址上允许什么操作。三者缺一不可：只说 `PROJECT` 不知道是哪个项目，只说 `101` 不知道它是项目还是部门，只说 `READ` 不知道在哪里读。
+
+:::note[READ 与 WRITE 是精确匹配，不是继承关系]
+Muer 0.1.0 对 `ScopeAccess` 做**精确匹配**（`DefaultAuthorizationEngine` 用 `scope.accessMode() == request.scopeAccess()`）：
+
+- `READ` Scope 只匹配 `READ` 请求；
+- `WRITE` Scope 只匹配 `WRITE` 请求。
+
+因此，`WRITE` **并不**自动意味着拥有 `READ`，也不存在“高级权限自动包含低级权限”。
+
+如果同一个 Profile 需要同时支持读和写，就按业务接口实际使用的 `scopeAccess` 配置对应的两条 Scope（例如 `(PROJECT, 101, READ)` 与 `(PROJECT, 101, WRITE)`）。上面的表格正是这样表达的：401 Profile 同时持有 READ 与 WRITE 两条 Scope，才能读、也能写。
+:::
 
 ## 概念二：ResourceDescriptor——请求正在访问哪个叶子节点
 

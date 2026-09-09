@@ -62,6 +62,8 @@ mvn clean install -DskipTests
 - MySQL 8.x（发布验证基线为 MySQL 8.4）；
 - Redis 7。
 
+上面的 MySQL / Redis 是 **Muer 0.1.0 默认 Starter 实现**运行所需的持久化 Repository 与默认 Token/Session 快速状态存储。若宿主替换了对应的公共 SPI 实现，其基础设施要求由宿主实现自行决定。
+
 MySQL 和 Redis 可以是：
 
 - 本机安装；
