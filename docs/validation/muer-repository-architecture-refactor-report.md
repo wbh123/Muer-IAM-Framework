@@ -6,12 +6,11 @@ Base: `origin/main` at `ca9788b`
 
 ## Decision
 
-**NOT READY FOR FINAL INTEGRATION REVIEW: environment-only Docker blocker.**
+**READY FOR POST-REFACTOR ARCHITECTURE REVIEW.**
 
-The repository reorganization and non-container verification are complete. The
-remaining release gate is to rerun the MySQL and Redis Testcontainers suites in
-an environment exposing a working Docker socket. No test was weakened or
-disabled to make the current WSL run pass.
+Docker Desktop WSL integration is available and the MySQL and Redis
+Testcontainers suites now run successfully. No test was weakened or disabled
+to make the WSL run pass.
 
 ## Delivered architecture
 
@@ -47,9 +46,14 @@ disabled to make the current WSL run pass.
 Passed:
 
 - `mvn -B install -DskipTests`
+- `mvn -B clean verify` — all 12 Reactor modules passed, including the MySQL
+  and Redis Testcontainers suites (persistence: 14 tests; HTTP API: 48 tests;
+  autoconfigure: 38 tests; architecture: 1 test)
 - `mvn -B -f examples/quickstart/pom.xml test` — 3 tests, 0 failures
-- `mvn -B -f examples/showcase/pom.xml test` — 10 tests, 0 failures
-- `mvn -B -f test-apps/consumer-acceptance/pom.xml test -DskipTests` — compile
+- `mvn -B -f examples/showcase/pom.xml -Pintegration test` — 23 tests, 0
+  failures, using MySQL and Redis Testcontainers
+- `mvn -B -f test-apps/consumer-acceptance/pom.xml test` — 2 tests, 0
+  failures, using MySQL and Redis Testcontainers
 - `bash scripts/verify-consumer-public-api.sh test-apps/consumer-acceptance/src/main/java`
 - `bash scripts/verify-repository-layout.sh`
 - `bash scripts/test-docs-workflow.sh`
@@ -62,24 +66,22 @@ Passed:
   `npm run build` (66 pages)
 - `git diff --check`
 
-Blocked:
-
-- `mvn -B clean verify` reached the persistence integration tests, then failed
-  because Testcontainers could not find `/var/run/docker.sock`.
-- `mvn -B -f test-apps/consumer-acceptance/pom.xml verify` has the same
-  Docker/Testcontainers prerequisite and must be rerun with Docker available.
-
 The Docs Site build retains its pre-existing non-fatal warnings about the
 optional i18n directory and the 404 content entry. The Admin Console build
 retains its pre-existing chunk-size warning and test-time router injection
 warnings.
 
-## Required follow-up
+The Consumer Acceptance `verify` invocation completed its test phase
+successfully, then its package phase waited on an external Maven mirror while
+fetching packaging-plugin dependencies. The clean `test` invocation above is
+the recorded consumer acceptance result; the root Reactor's `clean verify` and
+`install` both completed successfully.
 
-1. Enable Docker Desktop WSL integration or expose a valid Docker socket to
-   this WSL distribution.
-2. Rerun `mvn -B clean verify` from the repository root.
-3. Rerun `mvn -B -f test-apps/consumer-acceptance/pom.xml verify` and the
-   Showcase integration profile.
-4. Record the Docker-backed results, then perform the normal branch review and
-   integration decision. This branch has not been merged or pushed.
+## Next review step
+
+1. Review the isolated branch against `origin/main` and make the normal
+   integration decision.
+2. If a separately packaged Consumer Acceptance JAR is required, rerun its
+   `verify` goal with a responsive Maven mirror or configured proxy.
+
+This branch has not been merged or pushed.
