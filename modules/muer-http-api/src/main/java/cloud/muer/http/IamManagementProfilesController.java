@@ -1,0 +1,164 @@
+package cloud.muer.http;
+
+import cloud.muer.authorization.AuthorizationEngine;
+import cloud.muer.authorization.AuthorizationProfile;
+import cloud.muer.authorization.AuthorizationProfileQueryRepository;
+import cloud.muer.authorization.AuthorizationProfileRepository;
+import cloud.muer.authorization.AuthorizationProfileService;
+import cloud.muer.core.port.UserQueryRepository;
+import cloud.muer.http.api.ManagementProfilesApi;
+import cloud.muer.http.dto.AuthorizationProfileResponse;
+import cloud.muer.http.dto.AuthorizationProfileCreateRequest;
+import cloud.muer.http.dto.ProfileListResponse;
+import cloud.muer.http.dto.ResourceScope;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.NoSuchElementException;
+
+import static cloud.muer.http.WebSecurity.allowedRead;
+import static cloud.muer.http.WebSecurity.allowed;
+import static cloud.muer.http.WebSecurity.currentPrincipal;
+
+@RestController
+public class IamManagementProfilesController implements ManagementProfilesApi {
+    private static final String PROFILE_READ = "iam.admin.profile.read";
+    private static final String PROFILE_WRITE = "iam.admin.profile.write";
+    private static final String SCOPE_READ = "iam.admin.scope.read";
+
+    private final AuthorizationEngine authorization;
+    private final AuthorizationProfileQueryRepository query;
+    private final AuthorizationProfileRepository profiles;
+    private final UserQueryRepository users;
+    private final AuthorizationProfileService profileService;
+
+    public IamManagementProfilesController(AuthorizationEngine authorization,
+                                           AuthorizationProfileQueryRepository query,
+                                           AuthorizationProfileRepository profiles,
+                                           UserQueryRepository users) {
+        this(authorization, query, profiles, users, null);
+    }
+
+    public IamManagementProfilesController(AuthorizationEngine authorization,
+                                           AuthorizationProfileQueryRepository query,
+                                           AuthorizationProfileRepository profiles,
+                                           UserQueryRepository users,
+                                           AuthorizationProfileService profileService) {
+        this.authorization = Objects.requireNonNull(authorization, "authorization must not be null");
+        this.query = Objects.requireNonNull(query, "query must not be null");
+        this.profiles = Objects.requireNonNull(profiles, "profiles must not be null");
+        this.users = Objects.requireNonNull(users, "users must not be null");
+        this.profileService = profileService;
+    }
+
+    @Override
+    public ResponseEntity<AuthorizationProfileResponse> createAuthorizationProfile(
+            AuthorizationProfileCreateRequest request) {
+        var principal = currentPrincipal();
+        if (principal == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        if (!allowed(authorization, principal, PROFILE_WRITE,
+                "IAM_AUTHORIZATION_PROFILE_COLLECTION", "profiles", cloud.muer.core.model.ScopeAccess.WRITE)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        if (profileService == null || request == null) return ResponseEntity.badRequest().build();
+        if (users.findById(request.getUserId()).isEmpty()) return ResponseEntity.notFound().build();
+        try {
+            var scopes = request.getScopes().stream().map(scope -> new cloud.muer.core.model.ResourceScope(
+                    scope.getScopeType(), scope.getScopeRefId(),
+                    cloud.muer.core.model.ScopeAccess.valueOf(scope.getAccessMode().getValue()))).toList();
+            var created = profileService.create(new AuthorizationProfile(1L, request.getUserId(),
+                    request.getProfileName(), request.getTemplateVersionId(),
+                    java.util.Set.copyOf(request.getClientTypes()), request.getEnabled(), request.getRevoked(),
+                    request.getValidFrom() == null ? null : request.getValidFrom().toInstant(),
+                    request.getValidUntil() == null ? null : request.getValidUntil().toInstant(), scopes));
+            return ResponseEntity.status(HttpStatus.CREATED).body(toResponse(created));
+        } catch (IllegalArgumentException | UnsupportedOperationException exception) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @Override
+    public ResponseEntity<ProfileListResponse> listAuthorizationProfiles(Long afterProfileId, Integer limit,
+                                                                         Long userId, Long templateVersionId,
+                                                                         Boolean enabled, Boolean revoked,
+                                                                         String clientType) {
+        var principal = currentPrincipal();
+        if (principal == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        if (!allowedRead(authorization, principal, PROFILE_READ,
+                "IAM_AUTHORIZATION_PROFILE_COLLECTION", "profiles")) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        int pageSize = limit == null ? 50 : limit;
+        var page = query.search(afterProfileId == null ? 0L : afterProfileId, pageSize, userId,
+                templateVersionId, enabled, revoked, clientType);
+        var items = page.stream().map(IamManagementProfilesController::toResponse).toList();
+        Long next = items.size() < pageSize ? null : items.getLast().getProfileId();
+        return ResponseEntity.ok(new ProfileListResponse(items).nextAfterProfileId(next));
+    }
+
+    @Override
+    public ResponseEntity<AuthorizationProfileResponse> getAuthorizationProfile(Long profileId) {
+        var principal = currentPrincipal();
+        if (principal == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        if (!allowedRead(authorization, principal, PROFILE_READ,
+                "IAM_AUTHORIZATION_PROFILE", profileId.toString())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        try {
+            return ResponseEntity.ok(toResponse(profiles.require(profileId)));
+        } catch (NoSuchElementException exception) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @Override
+    public ResponseEntity<List<ResourceScope>> getAuthorizationProfileScopes(Long profileId) {
+        var principal = currentPrincipal();
+        if (principal == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        if (!allowedRead(authorization, principal, SCOPE_READ,
+                "IAM_AUTHORIZATION_PROFILE", profileId.toString())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        try {
+            var scopes = profiles.require(profileId).scopes().stream()
+                    .map(IamManagementProfilesController::toScope)
+                    .toList();
+            return ResponseEntity.ok(scopes);
+        } catch (NoSuchElementException exception) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @Override
+    public ResponseEntity<List<AuthorizationProfileResponse>> listUserAuthorizationProfiles(Long userId) {
+        var principal = currentPrincipal();
+        if (principal == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        if (!allowedRead(authorization, principal, PROFILE_READ, "IAM_USER", userId.toString())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        if (users.findById(userId).isEmpty()) return ResponseEntity.notFound().build();
+        var owned = profiles.findByUserId(userId).stream()
+                .map(IamManagementProfilesController::toResponse)
+                .toList();
+        return ResponseEntity.ok(owned);
+    }
+
+    private static AuthorizationProfileResponse toResponse(AuthorizationProfile profile) {
+        var response = new AuthorizationProfileResponse(
+                profile.profileId(), profile.userId(), profile.profileName(), profile.templateVersionId(),
+                profile.clientTypes().stream().sorted().toList(), profile.enabled(), profile.revoked(),
+                profile.scopes().stream().map(IamManagementProfilesController::toScope).toList());
+        if (profile.validFrom() != null) response.validFrom(Date.from(profile.validFrom()));
+        if (profile.validUntil() != null) response.validUntil(Date.from(profile.validUntil()));
+        return response;
+    }
+
+    private static ResourceScope toScope(cloud.muer.core.model.ResourceScope scope) {
+        return new ResourceScope(scope.scopeType(), scope.scopeRefId(),
+                ResourceScope.AccessModeEnum.fromValue(scope.accessMode().name()));
+    }
+}
