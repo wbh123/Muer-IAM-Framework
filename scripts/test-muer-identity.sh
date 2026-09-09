@@ -84,13 +84,13 @@ fi
 
 # 3) AutoConfiguration imports 指向 MuerAutoConfiguration。
 if ! grep -qx 'cloud.muer.autoconfigure.MuerAutoConfiguration' \
-    "$repository_root/muer-spring-boot-autoconfigure/src/main/resources/META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports"; then
+    "$repository_root/modules/muer-spring-boot-autoconfigure/src/main/resources/META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports"; then
     echo 'AutoConfiguration.imports does not name MuerAutoConfiguration' >&2
     exit 1
 fi
 
 # 4) 示例配置不使用旧的顶层 iam: 前缀（正式前缀为 muer:）。
-if grep -rIn '^iam:' "$repository_root/muer-example/src/main/resources" 2>/dev/null; then
+if grep -rIn '^iam:' "$repository_root/examples/showcase/src/main/resources" 2>/dev/null; then
     echo 'legacy YAML configuration prefix remains' >&2
     exit 1
 fi

@@ -1,0 +1,36 @@
+{
+  "name": "muer-admin-console",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "type-check": "vue-tsc --noEmit -p tsconfig.json",
+    "api:generate": "openapi-generator-cli generate -i ../../contracts/openapi/iam.yaml -g typescript-axios -o src/api/generated --additional-properties=supportsES6=true,withInterfaces=true,useSingleRequestParameter=true --skip-validate-spec",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "echo 'lint: no linter configured for muer-admin-console 0.1.0'"
+  },
+  "dependencies": {
+    "axios": "^1.7.9",
+    "element-plus": "^2.9.3",
+    "pinia": "^2.3.0",
+    "vue": "^3.5.13",
+    "vue-router": "^4.5.0"
+  },
+  "devDependencies": {
+    "@openapitools/openapi-generator-cli": "^2.15.3",
+    "@vitejs/plugin-vue": "^5.2.1",
+    "@vue/test-utils": "^2.4.6",
+    "jsdom": "^25.0.1",
+    "typescript": "~5.6.3",
+    "vite": "^6.0.7",
+    "vitest": "^2.1.8",
+    "vue-tsc": "^2.2.0"
+  }
+}
