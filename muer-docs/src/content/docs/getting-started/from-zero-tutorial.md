@@ -61,7 +61,14 @@ Redis   → 保存 opaque Token 的快速查找状态
 muer.*  → 控制 Starter 自己的行为（是否启用、Token TTL、允许的客户端类型等）
 ```
 
-MySQL 与 Redis 是运行必需（Muer 需要数据源做授权事实、需要 Redis 管理 Token）。**muer 配置没有这些连接信息**，它只描述 Starter 行为。最小配置：
+使用 Muer 0.1.0 **默认 Starter 实现**时，需要 MySQL 与 Redis：
+
+- **MySQL** → Muer 的持久化 Repository 保存 Permission / Template / Profile / Scope / Session 等授权事实；
+- **Redis** → 默认 TokenStore / Session 相关的快速状态（opaque Token 查找）。
+
+> 这里的 MySQL / Redis 是**默认实现的依赖**，不是 Muer 的硬性绑定。如果宿主显式替换了对应的公共 SPI 实现（例如自定义的 `TokenStore` / Session 存取，或自定义的 Repository / 持久化 Repository），那么该实现本身所需的基础设施由宿主自己的实现决定，不再强制依赖默认的 MySQL / Redis。是否以及如何替换，按你实际接线的 SPI 为准。
+
+**muer 配置没有这些连接信息**，它只描述 Starter 行为。使用默认实现时的最小配置：
 
 ```yaml
 spring:
