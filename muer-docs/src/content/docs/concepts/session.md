@@ -1,5 +1,5 @@
 ---
-title: 会话（Session）
+title: 会话与权限失效
 description: 理解登录产生的 AuthSession 与 TokenRecord，以及查询、续期与撤销的生命周期管理。
 sidebar:
   order: 6
@@ -52,4 +52,5 @@ curl -X POST "$BASE/iam/sessions/$SESSION_ID/revoke" \
 
 ## 下一步
 
-Profile 切换会创建独立 session，见 [Profile 切换](/profile-session/profile-switch/) 与 [Session 撤销](/profile-session/session-revoke/)。
+- Profile 切换会创建独立 session，见 [切换授权身份](/profile-session/profile-switch/) 与 [撤销登录会话](/profile-session/session-revoke/)。
+- 想让「权限变更后旧 Token 失效」，见 [权限变更与旧 Token](/concepts/authorization-version/)。
