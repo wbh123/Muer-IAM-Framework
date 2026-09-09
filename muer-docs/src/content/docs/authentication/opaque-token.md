@@ -1,5 +1,5 @@
 ---
-title: 不透明令牌
+title: 访问令牌
 description: 说明 IAM 访问令牌为不透明令牌的存储与解析机制。
 sidebar:
   order: 5

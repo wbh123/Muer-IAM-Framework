@@ -1,5 +1,5 @@
 ---
-title: Management Console 介绍
+title: 管理控制台介绍
 description: Muer Admin Console 的定位、能力、启动方式与权限模型概述。
 sidebar:
   order: 1

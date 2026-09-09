@@ -1,5 +1,5 @@
 ---
-title: 数据投影
+title: 用户与权限数据如何映射
 description: 把宿主现有的用户与身份投影进 IAM，而非迁移数据库。
 sidebar:
   order: 3

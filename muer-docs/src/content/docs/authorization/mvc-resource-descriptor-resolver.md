@@ -1,5 +1,5 @@
 ---
-title: MVC 资源描述解析器
+title: 把请求映射成业务资源
 description: 为什么需要 Resolver、它如何把请求翻译成 ResourceDescriptor、parentPath 怎么填，以及常见的解析失败。
 sidebar:
   order: 3

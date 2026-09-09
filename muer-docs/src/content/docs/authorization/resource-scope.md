@@ -1,5 +1,5 @@
 ---
-title: 资源作用域
+title: 资源权限范围
 description: 用真实资源树讲清 ResourceScope、ResourceDescriptor 与 ResourceHierarchyProvider 如何共同决定「一个请求落在哪片资源上」。
 sidebar:
   order: 4

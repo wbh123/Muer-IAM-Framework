@@ -1,5 +1,5 @@
 ---
-title: 生产环境检查清单
+title: 上线前检查清单
 description: 上线前核对数据源、令牌、会话、审计与安全配置的关键检查项。
 sidebar:
   order: 5

@@ -1,5 +1,5 @@
 ---
-title: Profile（身份画像）
+title: 用户授权身份（Profile）
 description: 理解 Profile 不是角色，而是把权限模板版本与资源作用域绑定到具体用户的可切换身份视图。
 sidebar:
   order: 1

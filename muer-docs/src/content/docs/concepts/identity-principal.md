@@ -1,5 +1,5 @@
 ---
-title: Identity 与 Principal
+title: 身份与当前用户
 description: 理解 IAM 如何把宿主用户投影为运行时的 IamPrincipal，以及它的字段含义与校验规则。
 sidebar:
   order: 1

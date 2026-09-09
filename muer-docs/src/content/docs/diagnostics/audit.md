@@ -1,5 +1,5 @@
 ---
-title: 审计日志
+title: 审计记录
 description: 了解 IAM 的审计能力开关与事件记录范围，满足合规追溯需求。
 sidebar:
   order: 2

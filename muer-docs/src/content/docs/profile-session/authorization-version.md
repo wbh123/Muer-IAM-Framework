@@ -1,5 +1,5 @@
 ---
-title: 授权版本（AuthorizationVersion）
+title: 权限变更后让旧 Token 失效
 description: 理解 principal 上的 authorizationVersion 如何在权限模板变更时保证决策一致性。
 sidebar:
   order: 5

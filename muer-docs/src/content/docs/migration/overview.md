@@ -1,5 +1,5 @@
 ---
-title: 迁移总览
+title: 已有系统如何接入
 description: 宿主如何在不一次性替换既有权限系统的前提下，渐进式采用 IAM。
 sidebar:
   order: 1

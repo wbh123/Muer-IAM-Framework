@@ -1,5 +1,5 @@
 ---
-title: 自定义错误处理
+title: 自定义认证与授权错误响应
 description: 理解 IAM 的 problem+json 失败响应结构，并在应用中定制异常映射。
 sidebar:
   order: 3

@@ -1,5 +1,5 @@
 ---
-title: 资源范围（Resource Scope）
+title: 资源与权限范围
 description: 理解 ResourceScope、ResourceDescriptor 与 ResourceHierarchyProvider 如何把授权约束到具体资源空间。
 sidebar:
   order: 5

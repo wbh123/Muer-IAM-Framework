@@ -1,5 +1,5 @@
 ---
-title: 档案（Profile）
+title: 用户授权身份（Profile）
 description: 理解 AuthorizationProfile 如何把模板版本、客户端类型、启用状态与资源范围组合成一个可切换的授权上下文。
 sidebar:
   order: 4

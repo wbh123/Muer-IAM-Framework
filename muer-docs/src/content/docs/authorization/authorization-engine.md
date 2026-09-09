@@ -1,5 +1,5 @@
 ---
-title: 授权引擎
+title: 授权决策流程
 description: AuthorizationEngine 如何按固定顺序产出可解释的 AuthorizationDecision——含真实决策顺序、decisionCode 与 steps 的用途。
 sidebar:
   order: 5

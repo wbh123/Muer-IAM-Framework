@@ -1,5 +1,5 @@
 ---
-title: 授权诊断
+title: 为什么被拒绝：授权诊断
 description: 通过 AuthorizationDecision 与决策步骤定位权限、Scope、Profile 等授权拒绝原因。
 sidebar:
   order: 1
