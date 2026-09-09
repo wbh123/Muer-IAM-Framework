@@ -31,7 +31,7 @@ set -euo pipefail
 
 repository_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 docs_content="$repository_root/muer-docs/src/content/docs"
-openapi="$repository_root/muer-management-web/src/main/resources/openapi/iam.yaml"
+openapi="$repository_root/contracts/openapi/iam.yaml"
 properties_src="$repository_root/muer-spring-boot-autoconfigure/src/main/java/cloud/muer/autoconfigure/MuerProperties.java"
 
 failures=0

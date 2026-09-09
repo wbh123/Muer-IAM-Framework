@@ -33,7 +33,7 @@
                         <id>generate-iam-management-contract</id>
                         <goals><goal>generate</goal></goals>
                         <configuration>
-                            <inputSpec>${project.basedir}/src/main/resources/openapi/iam.yaml</inputSpec>
+                            <inputSpec>${maven.multiModuleProjectDirectory}/contracts/openapi/iam.yaml</inputSpec>
                             <generatorName>spring</generatorName>
                             <apiPackage>cloud.muer.web.api</apiPackage>
                             <modelPackage>cloud.muer.web.dto</modelPackage>
