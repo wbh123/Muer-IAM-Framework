@@ -1,5 +1,5 @@
 ---
-title: 会话吊销
+title: 撤销登录会话
 description: 按 sessionId 精确吊销单个 Session，并保持其他 Session 独立有效。
 sidebar:
   order: 4

@@ -1,5 +1,5 @@
 ---
-title: 身份认证器（IdentityAuthenticator）
+title: 接入现有登录系统
 description: 谁调用它、你负责什么、Muer 负责什么，以及如何用你自己的 UserService 投影一个真实的 IamPrincipal（含逐字段解释与首次无 Profile 场景）。
 sidebar:
   order: 2

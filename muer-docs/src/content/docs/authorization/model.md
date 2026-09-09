@@ -1,5 +1,5 @@
 ---
-title: 授权模型
+title: Muer 如何判断权限
 description: 概述 IAM 授权模型的核心要素：主体、权限、资源与作用域。
 sidebar:
   order: 1

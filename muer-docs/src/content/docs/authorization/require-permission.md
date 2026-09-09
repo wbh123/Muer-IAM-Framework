@@ -1,5 +1,5 @@
 ---
-title: 声明权限需求（@RequirePermission）
+title: 保护业务接口
 description: 说明 @RequirePermission 声明的不只是 Permission——它连同 Resolver 解析出的资源一起，交给引擎做 Permission + Resource + Scope 的联合判断。
 sidebar:
   order: 2

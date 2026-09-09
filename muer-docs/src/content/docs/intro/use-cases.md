@@ -1,5 +1,5 @@
 ---
-title: 适用场景
+title: 适合哪些项目
 description: 了解 IAM Spring Boot Starter 适合解决哪类授权与 Session 问题，以及哪些场景并不合适。
 sidebar:
   order: 3

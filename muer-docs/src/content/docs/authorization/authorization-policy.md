@@ -1,5 +1,5 @@
 ---
-title: 授权策略与拦截
+title: 自定义授权规则
 description: 区分两层——引擎的“策略层”（AuthorizationPolicy 扩展）与 MVC 拦截器的“HTTP 错误映射”，并用真实案例看懂 403 之后发生了什么。
 sidebar:
   order: 6

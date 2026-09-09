@@ -1,5 +1,5 @@
 ---
-title: Profile 切换
+title: 切换授权身份
 description: 切换 Profile 不修改旧 Session，而是创建新的 Token 与 Session。
 sidebar:
   order: 2

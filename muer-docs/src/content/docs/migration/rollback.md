@@ -1,5 +1,5 @@
 ---
-title: 回滚
+title: 接入失败如何回滚
 description: 当 IAM 出现问题时，如何撤销其下发的会话并回到原有路径。
 sidebar:
   order: 4

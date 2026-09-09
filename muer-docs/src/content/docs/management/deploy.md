@@ -1,5 +1,5 @@
 ---
-title: 安装与部署
+title: 部署管理控制台
 description: Muer Admin Console 的本地构建、后端要求与 Nginx 部署指引。
 sidebar:
   order: 2

@@ -1,5 +1,5 @@
 ---
-title: 第一次使用 Muer Admin Console
+title: 第一次使用管理控制台
 description: 按当前界面创建 Template、Version 与 Profile，并维护 Scope。
 ---
 

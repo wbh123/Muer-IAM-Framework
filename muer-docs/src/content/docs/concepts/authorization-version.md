@@ -1,5 +1,5 @@
 ---
-title: 授权版本（Authorization Version）
+title: 权限变更与旧 Token
 description: 理解 IamPrincipal 上的 authorizationVersion 字段如何用于授权缓存一致性，以及管理员如何提升它。
 sidebar:
   order: 7

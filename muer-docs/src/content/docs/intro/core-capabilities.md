@@ -55,7 +55,7 @@ IAM 不查询宿主的业务表，也不理解「文档属于哪个项目」。�
 - **Session**：MySQL 持久化权威 Session，Redis 只做 token 索引；
 - **撤销**：支持撤销单个 Session，且不影响其它会话。
 
-相关阅读：[Profile](/concepts/profile/)、[Profile 与 Session](/profile-session/profile/)。
+相关阅读：[用户授权身份（Profile）](/concepts/profile/)、[会话与权限失效](/concepts/session/)、[切换授权身份](/profile-session/profile-switch/)。
 
 ## 诊断与审计（Diagnostics & Audit）
 
