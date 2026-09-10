@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/iam_acceptance
+    username: iam
+    password: iam-secret
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+muer:
+  enabled: true
+  schema:
+    enabled: true
+  token:
+    ttl: 1h

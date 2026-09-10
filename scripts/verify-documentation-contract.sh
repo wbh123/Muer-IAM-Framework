@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Verify that the Muer documentation matches the real runtime contract.
 #
-# This is a Docs-vs-Code contract guard (per the muer-docs authoring spec):
+# This is a Docs-vs-Code contract guard (per the apps/muer-docs-site authoring spec):
 # documentation must not drift from the actual Maven coordinates, Java/Spring
 # namespaces, configuration properties, demonstration environment variables, and
 # HTTP API the framework really exposes. It deliberately avoids ripgrep and only
@@ -10,29 +10,29 @@
 # Checks:
 #   1. Identity: active docs match metadata (brand Muer, website muer.cloud,
 #      repository wbh123/Muer-IAM-Framework, group cloud.muer, package cloud.muer).
-#   2. Active muer-docs content contains no legacy technical identity (the
+#   2. Active apps/muer-docs-site content contains no legacy technical identity (the
 #      former Java namespace, the former GitHub web hosts, the former repository
 #      slug under wbh123, and the old frontend directory names). The scan is
-#      scoped to muer-docs/src/content/docs only; the maintainer-only docs/
+#      scoped to apps/muer-docs-site/src/content/docs only; the maintainer-only docs/
 #      directory is not part of the public documentation contract.
 #   3. Spring configuration prefix in active docs is muer.* -- no stray iam.*
 #      property-prefix usage (legitimate iam.admin.* management permissions,
 #      iam_* tables and /iam/** HTTP paths are allowed).
 #   4. reference/configuration.md documents the real MuerProperties key set and
 #      does not advertise properties that do not exist in MuerProperties.
-#   5. muer-example demonstration environment variables are consistently
-#      MUER_EXAMPLE_*; no stale IAM_EXAMPLE_* remains in active code/docs.
+#   5. examples/showcase demonstration environment variables are consistently
+#      MUER_SHOWCASE_*; no stale IAM_EXAMPLE_* remains in active code/docs.
 #   6. Core Quick Start endpoints exist in the real OpenAPI contract
-#      (muer-management-web/src/main/resources/openapi/iam.yaml).
+#      (modules/muer-http-api/src/main/resources/openapi/iam.yaml).
 #   7. The standalone examples/quickstart consumer exists, consumes only
 #      cloud.muer:muer-spring-boot-starter, is not part of the reactor, and
 #      uses only Muer public API (no internal/persistence/Mapper imports).
 set -euo pipefail
 
 repository_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-docs_content="$repository_root/muer-docs/src/content/docs"
-openapi="$repository_root/muer-management-web/src/main/resources/openapi/iam.yaml"
-properties_src="$repository_root/muer-spring-boot-autoconfigure/src/main/java/cloud/muer/autoconfigure/MuerProperties.java"
+docs_content="$repository_root/apps/muer-docs-site/src/content/docs"
+openapi="$repository_root/contracts/openapi/iam.yaml"
+properties_src="$repository_root/modules/muer-spring-boot-autoconfigure/src/main/java/cloud/muer/autoconfigure/MuerProperties.java"
 
 failures=0
 note_failure() {
@@ -73,14 +73,14 @@ if require_file 'root pom.xml exists' "$root_pom"; then
 fi
 
 # Astro site + edit link target the official site / repository.
-astro_config="$repository_root/muer-docs/astro.config.mjs"
+astro_config="$repository_root/apps/muer-docs-site/astro.config.mjs"
 if require_file 'astro.config.mjs exists' "$astro_config"; then
   grep -Eq "https://muer\.cloud" "$astro_config" || note_failure 'astro site defaults to https://muer.cloud'
   grep -Eq "wbh123/Muer-IAM-Framework" "$astro_config" || note_failure 'astro edit link points at wbh123/Muer-IAM-Framework'
 fi
 
 # --- 2. No legacy technical identity in active docs --------------------------
-printf 'Legacy-identity scan (active muer-docs only)\n'
+printf 'Legacy-identity scan (active apps/muer-docs-site only)\n'
 # Exclude the former Java namespace, the former GitHub web hosts, the former
 # repository slug under wbh123, and the old frontend directory names. A
 # migration guide may reference the "former GitHub-based Java namespace" in prose
@@ -125,15 +125,15 @@ if require_file 'MuerProperties.java exists' "$properties_src"; then
   fi
 fi
 
-# --- 5. Example environment variables are consistently MUER_EXAMPLE_* --------
+# --- 5. Example environment variables are consistently MUER_SHOWCASE_* --------
 printf 'Example environment variable contract\n'
 example_sources=(
-  "$repository_root/muer-example/src/main/resources/application.yaml"
-  "$repository_root/muer-example/src/main/resources/application-dev.yaml"
+  "$repository_root/examples/showcase/src/main/resources/application.yaml"
+  "$repository_root/examples/showcase/src/main/resources/application-dev.yaml"
   "$repository_root/examples/quickstart/docker-compose.yml"
   "$repository_root/examples/quickstart/.env.example"
   "$repository_root/scripts/test-showcase-readme.sh"
-  "$repository_root/muer-example/README.md"
+  "$repository_root/examples/showcase/README.md"
 )
 for path in "${example_sources[@]}"; do
   if [[ -f "$path" ]]; then
@@ -148,11 +148,11 @@ else
   pass 'no stale IAM_EXAMPLE_ in active docs or example sources'
 fi
 # Demonstration variables in active docs use the MUER_ prefix (either the
-# MUER_EXAMPLE_* showcase variables or the MUER_* quickstart variables).
-if grep -rqE 'MUER_(EXAMPLE_)?[A-Z_]+' "$docs_content/getting-started" 2>/dev/null; then
-  pass 'active docs reference MUER_* / MUER_EXAMPLE_* demonstration variables'
+# MUER_SHOWCASE_* showcase variables or the MUER_* quickstart variables).
+if grep -rqE 'MUER_(SHOWCASE_)?[A-Z_]+' "$docs_content/getting-started" 2>/dev/null; then
+  pass 'active docs reference MUER_* / MUER_SHOWCASE_* demonstration variables'
 else
-  note_failure 'active docs should reference MUER_* / MUER_EXAMPLE_* demonstration variables'
+  note_failure 'active docs should reference MUER_* / MUER_SHOWCASE_* demonstration variables'
 fi
 
 # --- 6. Core Quick Start endpoints exist in the OpenAPI contract -------------

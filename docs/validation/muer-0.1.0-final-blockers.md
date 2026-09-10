@@ -12,7 +12,7 @@
 | P1 | Quick Start Seeder 破坏 unrelated 数据 | RESOLVED | 固定 Demo 范围清理、ID/业务键冲突 fail-fast、H2 Safety Test |
 | P2 | Quick Start 与 From Zero 内容重叠 | RESOLVED | Quick Start 运行现成示例；手写接入说明位于 From Zero |
 | P2 | Admin Console 教程与 HEAD 漂移 | RESOLVED | 文档覆盖 Template、Version、Publish、Profile Create 与当前限制 |
-| P2 | 重复公开教程漂移 | RESOLVED | `muer-docs/` 为事实源；根目录旧文档仅作薄兼容入口 |
+| P2 | 重复公开教程漂移 | RESOLVED | `apps/muer-docs-site/` 为事实源；根目录旧文档仅作薄兼容入口 |
 | P2 | Observability 操作说明 | RESOLVED | 文档覆盖可选依赖、Actuator 暴露与验证 |
 
 发布阻塞统计：

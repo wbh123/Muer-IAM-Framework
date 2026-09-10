@@ -37,15 +37,24 @@ jobs:
       - name: Verify Muer project identity
         run: bash scripts/test-muer-identity.sh
 
+      - name: Verify framework Reactor and architecture tests
+        run: mvn -B verify
+
       - name: Test Spring Boot auto-configuration
         run: >-
-          mvn -B -pl muer-spring-boot-autoconfigure -am
+          mvn -B -pl modules/muer-spring-boot-autoconfigure -am
           -Dtest=MuerAutoConfigurationTest
           -Dsurefire.failIfNoSpecifiedTests=false test
 
-      - name: Smoke test the starter from a consumer application
+      - name: Install framework modules for standalone consumers
+        run: mvn -B install -DskipTests
+
+      - name: Smoke test the Quick Start consumer application
+        run: mvn -B -f examples/quickstart/pom.xml test
+
+      - name: Smoke test the Showcase consumer application
         run: >-
-          mvn -B -pl muer-example -am
+          mvn -B -f examples/showcase/pom.xml
           -Dtest=IamStarterAutoConfigurationSmokeTest
           -Dsurefire.failIfNoSpecifiedTests=false test
 
@@ -53,7 +62,7 @@ jobs:
         run: bash scripts/test-showcase-readme.sh
 
       - name: Package the consumable Starter
-        run: mvn -B -pl muer-spring-boot-starter -am package -DskipTests
+        run: mvn -B -pl modules/muer-spring-boot-starter -am package -DskipTests
 
   management-verify:
     name: Verify Muer Management API
@@ -68,7 +77,7 @@ jobs:
           cache: maven
 
       - name: Test management module and its domain dependencies
-        run: mvn -B -pl muer-management-web -am test
+        run: mvn -B -pl modules/muer-http-api -am test
 
   showcase-integration:
     name: Docker/Testcontainers consumer showcase
@@ -85,17 +94,14 @@ jobs:
       - name: Check Docker availability
         run: docker info
 
+      - name: Install framework modules for the Showcase consumer
+        run: mvn -B install -DskipTests
+
       - name: Run MySQL and Redis consumer walkthrough
-        run: >-
-          mvn -B -pl muer-example -am -Pintegration
-          -Dtest=IamStarterConsumptionTest,IamSecurityIntegrationTest
-          -Dsurefire.failIfNoSpecifiedTests=false test
+        run: mvn -B -f examples/showcase/pom.xml -Pintegration test
 
       - name: Verify opt-in admin demo seeder isolation
-        run: >-
-          mvn -B -pl muer-example -am -Pintegration
-          -Dtest=AdminConsoleDemoSeedIntegrationTest
-          -Dsurefire.failIfNoSpecifiedTests=false test
+        run: mvn -B -f examples/showcase/pom.xml -Pintegration test
 
   consumer-integration:
     name: Independent Consumer acceptance
@@ -113,10 +119,10 @@ jobs:
         run: docker info
 
       - name: Enforce Consumer public API boundary
-        run: bash scripts/verify-consumer-public-api.sh
+        run: bash scripts/verify-consumer-public-api.sh test-apps/consumer-acceptance/src/main/java
+
+      - name: Install framework modules for the independent Consumer
+        run: mvn -B install -DskipTests
 
       - name: Run independent Consumer acceptance
-        run: >-
-          mvn -B -pl muer-example -am -Pintegration
-          -Dtest=IamConsumerIntegrationTest
-          -Dsurefire.failIfNoSpecifiedTests=false test
+        run: mvn -B -f test-apps/consumer-acceptance/pom.xml verify

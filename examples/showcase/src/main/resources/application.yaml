@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: ${MUER_SHOWCASE_JDBC_URL:jdbc:mysql://localhost:3306/iam_showcase}
+    username: ${MUER_SHOWCASE_DB_USERNAME:iam}
+    password: ${MUER_SHOWCASE_DB_PASSWORD:iam-secret}
+  data:
+    redis:
+      host: ${MUER_SHOWCASE_REDIS_HOST:localhost}
+      port: ${MUER_SHOWCASE_REDIS_PORT:6379}
+
+muer:
+  enabled: true
+  token:
+    ttl: 8h

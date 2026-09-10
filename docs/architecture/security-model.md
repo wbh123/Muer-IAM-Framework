@@ -2,7 +2,7 @@
 
 Internal maintainer reference for the Muer authorization and token trust model.
 The user-facing summary lives in
-[`muer-docs` operations/security-model](../../muer-docs/src/content/docs/operations/security-model.md).
+[`apps/muer-docs-site` operations/security-model](../../apps/muer-docs-site/src/content/docs/operations/security-model.md).
 
 ## Trust boundaries
 

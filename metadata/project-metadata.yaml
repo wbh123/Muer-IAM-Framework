@@ -23,7 +23,7 @@ brand:
 artifact:
   rootArtifact: muer-parent
   starterArtifact: muer-spring-boot-starter
-  managementArtifact: muer-management-web
+  managementArtifact: muer-http-api
 
 java:
   basePackage: cloud.muer

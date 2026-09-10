@@ -4,16 +4,20 @@
 
 | Item | Value |
 | --- | --- |
-| Branch | `main` |
-| Product candidate SHA | `bd409d9b3da1138a1b4c1b920d12234e09740665` |
+| Original product candidate | `main` at `bd409d9b3da1138a1b4c1b920d12234e09740665` |
+| Current architecture candidate | `codex/repository-architecture-refactor` at `ca941de` before this report update |
 | Maven version | `0.1.0-SNAPSHOT` |
 | Runtime baseline | Java 21, Spring Boot 4.0.0, MySQL 8.4, Redis 7 |
 | Documentation baseline | Node 22+, Astro + Starlight |
 | Admin Console baseline | Node 22+, Vue 3 + TypeScript + Vite + Element Plus |
 | Tag / publication | Not created |
 
-`bd409d9b` is the product candidate merge commit that brings the complete 0.1.0 scope into `main`.
-This report is a documentation-only follow-up and does not change product runtime code.
+`bd409d9b` is the original product candidate merge commit that brings the
+complete 0.1.0 scope into `main`. The current candidate reorganizes repository
+boundaries only: it preserves the OpenAPI SHA-256, six Flyway migration hashes,
+and all `/iam/**` HTTP semantics. Its remote CI has not been triggered from this
+isolated branch, so the current remote status is **Pending** rather than
+inferred from the historical `main` run.
 
 ## 0.1.0 product scope
 
@@ -29,7 +33,7 @@ This report is a documentation-only follow-up and does not change product runtim
 - Audit and authenticated self Authorization Diagnostics;
 - Management API for users, identities, permissions, templates, profiles/scopes, sessions, audit and overview;
 - `GET /iam/auth/capabilities` for current-principal capabilities;
-- optional `muer-admin-web` Vue 3 Management Console;
+- optional `apps/muer-admin-console` Vue 3 Management Console;
 - Astro + Starlight documentation site and manual deployment/QuickStart documentation.
 
 The Admin Console is part of the 0.1.0 release scope but is **not** a runtime dependency of applications that only consume the Starter.
@@ -93,7 +97,7 @@ Security and compatibility boundaries reviewed before merge:
 
 ## Administrator bootstrap
 
-`muer-example` provides an explicit development-only administrator for manual Console acceptance only when **both** conditions hold:
+`examples/showcase` provides an explicit development-only administrator for manual Console acceptance only when **both** conditions hold:
 
 ```text
 SPRING_PROFILES_ACTIVE=dev
@@ -115,7 +119,7 @@ Production first-administrator provisioning is deployment-owned: controlled SQL/
 
 Repository and documentation-site QuickStart material now consistently describes manual MySQL/Redis configuration as the primary path, Docker as optional, and HTTP examples by request method/path/body/expected result rather than requiring curl/jq-based walkthroughs.
 
-## Remote CI evidence
+## Historical remote CI evidence
 
 All three main-branch workflows passed for the product candidate merge commit `bd409d9b3da1138a1b4c1b920d12234e09740665`.
 
@@ -126,6 +130,35 @@ All three main-branch workflows passed for the product candidate merge commit `b
 | Verify Muer Documentation | `33970825217` | `bd409d9b` | success | workflow guard, install, Astro check, Astro build |
 
 The same feature head `03e723ff` also passed all three PR workflows before PR #2 was merged into `main`.
+
+## Current architecture candidate verification
+
+The repository-architecture candidate was verified locally with Docker Desktop
+WSL integration available. No framework behavior, HTTP route, OpenAPI content,
+or database migration was changed by this reorganization.
+
+| Check | Local result |
+| --- | --- |
+| `mvn -B clean verify` | PASS — all 12 Reactor modules, including MySQL/Redis Testcontainers |
+| `mvn -B install -DskipTests` | PASS |
+| `mvn -B -f examples/quickstart/pom.xml test` | PASS — 3 tests |
+| `mvn -B -f examples/showcase/pom.xml -Pintegration test` | PASS — 23 tests with MySQL/Redis Testcontainers |
+| `mvn -B -f test-apps/consumer-acceptance/pom.xml test` | PASS — 2 tests with MySQL/Redis Testcontainers |
+| Consumer public API and repository-layout checks | PASS |
+| Documentation contract, workflow and README checks | PASS |
+| Astro `npm run check` | PASS — 0 errors, 0 warnings, 0 hints |
+| Astro `npm run build` | PASS — 66 static pages and search index |
+| Built-site internal route and anchor scan | PASS — 66 pages |
+
+The standalone Consumer Acceptance `verify` invocation completed its test phase,
+then waited on an external Maven mirror while fetching a packaging-plugin
+dependency. This did not affect its successful `test` acceptance result or the
+root Reactor's successful `clean verify` and `install` results.
+
+Remote CI for this architecture candidate: **Pending**. It must run the three
+existing workflows (`Verify Muer Starter`, `Verify Muer Admin Console`, and
+`Verify Muer Documentation`) on the candidate HEAD before any merge or release
+decision.
 
 ## Findings
 
@@ -139,10 +172,14 @@ The same feature head `03e723ff` also passed all three PR workflows before PR #2
 
 ## Release state
 
-**Software release candidate**: `READY FOR HUMAN RELEASE APPROVAL`.
+**Original software release candidate (`bd409d9b`)**: `READY FOR HUMAN RELEASE APPROVAL`.
 
 The product candidate is merged into `main`, the Starter/Management/Consumer/Admin Console/Documentation verification matrix is green, the compatibility regression around self diagnostics was corrected, and the Admin Demo Seeder is explicitly scoped to demo-owned permissions.
 
 **Public Maven / open-source distribution**: pending. The repository owner has chosen **Apache License 2.0**; a `LICENSE` file and matching Maven license metadata are now in place. The distribution gate will be re-evaluated once the Muer migration baseline (this branch) is green in CI.
 
-The repository intentionally remains `0.1.0-SNAPSHOT`. No `v0.1.0` tag, Maven publication, or GitHub Release has been created yet.
+**Current architecture candidate**: `READY FOR REMOTE CI / HUMAN RELEASE APPROVAL`.
+Local release gates are complete and P0/P1 remain zero; the required remaining
+gate is the current candidate's remote CI. The repository intentionally remains
+`0.1.0-SNAPSHOT`. No `v0.1.0` tag, Maven publication, GitHub Release, merge, or
+push has been created from this branch.

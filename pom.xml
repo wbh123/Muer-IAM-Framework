@@ -35,18 +35,17 @@
     </developers>
 
     <modules>
-        <module>muer-core</module>
-        <module>muer-authentication</module>
-        <module>muer-authorization</module>
-        <module>muer-session</module>
-        <module>muer-audit</module>
-        <module>muer-diagnostics</module>
-        <module>muer-persistence-mybatis</module>
-        <module>muer-management-web</module>
-        <module>muer-spring-boot-autoconfigure</module>
-        <module>muer-spring-boot-starter</module>
-        <module>muer-example</module>
-        <module>muer-tests</module>
+        <module>modules/muer-core</module>
+        <module>modules/muer-authentication</module>
+        <module>modules/muer-authorization</module>
+        <module>modules/muer-session</module>
+        <module>modules/muer-audit</module>
+        <module>modules/muer-diagnostics</module>
+        <module>modules/muer-persistence-mybatis</module>
+        <module>modules/muer-http-api</module>
+        <module>modules/muer-spring-boot-autoconfigure</module>
+        <module>modules/muer-spring-boot-starter</module>
+        <module>tests/architecture</module>
     </modules>
 
     <properties>

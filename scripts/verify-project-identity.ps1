@@ -54,7 +54,9 @@ if ($scmUrl -ne "https://github.com/$repositoryName") {
 
 $moduleNames = @($rootPom.project.modules.module)
 foreach ($moduleName in $moduleNames) {
-    $modulePomPath = Join-Path (Join-Path $RepositoryRoot $moduleName) 'pom.xml'
+    $modulePath = [string]$moduleName
+    $moduleDir  = ($modulePath -split '[\\/]')[-1]
+    $modulePomPath = Join-Path (Join-Path $RepositoryRoot $modulePath) 'pom.xml'
     [xml]$modulePom = Get-Content -LiteralPath $modulePomPath -Raw -Encoding utf8
     if ($modulePom.project.parent.groupId -ne $groupId) {
         throw "Module '$moduleName' parent groupId does not match '$groupId'."
@@ -62,14 +64,36 @@ foreach ($moduleName in $moduleNames) {
     if ($modulePom.project.parent.version -ne $version) {
         throw "Module '$moduleName' parent version does not match '$version'."
     }
-    if ($modulePom.project.artifactId -ne $moduleName) {
-        throw "Module POM artifactId '$($modulePom.project.artifactId)' does not match its directory '$moduleName'."
+    $moduleArtifact = [string]$modulePom.project.artifactId
+    if ($modulePath.StartsWith('modules/')) {
+        # Framework modules live one level under modules/ and their directory
+        # basename must equal the Maven artifactId.
+        if ($moduleArtifact -ne $moduleDir) {
+            throw "Module POM artifactId '$moduleArtifact' does not match its directory '$moduleName'."
+        }
+    }
+    elseif (-not $moduleArtifact.StartsWith('muer-')) {
+        # Organizational reactor modules (e.g. tests/architecture) keep a
+        # muer-prefixed artifactId rather than mirroring the grouping directory.
+        throw "Module '$moduleName' artifactId '$moduleArtifact' must use the 'muer-' prefix."
     }
 }
 
 # Muer is the single canonical brand identity: the consumable starter
 # artifact must exist under the Muer group and the canonical package root.
-$starterPomPath = Join-Path (Join-Path $RepositoryRoot $starterArtifact) 'pom.xml'
+# Locate the starter POM through the reactor <module> entries so the check
+# stays correct under the layered repository layout (modules/...).
+$starterModulePath = $null
+foreach ($m in $rootPom.project.modules.module) {
+    if (([string]$m).Split('/')[-1] -eq $starterArtifact -or ([string]$m).Split('\\')[-1] -eq $starterArtifact) {
+        $starterModulePath = [string]$m
+        break
+    }
+}
+if (-not $starterModulePath) {
+    throw "Reactor has no module for starter artifact '$starterArtifact'."
+}
+$starterPomPath = Join-Path (Join-Path $RepositoryRoot $starterModulePath) 'pom.xml'
 if (-not (Test-Path -LiteralPath $starterPomPath)) {
     throw "Missing canonical starter artifact POM: $starterPomPath"
 }

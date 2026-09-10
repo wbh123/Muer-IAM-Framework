@@ -2,7 +2,7 @@
 set -euo pipefail
 
 repository_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-readme="$repository_root/muer-example/README.md"
+readme="$repository_root/examples/showcase/README.md"
 root_readme="$repository_root/README.md"
 
 require() {
@@ -15,7 +15,7 @@ require() {
 }
 
 require 'demonstration credentials' 'operator-a.*demo-pass|demo-pass.*operator-a'
-require 'runtime environment variables' 'MUER_EXAMPLE_JDBC_URL'
+require 'runtime environment variables' 'MUER_SHOWCASE_JDBC_URL'
 require 'login endpoint' 'POST[[:space:]]+/iam/auth/login'
 require 'principal and session reads' 'GET[[:space:]]+/iam/auth/me'
 require 'session listing' 'GET[[:space:]]+/iam/sessions'
@@ -26,8 +26,8 @@ require 'profile switch endpoint' 'POST[[:space:]]+/iam/authorization/profiles/.
 require 'authorization diagnostics endpoint' 'POST[[:space:]]+/iam/authorization/diagnostics'
 require 'session revoke endpoint' 'POST[[:space:]]+/iam/sessions/.*/revoke'
 require 'post-revocation unauthorized result' '401'
-require 'container-free smoke command' 'mvn[[:space:]]+-pl[[:space:]]+muer-example[[:space:]]+-am.*-Dtest=IamStarterAutoConfigurationSmokeTest.*test'
-require 'Testcontainers integration command' 'mvn[[:space:]]+-pl[[:space:]]+muer-example[[:space:]]+-am[[:space:]]+-Pintegration.*IamStarterConsumptionTest.*IamSecurityIntegrationTest.*test'
+require 'container-free smoke command' 'mvn[[:space:]]+-f[[:space:]]+examples/showcase/pom\.xml.*-Dtest=IamStarterAutoConfigurationSmokeTest.*test'
+require 'Testcontainers integration command' 'mvn[[:space:]]+-f[[:space:]]+examples/showcase/pom\.xml.*-Pintegration.*IamStarterConsumptionTest.*IamSecurityIntegrationTest.*test'
 require 'declarative permission annotation' '@RequirePermission'
 require 'MVC resource resolver SPI' 'MvcResourceDescriptorResolver'
 require 'declarative unauthenticated status' '401'

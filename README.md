@@ -54,7 +54,7 @@ Audit / Diagnostics 解释发生了什么
 - [Public API / SPI](docs/PUBLIC_API.md)
 - [Admin Console 部署](https://muer.cloud/management/deploy/)
 - [0.1.0 Release Notes](docs/RELEASE_NOTES_0.1.0.md)
-- 文档站源码：[`muer-docs/`](muer-docs/)；正式站点目标：`https://muer.cloud`
+- 文档站源码：[`apps/muer-docs-site/`](apps/muer-docs-site/)；正式站点目标：`https://muer.cloud`
 
 ## Five-minute integration
 
@@ -68,7 +68,7 @@ Audit / Diagnostics 解释发生了什么
 </dependency>
 ```
 
-普通宿主应用只需要依赖 `muer-spring-boot-starter`。`muer-admin-web` 与 `muer-docs` 都不是运行时依赖。
+普通宿主应用只需要依赖 `muer-spring-boot-starter`。`apps/muer-admin-console` 与 `apps/muer-docs-site` 都不是运行时依赖。
 
 ### 2. 配置 MySQL、Redis 与 Muer
 
@@ -177,7 +177,7 @@ User / Session
 
 ## Muer Admin Console
 
-`muer-admin-web/` 是 0.1.0 随附的**可选管理客户端**，使用 Vue 3 + TypeScript + Element Plus，并从 `muer-management-web/src/main/resources/openapi/iam.yaml` 自动生成 TypeScript Client。
+`apps/muer-admin-console/` 是 0.1.0 随附的**可选管理客户端**，使用 Vue 3 + TypeScript + Element Plus，并从 `contracts/openapi/iam.yaml` 自动生成 TypeScript Client。
 
 当前覆盖：
 
@@ -197,11 +197,11 @@ Account
 
 ### 本地手工验收
 
-使用 `muer-example` 时，开发演示管理员必须显式启用：
+使用 `examples/showcase` 时，开发演示管理员必须显式启用：
 
 ```text
 SPRING_PROFILES_ACTIVE=dev
-MUER_EXAMPLE_SEED_ADMIN=true
+MUER_SHOWCASE_SEED_ADMIN=true
 ```
 
 登录：
@@ -217,13 +217,13 @@ clientType: WEB
 前端启动：
 
 ```bash
-cd muer-admin-web
+cd apps/muer-admin-console
 npm ci
 npm run api:generate
 npm run dev
 ```
 
-部署入口见 [Muer Admin Console Deployment](https://muer.cloud/management/deploy/)，首个生产管理员的最终说明位于 [`muer-docs` Bootstrap 页面](muer-docs/src/content/docs/management/bootstrap-first-admin.md)。
+部署入口见 [Muer Admin Console Deployment](https://muer.cloud/management/deploy/)，首个生产管理员的最终说明位于 [`apps/muer-docs-site` Bootstrap 页面](apps/muer-docs-site/src/content/docs/management/bootstrap-first-admin.md)。
 
 ## Runtime observability
 
@@ -266,27 +266,34 @@ muer.token.lookups
 
 `POST /iam/authorization/diagnostics` 始终是**当前已认证 Principal 的自诊断**，不是管理员专属接口，也不能指定其他用户/Profile。
 
-## Modules
+## Repository map
 
-应用通常只消费 Starter：
+第一次进入仓库时按职责定位代码：
 
 ```text
-muer-core
-muer-authentication
-muer-authorization
-muer-session
-muer-audit
-muer-diagnostics
-muer-persistence-mybatis
-muer-management-web
-muer-spring-boot-autoconfigure
-muer-spring-boot-starter   ← 普通业务应用入口
-muer-example
-muer-tests
-
-muer-admin-web              ← 可选管理客户端
-muer-docs                   ← 文档站
+modules/                         发布的 Muer Java Framework modules
+contracts/                       前后端共享机器契约
+apps/                            Admin Console 与 Documentation Site
+examples/                        面向使用者的可运行示例
+test-apps/                       CI 使用的真实外部 Consumer
+tests/                           框架架构约束测试
+docs/                            发布与维护者文档
+metadata/                        可替换的项目元数据
+scripts/                         验证与维护脚本
 ```
+
+框架模块位于 `modules/`，普通应用只依赖 `cloud.muer:muer-spring-boot-starter`。共享 HTTP 契约位于 `contracts/openapi/iam.yaml`；Java HTTP 实现位于 `modules/muer-http-api`。
+
+示例和验收分层如下：
+
+| 目录 | 用途 |
+| --- | --- |
+| `examples/quickstart` | 最小接入：登录、Allow、Permission Deny、Scope Deny |
+| `examples/showcase` | 面向人类探索的完整功能演示 |
+| `test-apps/consumer-acceptance` | CI-only 的真实第三方 Starter Consumer，不是教程 |
+| `apps/muer-admin-console` | 可选 Vue 管理控制台 |
+| `apps/muer-docs-site` | Astro/Starlight 文档站源码 |
+| `tests/architecture` | 不发布的框架架构边界测试 |
 
 HTTP 路径 `/iam/**`、数据库表 `iam_*` 与管理 Permission `iam.admin.*` 继续保留，因为它们表达 IAM 领域协议；Muer 是品牌、Java/Maven 命名空间和 Spring 配置身份。
 
