@@ -1,185 +1,114 @@
-# Muer 0.1.0 Release Validation Report
+# Muer 0.1.0 Release Candidate Validation Report
 
-## Candidate
+## Candidate baseline
 
-| Item | Value |
-| --- | --- |
-| Original product candidate | `main` at `bd409d9b3da1138a1b4c1b920d12234e09740665` |
-| Current architecture candidate | `codex/repository-architecture-refactor` at `ca941de` before this report update |
-| Maven version | `0.1.0-SNAPSHOT` |
-| Runtime baseline | Java 21, Spring Boot 4.0.0, MySQL 8.4, Redis 7 |
-| Documentation baseline | Node 22+, Astro + Starlight |
-| Admin Console baseline | Node 22+, Vue 3 + TypeScript + Vite + Element Plus |
-| Tag / publication | Not created |
-
-`bd409d9b` is the original product candidate merge commit that brings the
-complete 0.1.0 scope into `main`. The current candidate reorganizes repository
-boundaries only: it preserves the OpenAPI SHA-256, six Flyway migration hashes,
-and all `/iam/**` HTTP semantics. Its remote CI has not been triggered from this
-isolated branch, so the current remote status is **Pending** rather than
-inferred from the historical `main` run.
-
-## 0.1.0 product scope
-
-0.1.0 is defined as the first complete product baseline and contains:
-
-- `muer-spring-boot-starter` and Spring Boot auto-configuration;
-- host-owned credential authentication through `IdentityAuthenticator`;
-- opaque token issuance, durable MySQL Session state and Redis token index;
-- Permission, immutable Permission Template Version, Profile and Resource Scope authorization;
-- direct `AuthorizationEngine` use and declarative MVC authorization through `@RequirePermission`;
-- Profile Switch with replacement token/session semantics;
-- isolated Session revocation;
-- Audit and authenticated self Authorization Diagnostics;
-- Management API for users, identities, permissions, templates, profiles/scopes, sessions, audit and overview;
-- `GET /iam/auth/capabilities` for current-principal capabilities;
-- optional `apps/muer-admin-console` Vue 3 Management Console;
-- Astro + Starlight documentation site and manual deployment/QuickStart documentation.
-
-The Admin Console is part of the 0.1.0 release scope but is **not** a runtime dependency of applications that only consume the Starter.
-
-## Deployment and QuickStart boundary
-
-End users are not required to install Docker or run the repository's full verification suite.
-Supported deployment paths include manually installed or pre-existing MySQL 8.x and Redis 7 services, internal/cloud services, containers, or equivalent managed infrastructure.
-
-The user-facing QuickStart verifies the minimum useful path:
-
-1. configure MySQL and Redis;
-2. add the Starter and host adapters;
-3. start Spring Boot and complete IAM schema migration;
-4. confirm login and current-principal endpoints;
-5. confirm at least one allow/deny authorization result;
-6. optionally start and manually inspect the Admin Console.
-
-Docker/Testcontainers remain maintainer-side CI tools and are not a production deployment requirement.
-
-## Starter and consumer verification
-
-| Check | Remote result at `bd409d9b` |
-| --- | --- |
-| Project identity / legacy identifier scan | PASS |
-| Spring Boot auto-configuration | PASS |
-| Consumer Starter smoke | PASS |
-| Consumer showcase documentation | PASS |
-| Starter package | PASS |
-| Management API tests | PASS |
-| Consumer public API boundary | PASS |
-| Independent Consumer acceptance | PASS |
-| MySQL + Redis Testcontainers showcase | PASS |
-| Admin demo seeder isolation | PASS |
-
-The Admin Demo Seeder isolation regression specifically verifies that a non-demo permission such as `iam.admin.extension.read` survives demo reseeding and is not attached to the demo Admin Template. The Seeder now deletes and links only the explicit canonical permission set in `AdminDemoSeedConstants`.
-
-## Admin Console verification
-
-The optional Management Console uses the OpenAPI contract as the Java/TypeScript API boundary.
-
-| Check | Remote result at `bd409d9b` |
-| --- | --- |
-| `npm ci` | PASS |
-| TypeScript client generation from `iam.yaml` | PASS |
-| Vue/TypeScript type check | PASS |
-| Vitest | PASS |
-| Vite production build | PASS |
-
-Security and compatibility boundaries reviewed before merge:
-
-- management routes use current-principal capabilities only as a frontend usability guard;
-- every `/iam/admin/**` backend operation remains authorized by `AuthorizationEngine`;
-- no role/super-admin bypass was introduced;
-- `/account` requires authentication but not an admin capability;
-- `POST /iam/authorization/diagnostics` remains authenticated **self diagnostics**, not admin-only;
-- browser session data uses `sessionStorage`; no repository use of `localStorage`, `v-html`, or `console.log(token)` was found in final review;
-- management Session responses do not expose raw tokens or Redis keys;
-- logout calls the backend before local session cleanup;
-- production creates no default administrator and exposes no public admin-bootstrap endpoint.
-
-## Administrator bootstrap
-
-`examples/showcase` provides an explicit development-only administrator for manual Console acceptance only when **both** conditions hold:
-
-```text
-SPRING_PROFILES_ACTIVE=dev
-IAM_EXAMPLE_SEED_ADMIN=true
-```
-
-Demo credentials are `admin-demo / demo-pass / WEB` and must never be copied into production.
-
-Production first-administrator provisioning is deployment-owned: controlled SQL/migration/deployment seeding or the host application's own initial-provisioning process must establish the first IAM Admin Template/Profile/Scope. Subsequent administration can be performed through the Management Console.
-
-## Documentation verification
-
-| Check | Remote result at `bd409d9b` |
-| --- | --- |
-| Docs workflow configuration guard | PASS |
-| `npm ci` | PASS |
-| Astro type check | PASS |
-| Astro static build | PASS |
-
-Repository and documentation-site QuickStart material now consistently describes manual MySQL/Redis configuration as the primary path, Docker as optional, and HTTP examples by request method/path/body/expected result rather than requiring curl/jq-based walkthroughs.
-
-## Historical remote CI evidence
-
-All three main-branch workflows passed for the product candidate merge commit `bd409d9b3da1138a1b4c1b920d12234e09740665`.
-
-| Workflow | Run ID | Head SHA | Conclusion | Important jobs |
-| --- | --- | --- | --- | --- |
-| Verify Muer Starter | `33970825245` | `bd409d9b` | success | `verify`, `Verify Muer Management API`, `Independent Consumer acceptance`, `Docker/Testcontainers consumer showcase` |
-| Verify Muer Admin Console | `33970825261` | `bd409d9b` | success | OpenAPI generation, type check, tests, production build |
-| Verify Muer Documentation | `33970825217` | `bd409d9b` | success | workflow guard, install, Astro check, Astro build |
-
-The same feature head `03e723ff` also passed all three PR workflows before PR #2 was merged into `main`.
-
-## Current architecture candidate verification
-
-The repository-architecture candidate was verified locally with Docker Desktop
-WSL integration available. No framework behavior, HTTP route, OpenAPI content,
-or database migration was changed by this reorganization.
-
-| Check | Local result |
-| --- | --- |
-| `mvn -B clean verify` | PASS — all 12 Reactor modules, including MySQL/Redis Testcontainers |
-| `mvn -B install -DskipTests` | PASS |
-| `mvn -B -f examples/quickstart/pom.xml test` | PASS — 3 tests |
-| `mvn -B -f examples/showcase/pom.xml -Pintegration test` | PASS — 23 tests with MySQL/Redis Testcontainers |
-| `mvn -B -f test-apps/consumer-acceptance/pom.xml test` | PASS — 2 tests with MySQL/Redis Testcontainers |
-| Consumer public API and repository-layout checks | PASS |
-| Documentation contract, workflow and README checks | PASS |
-| Astro `npm run check` | PASS — 0 errors, 0 warnings, 0 hints |
-| Astro `npm run build` | PASS — 66 static pages and search index |
-| Built-site internal route and anchor scan | PASS — 66 pages |
-
-The standalone Consumer Acceptance `verify` invocation completed its test phase,
-then waited on an external Maven mirror while fetching a packaging-plugin
-dependency. This did not affect its successful `test` acceptance result or the
-root Reactor's successful `clean verify` and `install` results.
-
-Remote CI for this architecture candidate: **Pending**. It must run the three
-existing workflows (`Verify Muer Starter`, `Verify Muer Admin Console`, and
-`Verify Muer Documentation`) on the candidate HEAD before any merge or release
-decision.
-
-## Findings
-
-| Priority | Finding | Status |
+| Item | Value | Status |
 | --- | --- | --- |
-| P0 | No release-blocking software correctness or security issue recorded after final review. | Closed / none |
-| P1 | No `LICENSE` file existed; license metadata was intentionally omitted rather than invented, which blocked public open-source / Maven Central distribution. | Resolved — Apache License 2.0 added (`LICENSE`, root POM `<licenses>`, README and docs). Final public-distribution readiness still gated on a passing Muer CI baseline. |
-| P2 | `main` currently has no enforced branch protection / required status checks. | Open — repository governance improvement |
-| P2 | GitHub Actions still use v4 checkout/setup actions that have deprecation/runtime notices; upgrade can be handled separately without changing 0.1.0 product semantics. | Open — technical debt |
-| P3 | Browser-level Playwright end-to-end coverage for the Admin Console is deferred; backend integration, OpenAPI generation, frontend unit/component tests, type checking and production build are present. | Deferred |
+| Candidate branches | `main`, `release/0.1.0`, `release-prep/maven-central-0.1.0` | `main` and `release/0.1.0` are aligned |
+| Candidate SHA | `6974bf110b2005f88bc334adac8feed46b1ff2b1` | Verified locally and with `git ls-remote` |
+| Maven version | `0.1.0-SNAPSHOT` | Intentionally unchanged; no tag or release created |
+| Java / Spring Boot | Java 21 / Spring Boot 4.0.0 | PASS |
+| Runtime dependencies | MySQL 8.4 / Redis 7 | PASS in Testcontainers validation |
+| Documentation | Node 22+, Astro + Starlight | PASS |
+| Admin Console | Vue 3, TypeScript, Vite, Element Plus | PASS |
+| Release mode | RC validation only | No Central upload, GitHub Release, or `v0.1.0` tag |
 
-## Release state
+The release-preparation change is limited to Maven publication configuration,
+artifact guards, a manual-only workflow, and release evidence. It does not
+change authentication, authorization, persistence behavior, OpenAPI content,
+Flyway migrations, HTTP routes, or frontend runtime behavior.
 
-**Original software release candidate (`bd409d9b`)**: `READY FOR HUMAN RELEASE APPROVAL`.
+## Product and repository scope
 
-The product candidate is merged into `main`, the Starter/Management/Consumer/Admin Console/Documentation verification matrix is green, the compatibility regression around self diagnostics was corrected, and the Admin Demo Seeder is explicitly scoped to demo-owned permissions.
+The 0.1.0 candidate contains the Muer Spring Boot starter, authentication,
+opaque sessions, authorization and profile switching, audit and diagnostics,
+MyBatis persistence, the generated HTTP API, optional Management Console, and
+Astro/Starlight documentation. The published consumer entry point remains
+`cloud.muer:muer-spring-boot-starter`.
 
-**Public Maven / open-source distribution**: pending. The repository owner has chosen **Apache License 2.0**; a `LICENSE` file and matching Maven license metadata are now in place. The distribution gate will be re-evaluated once the Muer migration baseline (this branch) is green in CI.
+The repository keeps the framework modules separate from examples, the
+architecture test module, the optional web applications, and consumer
+acceptance projects. Only the ten framework modules plus the parent POM are
+intended for Maven Central; tests, examples, apps, and test apps are excluded.
 
-**Current architecture candidate**: `READY FOR REMOTE CI / HUMAN RELEASE APPROVAL`.
-Local release gates are complete and P0/P1 remain zero; the required remaining
-gate is the current candidate's remote CI. The repository intentionally remains
-`0.1.0-SNAPSHOT`. No `v0.1.0` tag, Maven publication, GitHub Release, merge, or
-push has been created from this branch.
+## Framework and consumer validation
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Root Maven reactor `mvn -B clean verify` | PASS | All 12 reactor modules; MySQL/Redis Testcontainers included |
+| QuickStart consumer | PASS | 3 tests |
+| Independent consumer acceptance | PASS | 2 tests |
+| Consumer public API boundary | PASS | `CONSUMER_PUBLIC_API_VERIFIED` |
+| Showcase integration | PASS | 23 tests with MySQL/Redis Testcontainers |
+| Starter runtime dependency tree | PASS | No test-app, architecture, or frontend dependency leakage |
+| Repository layout / docs / identity guards | PASS | All repository guard scripts passed |
+| Admin Console build and checks | PASS | Covered by remote workflow below |
+| Documentation build and checks | PASS | Covered by remote workflow below |
+
+The local runs emitted only expected Testcontainers teardown/Lettuce reconnect
+warnings. They did not produce test failures. The local Maven mirror stalled
+while downloading `maven-javadoc-plugin:3.11.2`; therefore the release profile
+artifact attachment is not claimed as locally passed.
+
+## Remote CI evidence
+
+All four push workflows completed successfully on the candidate SHA:
+
+| Workflow | Run | Conclusion | Key jobs |
+| --- | --- | --- | --- |
+| Verify Muer Starter | [34449059994](https://github.com/wbh123/Muer-IAM-Framework/actions/runs/34449059994) | success | `verify`, Management API, Docker/Testcontainers showcase, Independent Consumer acceptance |
+| Verify Muer Documentation | [34449059993](https://github.com/wbh123/Muer-IAM-Framework/actions/runs/34449059993) | success | Documentation install, check, and build |
+| Verify Muer Admin Console | [34449060131](https://github.com/wbh123/Muer-IAM-Framework/actions/runs/34449060131) | success | Admin Console production validation |
+| Publish Muer Documentation | [34449060240](https://github.com/wbh123/Muer-IAM-Framework/actions/runs/34449060240) | success | Documentation deployment job |
+
+The runs report GitHub Actions warnings that `actions/checkout@v4`,
+`actions/setup-java@v4`, and related actions target the deprecated Node 20
+runtime. This is non-blocking technical debt and is independent of the Muer
+runtime contract.
+
+## Contract, database, and security checks
+
+- `/iam/**`, `iam_*`, `iam.admin.*`, and Redis value namespace `iam` remain
+  unchanged compatibility contracts.
+- OpenAPI operation identifiers and generated Java/TypeScript boundaries remain
+  unchanged.
+- The six Flyway migrations and their checksums remain unchanged.
+- The Starter still requires host-owned credentials and does not create a
+  production administrator or expose a public bootstrap endpoint.
+- No credentials, private keys, `settings.xml`, `.env`, or generated secrets
+  were added to tracked files.
+
+## Maven Central publication readiness
+
+| Gate | Result | Interpretation |
+| --- | --- | --- |
+| Main JAR and POM | PASS | Ordinary Maven build produces the reactor artifacts and metadata |
+| Sources JAR | NOT LOCALLY VERIFIED | `central-release` profile is configured; local mirror stalled downloading the source/Javadoc toolchain |
+| Javadoc JAR | NOT LOCALLY VERIFIED | Same network/toolchain limitation; no successful dry-run evidence yet |
+| GPG signing configuration | READY / OWNER ACTION REQUIRED | `maven-gpg-plugin` is configured; the private key and passphrase are intentionally absent |
+| Central Portal plugin | CONFIGURED | `central-publishing-maven-plugin:0.11.0` is pinned in the separate `central-publish` profile |
+| Central namespace `cloud.muer` | OWNER ACTION REQUIRED | Namespace ownership must be verified in Central Portal/DNS; code cannot prove it |
+| Central credentials | OWNER ACTION REQUIRED | `MAVEN_CENTRAL_USERNAME` and `MAVEN_CENTRAL_PASSWORD` must be configured as GitHub Secrets |
+| Manual dry-run workflow | CONFIGURED / NOT RUN | `Verify Muer Maven Release` is `workflow_dispatch` only and defaults to `dry_run=true` |
+| Formal Central upload | NOT EXECUTED | Explicitly out of scope for this RC round |
+
+The repository now follows the official [Central Portal Maven publishing
+flow](https://central.sonatype.org/publish/publish-portal-maven/), including
+the required [publication artifacts and metadata](https://central.sonatype.org/publish/requirements/).
+The `cloud.muer` namespace remains an owner-only item under the [namespace
+registration process](https://central.sonatype.org/register/namespace/).
+
+## Release blockers and recommendation
+
+Software P0/P1 blockers: **0**. Owner-only release setup is still incomplete:
+namespace verification, Central token secrets, a published GPG public key,
+and a successful manual dry-run that verifies Sources/Javadoc/signatures.
+These are not defects in runtime behavior, but they prevent an evidence-backed
+Maven Central release decision today.
+
+**Recommendation: NOT READY FOR VERSION FREEZE.**
+
+The candidate is code-ready for the final release exercise, but version freeze
+must wait for the owner to complete Central setup and for the manual dry-run to
+produce a successful artifact-bundle report. Until then, keep
+`0.1.0-SNAPSHOT`, do not create `v0.1.0`, and do not upload to Central.
