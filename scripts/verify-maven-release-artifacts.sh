@@ -46,8 +46,10 @@ if find examples apps test-apps tests/architecture \
   exit 1
 fi
 
-if git ls-files | grep -Eq '(^|/)(settings\.xml|\.env|\.env\.|.*credentials.*|.*private.*key.*)$'; then
+tracked_sensitive_files="$(git ls-files | grep -E '(^|/)(settings\.xml|\.env($|\.)|.*credentials.*|.*private.*key.*)$' | grep -Ev '(^|/)\.env\.example$' || true)"
+if test -n "$tracked_sensitive_files"; then
   echo 'Tracked credential-like file found in repository.' >&2
+  printf '%s\n' "$tracked_sensitive_files" >&2
   exit 1
 fi
 
