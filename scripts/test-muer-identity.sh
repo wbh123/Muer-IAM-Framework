@@ -18,6 +18,7 @@ legacy_docs_dir="iam-$(printf '%s' 'docs')"
 legacy_hits="$(
   grep -rInF "$former_namespace" "$repository_root" \
     --exclude-dir=.git --exclude-dir=.worktrees --exclude-dir=.workbuddy \
+    --exclude-dir=.superpowers \
     --exclude-dir=node_modules \
     --exclude-dir=dist --exclude-dir=target --exclude-dir=.astro \
     --exclude-dir=scripts \
@@ -34,6 +35,7 @@ fi
 for obsolete in "$former_website" "$former_repository" "$legacy_admin_dir" "$legacy_docs_dir"; do
   if grep -rInF "$obsolete" "$repository_root" \
       --exclude-dir=.git --exclude-dir=.worktrees --exclude-dir=.workbuddy \
+      --exclude-dir=.superpowers \
       --exclude-dir=node_modules \
       --exclude-dir=dist --exclude-dir=target --exclude-dir=.astro \
       --exclude-dir=scripts \
@@ -52,6 +54,7 @@ legacy_hits="$(
     --exclude-dir=.git \
     --exclude-dir=.worktrees \
     --exclude-dir=.workbuddy \
+    --exclude-dir=.superpowers \
     --exclude-dir=node_modules \
     --exclude-dir=dist \
     --exclude-dir=target \
