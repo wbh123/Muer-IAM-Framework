@@ -15,7 +15,7 @@
 | P2 | Admin Console 教程与 HEAD 漂移 | RESOLVED | 文档覆盖当前 Template、Version、Publish、Profile Create 流程 |
 | P2 | 重复公开教程漂移 | RESOLVED | 文档事实源和兼容入口已统一 |
 | P2 | Observability 操作说明 | RESOLVED | 文档覆盖可选依赖、Actuator 暴露与验证 |
-| P2 | Maven Sources/Javadoc dry-run 证据 | OPEN | 配置已提交，但本地镜像下载 `maven-javadoc-plugin:3.11.2` 超时，手动 workflow 尚未执行 |
+| P2 | Maven Sources/Javadoc dry-run 证据 | OPEN | 配置已提交；首次 workflow 已完成 Maven staging 但在制品检查阶段失败，修复后仍需重新验证 |
 | P2 | 发布制品检查器误判 `.env.example` | RESOLVED | 首次 dry-run `34450935438` 暴露误报，已在 `c3dacba` 放行文档示例文件；需重新执行 dry-run |
 | P2 | 修复后的 Maven Central dry-run | OPEN | 重新运行 `Verify Muer Maven Release` 并确认 Sources/Javadoc、白名单和 Central staging 全部通过 |
 | P2 | Central namespace、token、GPG key | OWNER ACTION REQUIRED | 需由仓库所有者在 Central Portal/GitHub Secrets 完成，代码仓库不保存秘密 |
