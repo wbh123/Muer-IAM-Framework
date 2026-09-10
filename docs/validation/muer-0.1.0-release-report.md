@@ -5,7 +5,7 @@
 | Item | Value | Status |
 | --- | --- | --- |
 | Candidate branches | `main`, `release/0.1.0`, `release-prep/maven-central-0.1.0` | `main` and `release/0.1.0` are aligned |
-| Candidate SHA | `6974bf110b2005f88bc334adac8feed46b1ff2b1` | Verified locally and with `git ls-remote` |
+| Code candidate SHA | `9d9d16611430765dcee4d36d9f922007fb5a9afb` | Verified locally and with `git ls-remote` |
 | Maven version | `0.1.0-SNAPSHOT` | Intentionally unchanged; no tag or release created |
 | Java / Spring Boot | Java 21 / Spring Boot 4.0.0 | PASS |
 | Runtime dependencies | MySQL 8.4 / Redis 7 | PASS in Testcontainers validation |
@@ -52,14 +52,23 @@ artifact attachment is not claimed as locally passed.
 
 ## Remote CI evidence
 
-All four push workflows completed successfully on the candidate SHA:
+All four push workflows completed successfully on the code candidate SHA
+`9d9d16611430765dcee4d36d9f922007fb5a9afb`:
 
 | Workflow | Run | Conclusion | Key jobs |
 | --- | --- | --- | --- |
-| Verify Muer Starter | [34449059994](https://github.com/wbh123/Muer-IAM-Framework/actions/runs/34449059994) | success | `verify`, Management API, Docker/Testcontainers showcase, Independent Consumer acceptance |
-| Verify Muer Documentation | [34449059993](https://github.com/wbh123/Muer-IAM-Framework/actions/runs/34449059993) | success | Documentation install, check, and build |
-| Verify Muer Admin Console | [34449060131](https://github.com/wbh123/Muer-IAM-Framework/actions/runs/34449060131) | success | Admin Console production validation |
-| Publish Muer Documentation | [34449060240](https://github.com/wbh123/Muer-IAM-Framework/actions/runs/34449060240) | success | Documentation deployment job |
+| Verify Muer Starter | [34450531437](https://github.com/wbh123/Muer-IAM-Framework/actions/runs/34450531437) | success | `verify`, Management API, Docker/Testcontainers showcase, Independent Consumer acceptance |
+| Verify Muer Documentation | [34450531466](https://github.com/wbh123/Muer-IAM-Framework/actions/runs/34450531466) | success | Documentation install, check, and build |
+| Verify Muer Admin Console | [34450531575](https://github.com/wbh123/Muer-IAM-Framework/actions/runs/34450531575) | success | Admin Console production validation |
+| Publish Muer Documentation | [34450531454](https://github.com/wbh123/Muer-IAM-Framework/actions/runs/34450531454) | success | Documentation deployment job |
+
+The same Starter and Documentation workflows also completed successfully for
+the synchronized `release/0.1.0` push ([Starter
+34450533290](https://github.com/wbh123/Muer-IAM-Framework/actions/runs/34450533290),
+[Documentation
+34450533465](https://github.com/wbh123/Muer-IAM-Framework/actions/runs/34450533465)).
+The final report-only commit does not alter runtime or publication configuration;
+the listed runs therefore remain the validation evidence for the code candidate.
 
 The runs report GitHub Actions warnings that `actions/checkout@v4`,
 `actions/setup-java@v4`, and related actions target the deprecated Node 20
