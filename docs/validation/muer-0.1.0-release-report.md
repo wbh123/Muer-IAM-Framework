@@ -5,7 +5,8 @@
 | Item | Value | Status |
 | --- | --- | --- |
 | Candidate branches | `main`, `release/0.1.0`, `release-prep/maven-central-0.1.0` | `main` and `release/0.1.0` are aligned |
-| Code candidate SHA | `9d9d16611430765dcee4d36d9f922007fb5a9afb` | Verified locally and with `git ls-remote` |
+| Framework/runtime candidate SHA | `9d9d16611430765dcee4d36d9f922007fb5a9afb` | Verified locally and with `git ls-remote` |
+| Release-guard follow-up SHA | `c3dacba0e96683239129f5fb262668091c8c5ebd` | Fixes a false positive for the documented `.env.example`; no runtime changes |
 | Maven version | `0.1.0-SNAPSHOT` | Intentionally unchanged; no tag or release created |
 | Java / Spring Boot | Java 21 / Spring Boot 4.0.0 | PASS |
 | Runtime dependencies | MySQL 8.4 / Redis 7 | PASS in Testcontainers validation |
@@ -52,7 +53,8 @@ artifact attachment is not claimed as locally passed.
 
 ## Remote CI evidence
 
-All four push workflows completed successfully on the code candidate SHA
+All four push workflows completed successfully on the framework/runtime
+candidate SHA
 `9d9d16611430765dcee4d36d9f922007fb5a9afb`:
 
 | Workflow | Run | Conclusion | Key jobs |
@@ -98,7 +100,7 @@ runtime contract.
 | Central Portal plugin | CONFIGURED | `central-publishing-maven-plugin:0.11.0` is pinned in the separate `central-publish` profile |
 | Central namespace `cloud.muer` | OWNER ACTION REQUIRED | Namespace ownership must be verified in Central Portal/DNS; code cannot prove it |
 | Central credentials | OWNER ACTION REQUIRED | `MAVEN_CENTRAL_USERNAME` and `MAVEN_CENTRAL_PASSWORD` must be configured as GitHub Secrets |
-| Manual dry-run workflow | CONFIGURED / NOT RUN | `Verify Muer Maven Release` is `workflow_dispatch` only and defaults to `dry_run=true` |
+| Manual dry-run workflow | FAILED THEN FIXED / RERUN PENDING | Run [34450935438](https://github.com/wbh123/Muer-IAM-Framework/actions/runs/34450935438) reached Maven staging but the artifact guard incorrectly rejected `examples/quickstart/.env.example`; the guard fix is in `c3dacba`, and a post-fix run is still required |
 | Formal Central upload | NOT EXECUTED | Explicitly out of scope for this RC round |
 
 The repository now follows the official [Central Portal Maven publishing
@@ -109,7 +111,9 @@ registration process](https://central.sonatype.org/register/namespace/).
 
 ## Release blockers and recommendation
 
-Software P0/P1 blockers: **0**. Owner-only release setup is still incomplete:
+Software P0/P1 blockers: **0**. The first dry-run exposed and fixed a P2
+artifact-guard false positive; its post-fix rerun is still open. Owner-only
+release setup is also incomplete:
 namespace verification, Central token secrets, a published GPG public key,
 and a successful manual dry-run that verifies Sources/Javadoc/signatures.
 These are not defects in runtime behavior, but they prevent an evidence-backed

@@ -84,7 +84,7 @@
 - Produces: evidence for Main/Sources/Javadoc artifacts, dependency boundaries, and unchanged runtime contracts.
 
 - [x] Run `mvn -B clean verify`.
-- [ ] Run `mvn -B -Pcentral-release -Dgpg.skip=true -Dcentral.skipPublishing=true clean verify` (blocked by the local Maven mirror while downloading `maven-javadoc-plugin:3.11.2`; manual GitHub dry-run could not be triggered because the GitHub API timed out).
+- [ ] Run `mvn -B -Pcentral-release -Dgpg.skip=true -Dcentral.skipPublishing=true clean verify` (blocked by the local Maven mirror while downloading `maven-javadoc-plugin:3.11.2`; the first manual dry-run reached staging but exposed a `.env.example` guard false positive, fixed in `c3dacba`; post-fix dry-run remains pending).
 - [x] Inspect the ordinary publishable module boundary and run starter dependency-tree checks for testcontainers/H2/examples leakage.
 - [x] Run root layout, identity, docs, showcase README, consumer public API, Admin Console, and Docs Site checks.
 - [x] Verify unchanged OpenAPI/migration/runtime boundaries from the release-preparation diff.

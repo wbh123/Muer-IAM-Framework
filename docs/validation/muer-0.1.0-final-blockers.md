@@ -16,15 +16,17 @@
 | P2 | 重复公开教程漂移 | RESOLVED | 文档事实源和兼容入口已统一 |
 | P2 | Observability 操作说明 | RESOLVED | 文档覆盖可选依赖、Actuator 暴露与验证 |
 | P2 | Maven Sources/Javadoc dry-run 证据 | OPEN | 配置已提交，但本地镜像下载 `maven-javadoc-plugin:3.11.2` 超时，手动 workflow 尚未执行 |
+| P2 | 发布制品检查器误判 `.env.example` | RESOLVED | 首次 dry-run `34450935438` 暴露误报，已在 `c3dacba` 放行文档示例文件；需重新执行 dry-run |
+| P2 | 修复后的 Maven Central dry-run | OPEN | 重新运行 `Verify Muer Maven Release` 并确认 Sources/Javadoc、白名单和 Central staging 全部通过 |
 | P2 | Central namespace、token、GPG key | OWNER ACTION REQUIRED | 需由仓库所有者在 Central Portal/GitHub Secrets 完成，代码仓库不保存秘密 |
 
 ## 当前候选基线
 
 ```text
-main                     6974bf110b2005f88bc334adac8feed46b1ff2b1
-release/0.1.0             6974bf110b2005f88bc334adac8feed46b1ff2b1
+main                     c3dacba0e96683239129f5fb262668091c8c5ebd
+release/0.1.0             c3dacba0e96683239129f5fb262668091c8c5ebd
 release-prep/maven-central-0.1.0
-                           6974bf110b2005f88bc334adac8feed46b1ff2b1
+                           c3dacba0e96683239129f5fb262668091c8c5ebd
 ```
 
 `release/0.1.0` 已重新对齐当前可信 `main` 基线。未创建 `v0.1.0` 标签、
