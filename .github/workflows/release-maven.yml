@@ -1,0 +1,82 @@
+name: Verify Muer Maven Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Only build and stage release artifacts; never upload to Central'
+        required: true
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Verify ordinary build remains credential-free
+        run: mvn -B clean verify
+
+      - name: Build and stage Central bundle without publishing
+        if: ${{ inputs.dry_run }}
+        run: >-
+          mvn -B -Pcentral-release,central-publish
+          -Dgpg.skip=true
+          -Dcentral.skipPublishing=true
+          clean deploy
+
+      - name: Verify release artifacts and publication boundary
+        if: ${{ inputs.dry_run }}
+        run: bash scripts/verify-maven-release-artifacts.sh
+
+      - name: Generate effective POM for release review
+        if: ${{ inputs.dry_run }}
+        run: >-
+          mvn -B -Pcentral-release,central-publish help:effective-pom
+          -Dgpg.skip=true
+          -Dcentral.skipPublishing=true
+          -Doutput=target/effective-pom.xml
+
+      - name: Configure Maven Central credentials
+        if: ${{ !inputs.dry_run }}
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          server-id: central
+          server-username: MAVEN_CENTRAL_USERNAME
+          server-password: MAVEN_CENTRAL_PASSWORD
+
+      - name: Import release signing key
+        if: ${{ !inputs.dry_run }}
+        shell: bash
+        env:
+          MAVEN_GPG_PRIVATE_KEY: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          test -n "$MAVEN_GPG_PRIVATE_KEY" || { echo 'MAVEN_GPG_PRIVATE_KEY is required.' >&2; exit 1; }
+          printf '%s' "$MAVEN_GPG_PRIVATE_KEY" | gpg --batch --import
+
+      - name: Publish the approved release to Central
+        if: ${{ !inputs.dry_run }}
+        shell: bash
+        env:
+          MAVEN_CENTRAL_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          MAVEN_CENTRAL_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+        run: |
+          set -euo pipefail
+          test -n "$MAVEN_CENTRAL_USERNAME" || { echo 'MAVEN_CENTRAL_USERNAME is required.' >&2; exit 1; }
+          test -n "$MAVEN_CENTRAL_PASSWORD" || { echo 'MAVEN_CENTRAL_PASSWORD is required.' >&2; exit 1; }
+          test -n "$MAVEN_GPG_PASSPHRASE" || { echo 'MAVEN_GPG_PASSPHRASE is required.' >&2; exit 1; }
+          mvn -B -Pcentral-release,central-publish deploy -Dgpg.passphrase="$MAVEN_GPG_PASSPHRASE"
