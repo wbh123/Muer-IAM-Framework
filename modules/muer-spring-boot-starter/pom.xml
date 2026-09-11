@@ -7,6 +7,7 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <artifactId>muer-spring-boot-starter</artifactId>
+    <name>Muer Spring Boot Starter</name>
 
     <properties>
         <!--
