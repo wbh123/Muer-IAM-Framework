@@ -7,6 +7,16 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <artifactId>muer-spring-boot-starter</artifactId>
+
+    <properties>
+        <!--
+            This module is intentionally dependency-only and exposes no public Java types.
+            The inherited release Javadoc execution would otherwise fail on JDK 21 with
+            "No public or protected classes found to document".
+        -->
+        <maven.javadoc.skip>true</maven.javadoc.skip>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>cloud.muer</groupId>
@@ -30,4 +40,37 @@
             <artifactId>spring-boot-starter-data-redis</artifactId>
         </dependency>
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>central-release</id>
+            <build>
+                <plugins>
+                    <!--
+                        Maven Central still requires a -javadoc.jar for JAR artifacts.
+                        Attach a small documentation-only archive instead of inventing a
+                        public marker class solely to satisfy the Javadoc tool.
+                    -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <version>3.5.1</version>
+                        <executions>
+                            <execution>
+                                <id>attach-placeholder-javadocs</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                                <configuration>
+                                    <classifier>javadoc</classifier>
+                                    <classesDirectory>${project.basedir}/src/javadoc</classesDirectory>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
