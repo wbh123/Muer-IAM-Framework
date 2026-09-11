@@ -10,6 +10,7 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <artifactId>muer-persistence-mybatis</artifactId>
+    <name>Muer Persistence MyBatis</name>
 
     <dependencies>
         <dependency>
