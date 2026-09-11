@@ -140,3 +140,36 @@ jobs:
 
       - name: Run independent Consumer acceptance
         run: mvn -B -f test-apps/consumer-acceptance/pom.xml verify
+
+  release-bundle:
+    name: Maven Central release bundle dry-run
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/release/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Verify frozen release version
+        run: bash scripts/verify-release-version.sh
+
+      - name: Build Central bundle without publishing
+        run: >-
+          mvn -B -Pcentral-release,central-publish
+          -Dgpg.skip=true
+          -Dcentral.skipPublishing=true
+          clean deploy
+
+      - name: Verify release artifacts and publication boundary
+        run: bash scripts/verify-maven-release-artifacts.sh
+
+      - name: Generate effective POM for release review
+        run: >-
+          mvn -B -Pcentral-release,central-publish help:effective-pom
+          -Dgpg.skip=true
+          -Dcentral.skipPublishing=true
+          -Doutput=target/effective-pom.xml
