@@ -142,7 +142,7 @@ jobs:
         run: mvn -B -f test-apps/consumer-acceptance/pom.xml verify
 
   release-bundle:
-    name: Maven Central release bundle dry-run
+    name: Maven Central RC bundle dry-run
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/release/')
     runs-on: ubuntu-latest
     env:
@@ -160,7 +160,7 @@ jobs:
           server-username: CENTRAL_DRY_RUN_USERNAME
           server-password: CENTRAL_DRY_RUN_PASSWORD
 
-      - name: Verify frozen release version
+      - name: Verify release candidate remains SNAPSHOT
         run: bash scripts/verify-release-version.sh
 
       - name: Build Central bundle without publishing

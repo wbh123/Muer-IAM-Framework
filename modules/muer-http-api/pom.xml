@@ -3,7 +3,7 @@
     <parent>
         <groupId>cloud.muer</groupId>
         <artifactId>muer-parent</artifactId>
-        <version>0.1.0</version>
+        <version>0.1.0-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <artifactId>muer-http-api</artifactId>

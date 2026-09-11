@@ -36,7 +36,7 @@
 
     <groupId>com.example</groupId>
     <artifactId>muer-quickstart</artifactId>
-    <version>0.1.0</version>
+    <version>0.1.0-SNAPSHOT</version>
     <name>muer-quickstart</name>
     <description>Standalone Muer quick-start consumer (Document System)</description>
 
@@ -53,7 +53,7 @@
         <dependency>
             <groupId>cloud.muer</groupId>
             <artifactId>muer-spring-boot-starter</artifactId>
-            <version>0.1.0</version>
+            <version>0.1.0-SNAPSHOT</version>
         </dependency>
 
         <!-- Smoke test only: it starts a Spring context with a mocked identity
