@@ -7,7 +7,7 @@ Grow quietly. Connect steadily.
 
 Muer 是面向 Spring Boot 应用的可嵌入式身份与访问管理（Identity and Access Management，IAM）框架。它把认证、细粒度授权、权限范围、会话治理、审计、授权诊断与管理能力收敛到一套统一模型中，同时保留宿主应用对用户、密码和业务资源的所有权。
 
-> 当前仓库仍是 `0.1.0-SNAPSHOT` Release Candidate。正式 `v0.1.0` Tag、GitHub Release 与 Maven 发布尚未创建。
+> 当前正式版本：**Muer 0.1.0**。主要消费入口为 `cloud.muer:muer-spring-boot-starter:0.1.0`。
 
 ## Why Muer
 
@@ -64,7 +64,7 @@ Audit / Diagnostics 解释发生了什么
 <dependency>
     <groupId>cloud.muer</groupId>
     <artifactId>muer-spring-boot-starter</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>0.1.0</version>
 </dependency>
 ```
 

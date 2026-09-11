@@ -2,7 +2,7 @@
 
 ## 状态
 
-当前候选版本仍为 `0.1.0-SNAPSHOT`。仓库尚未创建 `v0.1.0` Tag、GitHub Release 或 Maven 正式发布；这些动作必须在最终 Release Gate 与人工批准之后执行。
+Muer 0.1.0 是首个正式发布版本。发布来源为 `release/0.1.0`，经最终 Release Gate 验证后以 `v0.1.0` 标记并发布到 Maven Central。
 
 0.1.0 采用“首版即形成完整产品闭环”的方案：**Starter、Management API、Muer Admin Console、Permission Registration、Runtime Observability 与文档站都属于 0.1.0 首发范围。**
 
@@ -155,16 +155,17 @@ admin-demo / demo-pass / WEB
 - Admin Console 当前具备后端集成测试、OpenAPI 生成、TypeScript 类型检查、Vitest 和生产构建，完整 Playwright 浏览器端到端测试延后；
 - Actuator / Micrometer 是可选运行时集成，不是 Starter 强制依赖。
 
-## Release Gate
+## Release Gate（已通过）
 
-正式 `v0.1.0` 前，最终目标 HEAD 至少必须证明以下远程检查全部成功：
+`v0.1.0` 最终发布基线已通过以下远程检查：
 
 - Verify Muer Starter；
 - Verify Muer Management API；
 - Independent Consumer acceptance；
 - Docker/Testcontainers consumer showcase；
 - Verify Muer Admin Console；
-- Verify Muer Documentation。
+- Verify Muer Documentation；
+- Maven Central release bundle dry-run。
 
 并确认：
 
