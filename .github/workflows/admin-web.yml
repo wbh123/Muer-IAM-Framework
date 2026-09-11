@@ -23,7 +23,7 @@ jobs:
           cache-dependency-path: apps/muer-admin-console/package-lock.json
 
       # openapi-generator-cli needs a JVM to turn iam.yaml into the TS client.
-      - uses: actions/setup-java@v6
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '21'
