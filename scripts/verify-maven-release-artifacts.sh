@@ -24,6 +24,13 @@ publishable_modules=(
 for module in "${publishable_modules[@]}"; do
   artifact_id="$(grep -o '<artifactId>[^<]*</artifactId>' "$module/pom.xml" | sed -n '2p' | sed 's/<[^>]*>//g')"
   test -n "$artifact_id" || { echo "Missing artifactId in $module/pom.xml" >&2; exit 1; }
+
+  project_name="$(grep -o '<name>[^<]*</name>' "$module/pom.xml" | head -n 1 | sed 's/<[^>]*>//g' || true)"
+  test -n "$project_name" || {
+    echo "Missing Maven Central project name in $module/pom.xml" >&2
+    exit 1
+  }
+
   target="$module/target"
   for suffix in ".jar" "-sources.jar" "-javadoc.jar"; do
     file="$target/${artifact_id}-${version}${suffix}"
@@ -39,12 +46,28 @@ for module in "${publishable_modules[@]}"; do
 done
 
 test "$(sed -n 's:.*<maven.deploy.skip>\([^<]*\)</maven.deploy.skip>.*:\1:p' tests/architecture/pom.xml | head -n 1)" = true
+
+grep -q '<excludeArtifact>muer-architecture-tests</excludeArtifact>' pom.xml || {
+  echo 'Central publishing configuration must explicitly exclude muer-architecture-tests.' >&2
+  exit 1
+}
+
 if find examples apps test-apps tests/architecture \
     \( -path '*/target/central-staging' -o -path '*/target/*-sources.jar' -o -path '*/target/*-javadoc.jar' \) \
     -print | grep -q .; then
   echo 'A non-published example, app, consumer, or architecture-test project produced release artifacts.' >&2
   exit 1
 fi
+
+# central-publishing-maven-plugin may still collect a module even when
+# maven.deploy.skip=true. Inspect any generated Central bundle as a final
+# publication-boundary check so test-only modules can never reach the portal.
+while IFS= read -r -d '' bundle; do
+  if unzip -Z1 "$bundle" | grep -q 'muer-architecture-tests'; then
+    echo "Central bundle unexpectedly contains muer-architecture-tests: $bundle" >&2
+    exit 1
+  fi
+done < <(find . -type f -name 'central-bundle*.zip' -print0)
 
 tracked_sensitive_files="$(git ls-files | grep -E '(^|/)(settings\.xml|\.env($|\.)|.*credentials.*|.*private.*key.*)$' | grep -Ev '(^|/)\.env\.example$' || true)"
 if test -n "$tracked_sensitive_files"; then
