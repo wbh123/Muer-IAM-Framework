@@ -104,6 +104,10 @@
                         <artifactId>maven-source-plugin</artifactId>
                         <version>${maven-source-plugin.version}</version>
                         <inherited>true</inherited>
+                        <configuration>
+                            <!-- Dependency-only modules still need a sources artifact for Maven Central. -->
+                            <forceCreation>true</forceCreation>
+                        </configuration>
                         <executions>
                             <execution>
                                 <id>attach-sources</id>
