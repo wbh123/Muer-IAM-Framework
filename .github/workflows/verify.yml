@@ -145,6 +145,9 @@ jobs:
     name: Maven Central release bundle dry-run
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/release/')
     runs-on: ubuntu-latest
+    env:
+      CENTRAL_DRY_RUN_USERNAME: dry-run
+      CENTRAL_DRY_RUN_PASSWORD: dry-run
     steps:
       - uses: actions/checkout@v7
 
@@ -153,6 +156,9 @@ jobs:
           distribution: temurin
           java-version: '21'
           cache: maven
+          server-id: central
+          server-username: CENTRAL_DRY_RUN_USERNAME
+          server-password: CENTRAL_DRY_RUN_PASSWORD
 
       - name: Verify frozen release version
         run: bash scripts/verify-release-version.sh

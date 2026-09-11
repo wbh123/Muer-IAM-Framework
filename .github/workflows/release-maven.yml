@@ -15,6 +15,9 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
+    env:
+      CENTRAL_DRY_RUN_USERNAME: dry-run
+      CENTRAL_DRY_RUN_PASSWORD: dry-run
     steps:
       - uses: actions/checkout@v4
 
@@ -23,6 +26,9 @@ jobs:
           distribution: temurin
           java-version: '21'
           cache: maven
+          server-id: central
+          server-username: CENTRAL_DRY_RUN_USERNAME
+          server-password: CENTRAL_DRY_RUN_PASSWORD
 
       - name: Verify ordinary build remains credential-free
         run: mvn -B clean verify
