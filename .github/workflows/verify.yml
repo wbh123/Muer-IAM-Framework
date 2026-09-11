@@ -14,9 +14,12 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-java@v4
+      - name: Verify ordinary CI workflow hygiene
+        run: bash scripts/test-ci-workflows.sh
+
+      - uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: '21'
@@ -68,9 +71,9 @@ jobs:
     name: Verify Muer Management API
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: '21'
@@ -83,9 +86,9 @@ jobs:
     name: Docker/Testcontainers consumer showcase
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: '21'
@@ -97,19 +100,16 @@ jobs:
       - name: Install framework modules for the Showcase consumer
         run: mvn -B install -DskipTests
 
-      - name: Run MySQL and Redis consumer walkthrough
-        run: mvn -B -f examples/showcase/pom.xml -Pintegration test
-
-      - name: Verify opt-in admin demo seeder isolation
+      - name: Run MySQL and Redis consumer walkthrough and seeder isolation checks
         run: mvn -B -f examples/showcase/pom.xml -Pintegration test
 
   consumer-integration:
     name: Independent Consumer acceptance
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: '21'
