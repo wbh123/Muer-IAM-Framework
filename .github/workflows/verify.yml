@@ -67,6 +67,20 @@ jobs:
       - name: Package the consumable Starter
         run: mvn -B -pl modules/muer-spring-boot-starter -am package -DskipTests
 
+      - name: Verify dependency-only Starter release Javadoc artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          mvn -B -pl modules/muer-spring-boot-starter -am \
+            -Pcentral-release \
+            -Dgpg.skip=true \
+            -DskipTests \
+            package
+          javadoc_jar="$(find modules/muer-spring-boot-starter/target -maxdepth 1 -type f \
+            -name 'muer-spring-boot-starter-*-javadoc.jar' -print -quit)"
+          test -n "$javadoc_jar"
+          jar tf "$javadoc_jar" | grep -Fxq 'README.md'
+
   management-verify:
     name: Verify Muer Management API
     runs-on: ubuntu-latest
