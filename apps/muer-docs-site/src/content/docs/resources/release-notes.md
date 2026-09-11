@@ -1,15 +1,19 @@
 ---
 title: 发布说明
-description: 当前版本 0.1.0-SNAPSHOT（Release Candidate）的状态与首发范围。
+description: Muer 0.1.0 正式版本的状态、能力范围与运行前提。
 sidebar:
   order: 3
 ---
 
 ## 当前版本
 
-**0.1.0-SNAPSHOT（Release Candidate）**，尚未发布到 Maven Central，也未作为正式 `0.1.0` 发布。
+**Muer 0.1.0** 是首个正式发布版本。主要 Maven 消费入口为：
 
-0.1.0 首发范围已经确定为：**Starter + Management API + Muer Admin Console + 文档站**。Admin Console 属于首发能力，但仍是可选客户端，Starter 本身不依赖前端。
+```text
+cloud.muer:muer-spring-boot-starter:0.1.0
+```
+
+0.1.0 首发范围为：**Starter + Management API + Muer Admin Console + Permission Registration + Runtime Observability + 文档站**。Admin Console 属于首发能力，但仍是可选客户端，Starter 本身不依赖前端。
 
 ## 包含能力
 
@@ -19,6 +23,7 @@ sidebar:
 - 管理 API：Users、Identity、Permissions、Templates、Profiles、Scopes、Sessions、Audit、Overview；
 - Admin Console：Vue 3 + TypeScript 管理端，覆盖 Dashboard、用户、模板、Profile、Session、Audit、Diagnostics 与个人安全中心；
 - 文档站：QuickStart、手动 MySQL/Redis 配置、Management Console、部署和安全说明；
+- 运行时观测：可选 Spring Boot Actuator / Micrometer 集成；
 - 迁移友好：影子模式、数据投影与回滚说明。
 
 ## Admin Console 边界
@@ -46,7 +51,7 @@ MySQL / Redis 不要求使用 Docker；可以使用本机、局域网、云服�
 
 - `audit/diagnostics/session` 的 `enabled` 属性已暴露，但当前自动配置未按其做条件化 bean；
 - Admin Console 目前使用单元/组件测试、TypeScript 类型检查、OpenAPI 生成与 production build 做自动验证，浏览器级 Playwright E2E 可后续补充；
-- 当前仍为候选发布，正式 `0.1.0` 必须通过最终 CI 与人工发布批准。
+- 0.1.0 不提供 OAuth 2.0、OpenID Connect、SAML、LDAP 或单点登录协议。
 
 ## 继续阅读
 

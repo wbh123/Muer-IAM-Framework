@@ -19,49 +19,29 @@ Muer 以「一个 Starter 依赖 + 宿主提供少量 SPI」的方式嵌入现�
 
 ## 依赖坐标
 
-业务应用通常只需要下面这一个聚合 Starter：
+Muer 0.1.0 的主要消费入口是下面这个聚合 Starter：
 
 ```xml
 <dependency>
     <groupId>cloud.muer</groupId>
     <artifactId>muer-spring-boot-starter</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>0.1.0</version>
 </dependency>
 ```
 
-## 三种使用情景
+正式版本发布到 Maven Central 后，普通业务项目不需要 clone Muer 源码，也不需要额外声明 Muer 专用仓库；按照普通 Maven Central 依赖使用即可。
 
-当前 `0.1.0` 是 Release Candidate（`0.1.0-SNAPSHOT`），**尚未发布到 Maven Central**。按你的环境选择获取方式：
-
-| 情景 | 怎么做 |
-| --- | --- |
-| **0.1.0 RC（本机开发）** | 本地 `mvn install`，见下方「本地安装」 |
-| **企业内部使用** | 把构建产物上传到 Nexus / Artifactory，团队成员从内部仓库拉取 |
-| **未来 Maven Central 发布后** | 直接在上面的 `pom.xml` 里加依赖即可（当前不可用） |
-
-当前重点讲前两种。
-
-### 0.1.0 RC 本地安装
-
-从源码把框架安装到本机 Maven 仓库：
+如果你正在修改 Muer 源码，或希望在正式仓库同步完成前验证当前 checkout，也可以在仓库根目录执行：
 
 ```bash
-git clone https://github.com/wbh123/Muer-IAM-Framework.git
-cd Muer-IAM-Framework
 mvn clean install -DskipTests
 ```
 
-这会安装到：
-
-```text
-~/.m2/repository/cloud/muer/muer-spring-boot-starter/0.1.0-SNAPSHOT/
-```
-
-> 正式 0.1.0 发布 Maven Central 后，这一步会被删除。
+这会把当前版本安装到本机 Maven 仓库，供示例或本地宿主项目优先解析。
 
 ### 企业内部仓库
 
-发布到内部 Nexus / Artifactory 后，开发者无需 clone 源码，只需在 `pom.xml` 声明坐标，并配置镜像仓库为内部地址即可。
+如果组织统一使用 Nexus / Artifactory，也可以把 Muer 构件同步到内部仓库；业务项目仍使用相同的 `cloud.muer:muer-spring-boot-starter:0.1.0` 坐标。
 
 ## 运行前置条件
 

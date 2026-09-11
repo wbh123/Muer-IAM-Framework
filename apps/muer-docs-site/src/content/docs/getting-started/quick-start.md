@@ -51,15 +51,21 @@ git clone https://github.com/wbh123/Muer-IAM-Framework.git
 Set-Location Muer-IAM-Framework
 ```
 
-## 3. 构建 Muer
+## 3. 准备 Muer 0.1.0
 
-0.1.0 Release Candidate 尚未发布到 Maven Central，先安装到本机 Maven 仓库：
+正式消费坐标为：
+
+```text
+cloud.muer:muer-spring-boot-starter:0.1.0
+```
+
+发布同步到 Maven Central 后，普通宿主项目会直接从 Maven Central 解析该版本。运行仓库内的 Quickstart 时，如果你希望确保示例使用当前 checkout 的源码，也可以先执行：
 
 ```bash
 mvn clean install -DskipTests
 ```
 
-成功后，Quickstart 可以解析 `cloud.muer:muer-spring-boot-starter:0.1.0-SNAPSHOT`。
+成功后，Quickstart 会解析本机仓库中的 `cloud.muer:muer-spring-boot-starter:0.1.0`。
 
 ## 4. 准备 MySQL 与 Redis
 
